@@ -1,0 +1,67 @@
+digraph test_3 {
+newrank=true;
+ranksep = 0.25;
+node [shape=box, style=filled, fillcolor=deepskyblue, fontname=arial, fontsize=10];
+edge [fontname=arial, fontsize=9];
+
+// Contexts
+d1 [label=<<b>D1</b>>, shape=oval, style=filled, fillcolor=grey];
+d2 [label=<<b>D2</b>>, shape=oval, style=filled, fillcolor=grey];
+
+// Tests
+t1 [shape=diamond, label=<<b>T1</b>>, fillcolor=darkorange]
+t2 [shape=diamond, label=<<b>T2</b>>, fillcolor=darkorange]
+t3 [shape=diamond, label=<<b>T3</b>>, fillcolor=darkorange]
+
+// Actions
+a0 [label=<<b>A0</b><br/>[cost=10]>];
+a1 [label=<<b>A1</b><br/>[cost=10]>];
+a2 [label=<<b>A2</b><br/>[cost=10]>];
+a3 [label=<<b>A3</b><br/>[cost=10]>];
+a7 [label=<<b>A7</b><br/>[cost=10]>];
+a4 [label=<<b>A4</b><br/>[cost=10]>];
+
+// Alternative
+// d2_alt1 [shape=trapezium, height=0.3, width=0.4, fixedsize=true, fillcolor=grey, label=""];
+// d2_alt2 [shape=trapezium, height=0.3, width=0.4, fixedsize=true, fillcolor=grey, label=""];
+
+// Goals
+g1 [shape=circle, width=0.1, fillcolor=forestgreen, label=<<b>G1</b>>, fontcolor=white, fontsize=8];
+g2 [shape=circle, width=0.1, fillcolor=forestgreen, label=<<b>G2</b>>, fontcolor=white, fontsize=8];
+
+d1 -> t1;
+t1 -> a0 [label=<V1 = [0..3]>];
+t1 -> a1 [label=<V1 = [4..6]>];
+t1 -> a2 [label=<V1 = [7..10]>];
+{a0, a1, a2} -> t2;
+t2 -> g1 [label=<V2 = [0..4]>];
+t2 -> a3 [label=<V2 = [5..10]>];
+a3 -> g1;
+
+// // Arcs
+// subgraph cluster_0 {
+//     a3;
+//     a7;
+//     style=dotted;
+//     label=<<i>Shared</i>>;
+//     fontname=arial;
+//     fontsize=9;
+// }
+
+d2 -> a4 -> t3;
+t3 -> a7 [label=<V3 = [0..4]>];
+t3 -> g2 [label=<V3 = [5..10]>];
+a7 -> g2;
+
+{g1, g2} -> ros [style=invis];
+ros [shape=box, width=5, style=filled, fillcolor=white, color=white, align=center, label=<
+<b>Revision operators:</b><br/>
+1. if <i>A2</i> and <i>A7</i>, then replace <i>A7</i> with <i>newAction</i> [cost=100]<br/>
+2. if <i>A0</i> and <i>A7</i>, then replace <i>A7</i> with <i>newAction0</i> [cost=100]
+>]
+
+{rank=same; a0; a1; a2; a4}
+{rank=same; d1; d2 }
+{rank=same; a3; a7 }
+}
+

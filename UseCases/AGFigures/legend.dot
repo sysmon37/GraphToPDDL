@@ -1,0 +1,38 @@
+digraph legend {
+    newrank=true;
+    ranksep=0.0;
+    nodesep=0.0;
+
+
+    // rankdir=TD;
+    subgraph cluster0 {
+    fontname=arial;
+    fontsize=10;
+    label=<<b>Legend</b>>;
+    // style=dotted;
+    color=white;
+
+    node [shape=plaintext, style=solid, fontname=arial, fontsize=10];
+    shape_context [height=0.3, width=0.6, fixedsize=true, label="", shape=oval, style=filled, fillcolor=grey];
+    key_context [label="Context node\l"];
+    shape_action [height=0.3, width=0.6, fixedsize=true,shape=box, style=filled, fillcolor=deepskyblue, label=""];
+    key_action [label="Action node\l"];
+    shape_decision [shape=diamond, height=0.3, width=0.6, fixedsize=true, style=filled, fillcolor=darkorange, label=""];
+    key_decision [label="Decision node\l"];
+    shape_parallel [shape=hexagon, height=0.3, width=0.6, fixedsize=true, style=filled, fillcolor=gold, label=""];
+    key_parallel [label="Parallel node\l"];
+    shape_alternative [shape=trapezium, height=0.3, width=0.6, fixedsize=true, style=filled, fillcolor=orange, label=""];
+    key_alternative [label="Alternative node\l"];
+    shape_goal [shape=circle, height=0.3, width=0.3, fixedsize=true, style=filled, fillcolor=forestgreen, label=""];
+    key_goal [label="Goal node\l"];
+
+    { rank=same; key_context; shape_context }
+    { rank=same; key_decision; shape_decision }
+    { rank=same; key_action; shape_action }
+    { rank=same; key_parallel; shape_parallel}
+    { rank=same; key_alternative; shape_alternative}
+    { rank=same; key_goal; shape_goal}
+
+    }
+    shape_context -> shape_decision -> shape_action -> shape_parallel -> shape_alternative -> shape_goal [style=invis];
+}
