@@ -16,6 +16,9 @@ POSSIBLE_NODES = {
     "hexagon": ParallelNode,
 }
 
+# TODO
+# node type by label letter
+
 
 class Graph:
     def __init__(self, pydot):
@@ -37,7 +40,7 @@ class Graph:
             new_node = ActionNode
             is_action_node = True
             if "shape" in node.get_attributes():
-                new_node = POSSIBLE_NODES.get(node.get_attributes()["shape"])
+                new_node = POSSIBLE_NODES.get(node.get_attributes()["shape"], None)
                 is_action_node = False
 
             # ignores revision operators (ros) for now
@@ -51,20 +54,19 @@ class Graph:
         edges = self.pydot_graph.get_edge_list()
         nodes_label = [node_label for node_label in self.nodes.keys()]
         for edge in edges:
-            # try:
             from_node = [edge.get_source()]
             to_node = [edge.get_destination()]
 
             if type(from_node[0]) == pydot.frozendict:
                 from_node = []
                 for node in edge.get_source()["nodes"]:
-                    if node in nodes_label:
+                    if node.upper() in nodes_label:
                         from_node.append(node)
 
             if type(to_node[0]) == pydot.frozendict:
                 to_node = []
                 for node in edge.get_source()["nodes"]:
-                    if node in nodes_label:
+                    if node.upper() in nodes_label:
                         to_node.append(node)
 
             for f_node in from_node:
@@ -81,8 +83,6 @@ class Graph:
                                 ),
                             )
                         )
-        # except Exception as e:
-        #     print("Erreur", edge, e)
 
     def parse_edge_label(self, label):
         if not label:
@@ -90,9 +90,10 @@ class Graph:
         label, value = re.findall("<(.*) = \[(.*)\]>", label)[0]
         min, max = value.split("..")
         return {
-            "label": label,
-            "lower_bound": min,
-            "upper_bound": max,
+            label: {
+                "lower_bound": min,
+                "upper_bound": max,
+            }
         }
 
     def parse_node_label(self, label, isActionNode):
@@ -109,30 +110,17 @@ class Graph:
     def link_nodes_and_edges(self):
         i = 0
         for edge in self.edges:
-            print(edge.from_node, edge.to_node)
             self.nodes[edge.from_node].add_out_edge(edge)
             self.nodes[edge.to_node].add_in_edge(edge)
 
-        for n in self.nodes:
-            print(n, self.nodes[n])
+        # for n in self.nodes:
+        #     print(n, self.nodes[n])
+        #     for e in self.nodes[n].out_edges:
+        #         print(e)
+        #     for e in self.nodes[n].in_edges:
+        #         print(e)
 
 
-graphs = graph_from_dot_file("..\\UseCases\AGFigures\\testcase-1.dot", encoding="utf-8")
+graphs = graph_from_dot_file("..\\UseCases\AGFigures\\testcase-5.dot", encoding="utf-8")
 graph = graphs[0]
 q = Graph(graph)
-
-z = ActionNode
-pp = pprint.PrettyPrinter(indent=4)
-
-# # print(type(z))
-# for n in graph.get_edges():
-#     if type(n.get_source()) == pydot.frozendict:
-#         # pp.pprint(n.get_source()["nodes"])
-#         for node in n.get_source()["nodes"]:
-#             if(node in )
-#     # print(n.get_source(), n.get_destination())
-# # print(graph.get_edges())
-
-# a = "<V1 = [0..4]>"
-
-# print(re.findall("<(.*) = \[(.*)\]>", a))
