@@ -1,10 +1,17 @@
 # graphView module
 Use to test the graph data structure
 
+## Sections
+[Requirements](#Requirements)
+[Documentations](#Documentations)
+[Python Environment](#Python-graphView-environment)
+
 ## Requirements
 - Python 3.9.X
 - graphviz
 
+## Documentations
+- [graphviz python api](https://graphviz.readthedocs.io/en/stable/manual.html)
 
 ## Python graphView environment
 ### Creating Python environment
