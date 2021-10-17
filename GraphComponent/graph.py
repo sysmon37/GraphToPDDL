@@ -1,11 +1,11 @@
 import pydot
 from pydot import frozendict, graph_from_dot_file
-from edge import Edge
-from decision_node import DecisionNode
-from parallel_node import ParallelNode
-from context_node import ContextNode
-from action_node import ActionNode
-from goal_node import GoalNode
+from GraphComponent.edge import Edge
+from GraphComponent.decision_node import DecisionNode
+from GraphComponent.parallel_node import ParallelNode
+from GraphComponent.context_node import ContextNode
+from GraphComponent.action_node import ActionNode
+from GraphComponent.goal_node import GoalNode
 import re
 import pprint
 
@@ -113,14 +113,19 @@ class Graph:
             self.nodes[edge.from_node].add_out_edge(edge)
             self.nodes[edge.to_node].add_in_edge(edge)
 
-        # for n in self.nodes:
-        #     print(n, self.nodes[n])
-        #     for e in self.nodes[n].out_edges:
-        #         print(e)
-        #     for e in self.nodes[n].in_edges:
-        #         print(e)
+    # def printDot(self):
+    #     for n in self.nodes:
+    #         print(n, self.nodes[n])
+    #         for e in self.nodes[n].out_edges:
+    #             print(e)
+    #         for e in self.nodes[n].in_edges:
+    #             print(e)
 
+def run(path="UseCases\AGFigures\\testcase-5.dot"):
+    graphs = graph_from_dot_file(path, encoding="utf-8")
+    graph = graphs[0]
+    q = Graph(graph)
+    return q
 
-graphs = graph_from_dot_file("..\\UseCases\AGFigures\\testcase-5.dot", encoding="utf-8")
-graph = graphs[0]
-q = Graph(graph)
+if __name__ == "__main__":
+    run()

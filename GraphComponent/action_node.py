@@ -1,4 +1,4 @@
-from node import Node
+from GraphComponent.node import Node
 
 
 class ActionNode(Node):
