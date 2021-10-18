@@ -1,5 +1,6 @@
 import networkx as nwx
 import matplotlib.pyplot as plt
+from networkx.generators.social import les_miserables_graph
 
 path = "testcase-5.dot"
 path2 = "testcase-afib.dot"
@@ -26,9 +27,9 @@ dotGraph = nwx.drawing.nx_pydot.read_dot(path)
 #print(dotGraph.adj)
 #'data', 'get', 'isdisjoint', 'items', 'keys', 'values']
 print(dotGraph.nodes.get("a1")) #{'label': '<<b>A1</b><br/>[cost=10]>'} use default shape!!!
-print(dotGraph.nodes.get("d1")["shape"])#{'label': '<<b>D1</b>>', 'shape': 'oval', 'style': 'filled', 'fillcolor': 'grey'}
+print(dotGraph.nodes.get("p1"))#{'label': '<<b>D1</b>>', 'shape': 'oval', 'style': 'filled', 'fillcolor': 'grey'}
 print(dotGraph.in_edges("a1")) #[('t1', 'a1')]
-print(dotGraph.get_edge_data('t1', 'a1')) #{0: {'label': '<V1 = [0..4]>'}}
+print(dotGraph.get_edge_data('t1', 'a1'))#[0]["label"]) #{0: {'label': '<V1 = [0..4]>'}}
 
 
 # nwx.draw(dotGraph,with_labels = True)
@@ -48,35 +49,21 @@ dotGraph.remove_node("ros")
 
 for n in dotGraph.nodes:
     # print("node")
-    # print(n)
+    print(n)
 
-    # TODO: Add shape & color attributes to nodes
-    # g.attr('node', shape=graph.nodes[n].shape, color=graph.nodes[n].color)
-
-    # TODO: Action node case , the cost label
-    g.node(n)# Add label to the graph
+    g.node(n, 
+    label=dotGraph.nodes.get(n)["label"], 
+    shape=dotGraph.nodes.get(n).get('shape', dotGraph.graph["node"]["shape"]),
+    style='filled',fillcolor=dotGraph.nodes.get(n).get('fillcolor', dotGraph.graph["node"]["fillcolor"])) # Add label,shape,color to the graph if it exist
 
     # Add Edges to the graph
     for e in dotGraph.in_edges(n):
         # print("out")
-        # print(e.from_node)
-        # print(e.to_node)
-        # print(e.label_values)
-        
-        g.edge(e[0], e[1])
 
-        # No label is provided
-        # if(e.label_values != None):
-        #     key = list(e.label_values.keys())[0]
-        #     lower_bound = list(e.label_values[key]["lower_bound"])[0]
-        #     upper_bound = list(e.label_values[key]["upper_bound"])[0]
-    
-        #     str_label = "{} = [{}..{}]".format(key, lower_bound, upper_bound)
-        #     #print(str_label)
-        #     # TODO: parse label value
-        #     self.g.edge(e.from_node, e.to_node, label=str_label)
-        # else:
-        #     self.g.edge(e.from_node, e.to_node)
+        #print(dotGraph.get_edge_data(e[0], e[1])[0])
+        g.edge(e[0], e[1], 
+        label=dotGraph.get_edge_data(e[0], e[1])[0].get("label","")) # Add label to the edge if it exist
+
 
 
 g.view()

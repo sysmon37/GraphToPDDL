@@ -1,40 +1,40 @@
 digraph test_5 {
-	d1
-	d2
-	t1
-	d1 -> t1
-	t2
-	p2 -> t2
-	t3
-	a4 -> t3
-	a1
-	t1 -> a1
-	a2
-	t1 -> a2
-	a3
-	t2 -> a3
-	a7
-	t3 -> a7
-	a4
-	d2 -> a4
-	b1
-	p1 -> b1
-	b2
-	b1 -> b2
-	c1
-	p1 -> c1
-	c2
-	c1 -> c2
-	p1
-	a1 -> p1
-	a2 -> p1
-	p2
-	b2 -> p2
-	c2 -> p2
-	g1
-	t2 -> g1
-	a3 -> g1
-	g2
-	t3 -> g2
-	a7 -> g2
+	d1 [label=<<b>D1</b>> fillcolor=grey shape=oval style=filled]
+	d2 [label=<<b>D2</b>> fillcolor=grey shape=oval style=filled]
+	t1 [label=<<b>T1</b>> fillcolor=darkorange shape=diamond style=filled]
+	d1 -> t1 [label=""]
+	t2 [label=<<b>T2</b>> fillcolor=darkorange shape=diamond style=filled]
+	p2 -> t2 [label=""]
+	t3 [label=<<b>T3</b>> fillcolor=darkorange shape=diamond style=filled]
+	a4 -> t3 [label=""]
+	a1 [label=<<b>A1</b><br/>[cost=10]> fillcolor=deepskyblue shape=box style=filled]
+	t1 -> a1 [label=<V1 = [0..4]>]
+	a2 [label=<<b>A2</b><br/>[cost=10]> fillcolor=deepskyblue shape=box style=filled]
+	t1 -> a2 [label=<V1 = [5..10]>]
+	a3 [label=<<b>A3</b><br/>[cost=10]> fillcolor=deepskyblue shape=box style=filled]
+	t2 -> a3 [label=<V2 = [5..10]>]
+	a7 [label=<<b>A7</b><br/>[cost=10]> fillcolor=deepskyblue shape=box style=filled]
+	t3 -> a7 [label=<V3 = [0..4]>]
+	a4 [label=<<b>A4</b><br/>[cost=10]> fillcolor=deepskyblue shape=box style=filled]
+	d2 -> a4 [label=""]
+	b1 [label=<<b>B1</b><br/>[cost=10]> fillcolor=deepskyblue shape=box style=filled]
+	p1 -> b1 [label=""]
+	b2 [label=<<b>B2</b><br/>[cost=10]> fillcolor=deepskyblue shape=box style=filled]
+	b1 -> b2 [label=""]
+	c1 [label=<<b>C1</b><br/>[cost=10]> fillcolor=deepskyblue shape=box style=filled]
+	p1 -> c1 [label=""]
+	c2 [label=<<b>C2</b><br/>[cost=10]> fillcolor=deepskyblue shape=box style=filled]
+	c1 -> c2 [label=""]
+	p1 [label=<<b>P1</b>> fillcolor=gold shape=hexagon style=filled]
+	a1 -> p1 [label=""]
+	a2 -> p1 [label=""]
+	p2 [label=<<b>P2</b>> fillcolor=gold shape=hexagon style=filled]
+	b2 -> p2 [label=""]
+	c2 -> p2 [label=""]
+	g1 [label=<<b>G1</b>> fillcolor=forestgreen shape=circle style=filled]
+	t2 -> g1 [label=<V2 = [0..4]>]
+	a3 -> g1 [label=""]
+	g2 [label=<<b>G2</b>> fillcolor=forestgreen shape=circle style=filled]
+	t3 -> g2 [label=<V3 = [5..10]>]
+	a7 -> g2 [label=""]
 }
