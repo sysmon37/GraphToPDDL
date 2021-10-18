@@ -26,10 +26,10 @@ dotGraph = nwx.drawing.nx_pydot.read_dot(path)
 """
 #print(dotGraph.adj)
 #'data', 'get', 'isdisjoint', 'items', 'keys', 'values']
-print(dotGraph.nodes.get("a1")) #{'label': '<<b>A1</b><br/>[cost=10]>'} use default shape!!!
-print(dotGraph.nodes.get("p1"))#{'label': '<<b>D1</b>>', 'shape': 'oval', 'style': 'filled', 'fillcolor': 'grey'}
-print(dotGraph.in_edges("a1")) #[('t1', 'a1')]
-print(dotGraph.get_edge_data('t1', 'a1'))#[0]["label"]) #{0: {'label': '<V1 = [0..4]>'}}
+# print(dotGraph.nodes.get("a1")) #{'label': '<<b>A1</b><br/>[cost=10]>'} use default shape!!!
+# print(dotGraph.nodes.get("p1"))#{'label': '<<b>D1</b>>', 'shape': 'oval', 'style': 'filled', 'fillcolor': 'grey'}
+# print(dotGraph.in_edges("a1")) #[('t1', 'a1')]
+# print(dotGraph.get_edge_data('t1', 'a1'))#[0]["label"]) #{0: {'label': '<V1 = [0..4]>'}}
 
 
 # nwx.draw(dotGraph,with_labels = True)
@@ -43,13 +43,15 @@ g = Digraph(name=name)
 
 # preprocessing
 # print(dotGraph.edges)
-dotGraph.remove_node(",")
-dotGraph.remove_node("ros")
+if dotGraph.has_node(","):
+    dotGraph.remove_node(",")
+if dotGraph.has_node("ros"):
+    dotGraph.remove_node("ros")
 # print(dotGraph.edges)
 
 for n in dotGraph.nodes:
     # print("node")
-    print(n)
+    #print(n)
 
     g.node(n, 
     label=dotGraph.nodes.get(n)["label"], 
@@ -68,4 +70,4 @@ for n in dotGraph.nodes:
 
 g.view()
 
-print("Graph View for", name)
+print("Graph for", name)
