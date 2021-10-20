@@ -1,89 +1,47 @@
-from io import BufferedWriter, TextIOWrapper
+from io import TextIOWrapper
 from graphviz import Digraph
 from graphviz.files import File  # We only need Digraph
 import networkx as nwx
 import matplotlib.pyplot as plt
-from networkx.algorithms.shortest_paths.unweighted import predecessor
-from networkx.classes.reportviews import OutMultiEdgeDataView
-from networkx.generators.social import les_miserables_graph
+import DotGraphCreator as dgc
 
 test_path = "testcase-5.dot"
 test_path2 = "testcase-afib.dot"
-POSSIBLE_NODES = {
-    "circle": "goal",
-    "oval": "context",
-    "diamond": "decision",
-    "hexagon": "parallele",
-    "trapezium": "decision",
-}
+
+# return a list of nodes of the given type
+def get_type_nodes(graph, node_type):
+    return [node for node, attr in graph.nodes.items() if attr["type"] == node_type]
+
+
 # reads in a graph from a Dot file.
 # removing useless nodes
-
-
 def read_graph(path):
     graph = nwx.drawing.nx_pydot.read_dot(path)
-
     # bit of preprocessing clean up
     if graph.has_node(","):
         graph.remove_node(",")
     if graph.has_node("ros"):
         graph.remove_node("ros")
-    # TODO - rename nodes between parallel nodes with prefix
+    # TODO - rename nodes between parallel nodes with prefix?
     for name, node in graph.nodes.items():
-        node_type = POSSIBLE_NODES.get(node.get("shape", ""), "action")
-        node["type"] = node_type
         # used for actionNode predicate
         # might not be needed onde we start working with RO... TBD
-        if node_type == "action":
+        if node["type"] == "action":
             node["is_original"] = True
+    # TODO - add attributes to nodes between parallel nodes
     # handle_parallel(graph)
     return graph
 
 
-# def handle_parallel(graph):
-#     inital_nodes= []
-#     for node in graph.nodes:
-#         if not len(list(graph.in_edges(node))):
-#             inital_nodes.append(node)
-
-# def find_parallel_section(graph):
-#     inital_nodes= []
-#     for node in graph.nodes:
-#         if not len(list(graph.in_edges(node))):
-#             inital_nodes.append(node)
-#     parallel = []
-#     for node in inital_nodes:
-
 # outputs a graph to a pdf
 def outputGraphViz(graph):
-    graph_name = graph.graph["name"]
-    graph_view = Digraph(name=graph_name)
-
-    for node in graph.nodes:
-        label = graph.nodes[node].get("label", "No Label")
-        shape = graph.nodes[node].get("shape", graph.graph["node"]["shape"])
-        fillcolor = graph.nodes[node].get("fillcolor", graph.graph["node"]["fillcolor"])
-        graph_view.node(
-            node,
-            label=label,
-            shape=shape,
-            style="filled",
-            fillcolor=fillcolor,
-        )  # Add label,shape,color to the graph if it exist
-
-        # Add Edges to the graph
-        for edge in graph.in_edges(node):
-            in_edge, out_edge = edge
-            label = graph.get_edge_data(in_edge, out_edge)[0].get("label", "")
-            graph_view.edge(
-                in_edge, out_edge, label=label
-            )  # Add label to the edge if it exist
+    graph_view = dgc.DotGraphCreator.create_dot_graph(graph)
     graph_view.view()
 
 
 def write_objects(graph: nwx.DiGraph, file: TextIOWrapper):
     # might be able to refactor this into a function that returns {diseases, node, revId} once we'll add RO
-    disease = [node for node in graph.nodes if graph.nodes[node]["type"] == "context"]
+    disease = get_type_nodes(graph, "context")
     nodes = [node for node in graph.nodes if graph.nodes[node]["type"] != "context"]
     file.write("(:objects {} - disease\n".format(" ".join(disease)))
     file.write("\t" * 3 + "{} - node\n".format(" ".join(nodes)))
@@ -110,14 +68,14 @@ def find_init_node(graph, start_node):
 
 def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
     file.write("(:init ")
-    # decision branching min/max - LATER
+    # decision branching min/max
+    write_decision_branch(graph, file)
+    file.write("\n")
+
     # patient value - NOT NOW
     # noPreviousDecision- ???
     # predecessorNode
-    init_nodes = [
-        node for node in graph.nodes if graph.nodes[node]["type"] == "context"
-    ]
-
+    init_nodes = get_type_nodes(graph, "context")
     # for edge in graph.edges:
     #     from_edge, to_edge, *_ = edge
     #     if from_edge in init_nodes:
@@ -152,6 +110,7 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
             if pred not in init_nodes:
                 predecessor.append("\t(predecessorNode {} {})\n".format(pred, name))
 
+        # originalAction - added is_original to action nodes
         if attributes.get("is_original", False):
             original_node.append("\t(originalAction {})\n".format(name))
     file.write("".join(predecessor))
@@ -160,13 +119,45 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
     file.write("\n")
     file.write("".join(original_node))
 
-    # originalAction - added is_original to action nodes
     # revisionAction - NOT NOW
     # revision flag - NOT NOW
-    # nodeCost - ask with afib example for different costs
+    # tentativeGoalCount - ???
     # numgoals
+    file.write("\n")
+    file.write("\t(= (numGoals) {})\n".format(len(get_type_nodes(graph, "goal"))))
 
+    # nodeCost - ask with afib example for different costs
+    file.write("\n")
+    write_node_cost(graph, file)
+
+    # total-cost - ??
+    file.write("\n")
+    file.write("\t(= (total-cost) 0)\n")
     file.write(")\n")
+
+
+def write_decision_branch(graph, file):
+    decision_nodes = get_type_nodes(graph, "decision")
+    for node in decision_nodes:
+        for _, out_edge in graph.out_edges(node):
+            lower, upper = graph[node][out_edge][0]["range"].split("..")
+            file.write(
+                "\t(= (decisionBranchMin {} {} {}) {})\n".format(
+                    find_init_node(graph, node), node, out_edge, lower
+                )
+            )
+            file.write(
+                "\t(= (decisionBranchMax {} {} {}) {})\n".format(
+                    find_init_node(graph, node), node, out_edge, upper
+                )
+            )
+
+
+def write_node_cost(graph, file):
+    init_nodes = get_type_nodes(graph, "context")
+    for node, attr in graph.nodes.items():
+        if node not in init_nodes:
+            file.write("\t(= (nodesCost {}) {})\n".format(node, attr.get("cost", 0)))
 
 
 def write_goal(graph, file):
@@ -182,25 +173,39 @@ def write_goal(graph, file):
     file.write(")\n")
 
 
+def write_metric(graph, file):
+    file.write("(:metric minimize (total-cost))\n)\n")
+
+
 def outputPDDL(graph, problem_name, domain_name):
     with open("problem.pddl", "w") as pddl:
+        # define
         pddl.write(("(define (problem {})\n").format(problem_name))
         pddl.write(("\t(:domain  {})\n").format(domain_name))
+
+        # objects
         write_objects(graph, pddl)
+
+        # :init
+        pddl.write("\n")
         write_initial_state(graph, pddl)
+
         # :goal
+        pddl.write("\n")
         write_goal(graph, pddl)
+
         # :metric
+        pddl.write("\n")
+        write_metric(graph, pddl)
         pddl.write(")")
         pddl.close()
 
 
-def run(path="../UseCases/AGFigures/testcase-1.dot"):
+def run(path="../UseCases/AGFigures/testcase-5.dot"):
     graph = read_graph(path)
-
     outputPDDL(graph, "problem-test", "domain_test")
     # outputGraphViz(graph)
 
 
 if __name__ == "__main__":
-    run()
+    run("testcase-5-rev.dot")
