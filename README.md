@@ -10,6 +10,7 @@
 - Python 3.9.X
 - graphviz
 - pydot
+- networkx
 
 ## Documentations
 - [graphviz python api](https://graphviz.readthedocs.io/en/stable/manual.html)
