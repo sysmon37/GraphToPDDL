@@ -36,6 +36,29 @@ dotGraph.nodes.get("a1")
 
 dotGraph.nodes.get("d1")["shape"]
 #{'label': '<<b>D1</b>>', 'shape': 'oval', 'style': 'filled', 'fillcolor': 'grey'}
+
+for node in nx_graph.nodes:
+    print(node+ "=="+str(nx_graph.nodes[node]))
+"""
+d1=={'type': 'context'}
+d2=={'type': 'context'}
+t1=={'type': 'decision', 'dataItem': 'v1'}
+t2=={'type': 'decision', 'dataItem': 'v2'}
+t3=={'type': 'decision', 'dataItem': 'v3'}
+a1=={'cost': '10', 'type': 'action'}
+a2=={'cost': '10', 'type': 'action'}
+a3=={'cost': '10', 'type': 'action'}
+a7=={'cost': '10', 'type': 'action'}
+a4=={'cost': '10', 'type': 'action'}
+b1=={'cost': '10', 'type': 'action'}
+b2=={'cost': '10', 'type': 'action'}
+c1=={'cost': '10', 'type': 'action'}
+c2=={'cost': '10', 'type': 'action'}
+p1=={'type': 'parallel'}
+p2=={'type': 'parallel'}
+g1=={'type': 'goal'}
+g2=={'type': 'goal'}
+"""
 ````
 
 # Get edges for a node
@@ -49,3 +72,4 @@ dotGraph.in_edges("a1")
 dotGraph.get_edge_data('t1', 'a1') 
 #{0: {'label': '<V1 = [0..4]>'}}
 ````
+
