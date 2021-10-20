@@ -1,12 +1,14 @@
 import networkx as nwx
 import matplotlib.pyplot as plt
-from networkx.generators.social import les_miserables_graph
 
 path = "testcase-5.dot"
 path2 = "testcase-afib.dot"
-dotGraph = nwx.drawing.nx_pydot.read_dot(path)
+dotGraph = nwx.drawing.nx_pydot.read_dot(path2)
 
-#print(type(dotGraph))
+print(dir(dotGraph))
+print(dotGraph.graph)
+print(dotGraph.nodes)
+
 #print(dotGraph.graph)
 """
 {'name': 'test_5', 
