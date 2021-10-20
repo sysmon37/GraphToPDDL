@@ -130,3 +130,5 @@ dmypy.json
 
 # graphView Module
 .graphView/
+*.pdf
+*.gv
