@@ -29,7 +29,7 @@ def read_graph(path):
         if node["type"] == "action":
             node["is_original"] = True
     # TODO - add attributes to nodes between parallel nodes
-    # handle_parallel(graph)
+    update_between_parallel_ndoes(graph, "p1", "p2")
     return graph
 
 
@@ -96,7 +96,7 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
         if node_type not in ["context", "goal"]:
             nodes.append("\t({}Node {})\n".format(node_type, name))
         else:
-            if len(graph.in_edges(name)) == 0 and node_type == "context":
+            if node_type == "context":
                 file.write(
                     "\t(initialNode {} {})\n".format(
                         name, list(graph.out_edges(name))[0][1]
@@ -151,6 +151,14 @@ def write_decision_branch(graph, file):
                     find_init_node(graph, node), node, out_edge, upper
                 )
             )
+
+
+def update_between_parallel_ndoes(graph, start_node, end_node):
+    if graph.nodes[start_node]["type"] == "action":
+        graph.nodes[start_node]["is_in_parallel"] = True
+    for _, node in graph.out_edges(start_node):
+        if node != end_node:
+            update_between_parallel_ndoes(graph, node, end_node)
 
 
 def write_node_cost(graph, file):
