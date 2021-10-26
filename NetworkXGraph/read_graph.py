@@ -36,7 +36,7 @@ def read_graph(path):
 # outputs a graph to a pdf
 def outputGraphViz(graph):
     graph_view = dgc.DotGraphCreator.create_dot_graph(graph)
-    graph_view.view()
+    graph_view.render(format="png")
 
 
 def write_objects(graph: nwx.DiGraph, file: TextIOWrapper):
@@ -227,7 +227,7 @@ def outputPDDL(graph, problem_name, domain_name):
 def run(path="../UseCases/AGFigures/testcase-5.dot"):
     graph = read_graph(path)
     outputPDDL(graph, "problem-test", "domain_test")
-    # outputGraphViz(graph)
+    outputGraphViz(graph)
 
 
 if __name__ == "__main__":
