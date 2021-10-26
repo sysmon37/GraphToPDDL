@@ -1,0 +1,238 @@
+(define (problem simpleCPG17-problem)
+    (:domain simpleCPG17-domain)
+
+(:objects d1 d2 - disease
+          A0 A1 A2 A3 A7 A4 A5 T1 T2 T3 G1 G2 newAction newAction0 A6 - node
+          rev1 rev2 - revID
+)
+
+;;A6 was previously named newAction5.
+;;We are "unsharing" A3 and so renaming A3D1 to A3 and A3D2 to A7.
+
+(:init (= (decisionBranchMin d1 T1 A0) 0)
+       (= (decisionBranchMax d1 T1 A0) 3)
+       (= (decisionBranchMin d1 T1 A1) 4)
+       (= (decisionBranchMax d1 T1 A1) 6)
+       (= (decisionBranchMin d1 T1 A2) 7)
+       (= (decisionBranchMax d1 T1 A2) 10)
+       (= (decisionBranchMin d1 T1 A5) 8)
+       (= (decisionBranchMax d1 T1 A5) 11)
+
+       (= (decisionBranchMin d1 T2 G1) 0)
+       (= (decisionBranchMax d1 T2 G1) 4)
+       (= (decisionBranchMin d1 T2 A3) 5)
+       (= (decisionBranchMax d1 T2 A3) 10)
+
+       (= (decisionBranchMin d2 T3 G2) 5)
+       (= (decisionBranchMax d2 T3 G2) 10)
+       (= (decisionBranchMin d2 T3 A7) 0)
+       (= (decisionBranchMax d2 T3 A7) 4)
+       (= (decisionBranchMin d2 T3 newAction) 0)
+       (= (decisionBranchMax d2 T3 newAction) 4)
+       (= (decisionBranchMin d2 T3 newAction0) 0)
+       (= (decisionBranchMax d2 T3 newAction0) 4)
+
+       ;;patient value  as a property of the edge
+       ;;V1 = 9
+       (= (patientValue d1 T1 A0) 9)
+       (= (patientValue d1 T1 A1) 9)
+       (= (patientValue d1 T1 A2) 9)
+       (= (patientValue d1 T1 A5) 9)
+
+       ;;V2 = 3
+       (= (patientValue d1 T2 G1) 3)
+       (= (patientValue d1 T2 A3) 3)
+
+       ;;V3 = 1
+       (= (patientValue d2 T3 G2) 1)
+       (= (patientValue d2 T3 A7) 1)
+       (= (patientValue d2 T3 newAction) 1)
+       (= (patientValue d2 T3 newAction0) 1)
+
+       (noPreviousDecision d1)
+       ;;(noPreviousAction d1)
+       ;;(noPreviousDecision d2)
+       (noPreviousAction d2)
+
+       (initialNode d1 T1)
+       (initialNode d2 A4)
+       (goalNode d1 G1)
+       (goalNode d2 G2)
+
+       (predecessorNode T1 A0)
+       (predecessorNode T1 A1)
+       (predecessorNode T1 A2)
+       (predecessorNode T1 A5)
+       (predecessorNode A0 T2)
+       (predecessorNode A1 T2)
+       (predecessorNode A2 T2)
+       (predecessorNode T2 G1)
+       (predecessorNode T2 A3)
+       (predecessorNode A3 G1)
+
+       (predecessorNode A4 T3)
+       (predecessorNode T3 G2)
+       (predecessorNode T3 A7)
+       (predecessorNode A7 G2)
+       (predecessorNode T3 newAction)
+       (predecessorNode newAction G2)
+       (predecessorNode T3 newAction0)
+       (predecessorNode newAction0 G2)
+
+       (predecessorNode A5 A6)
+       (predecessorNode A6 G1)
+
+       (decisionNode T1)
+       (decisionNode T2)
+       (decisionNode T3)
+
+       (actionNode A0)
+       (actionNode A1)
+       (actionNode A2)
+       (actionNode A3)
+       (actionNode A7)
+       (actionNode A4)
+       (actionNode A5)
+       (actionNode newAction)
+       (actionNode newAction0)
+       (actionNode A6)
+
+       (originalAction A0)
+       (originalAction A1)
+       (originalAction A2)
+       (originalAction A3)
+       (originalAction A7)
+       (originalAction A4)
+       (originalAction A5)
+
+       (originalAction A6)
+
+       (revisionAction newAction)
+       (revisionAction newAction0)
+
+       ;;Revision (A2+A7, newAction): rev1
+
+       (= (revisionFlag A0 rev1) 0)
+       (= (revisionFlag A1 rev1) 0)
+       (= (revisionFlag A2 rev1) 1)
+       (= (revisionFlag A3 rev1) 0)
+       (= (revisionFlag A7 rev1) 1)
+       (= (revisionFlag A4 rev1) 0)
+       (= (revisionFlag A5 rev1) 0)
+       (= (revisionFlag T1 rev1) 0)
+       (= (revisionFlag T2 rev1) 0)
+       (= (revisionFlag T3 rev1) 0)
+       (= (revisionFlag G1 rev1) 0)
+       (= (revisionFlag G2 rev1) 0)
+       (= (revisionFlag newAction rev1) 0)
+       (= (revisionFlag newAction0 rev1) 1)
+       (= (revisionFlag A6 rev1) 0)
+
+       (= (revisionSequenceNumNodes rev1) 2)
+       (= (numNodesToReplace rev1) 1)
+       (= (revisionCount rev1) 0)
+       (= (revisionIDPass d1 rev1) 0)
+       (= (revisionIDPass d2 rev1) 0)
+
+       ;;Revision (A0+A7, newAction0): rev2
+
+       (= (revisionFlag A0 rev2) 1)
+       (= (revisionFlag A1 rev2) 0)
+       (= (revisionFlag A2 rev2) 0)
+       (= (revisionFlag A3 rev2) 0)
+       (= (revisionFlag A7 rev2) 1)
+       (= (revisionFlag A4 rev2) 0)
+       (= (revisionFlag A5 rev2) 0)
+       (= (revisionFlag T1 rev2) 0)
+       (= (revisionFlag T2 rev2) 0)
+       (= (revisionFlag T3 rev2) 0)
+       (= (revisionFlag G1 rev2) 0)
+       (= (revisionFlag G2 rev2) 0)
+       (= (revisionFlag newAction rev2) 1)
+       (= (revisionFlag newAction0 rev2) 0)
+       (= (revisionFlag A6 rev2) 0)
+
+       (= (revisionSequenceNumNodes rev2) 2)
+       (= (numNodesToReplace rev2) 1)
+       (= (revisionCount rev2) 0)
+       (= (revisionIDPass d1 rev2) 0)
+       (= (revisionIDPass d2 rev2) 0)
+
+       (= (allRevisionsPass d1) 0)
+       (= (allRevisionsPass d2) 0)
+       (= (numRevisionIDs d1) 2)
+       (= (numRevisionIDs d2) 2)
+
+       (anyRevisionOps d1)
+       (anyRevisionOps d2)
+
+       (= (tentativeGoalCount) 0)
+       (= (numGoals) 2)
+
+       ;;Different cost/metric functions.
+       (= (total-cost) 0)
+       (= (total-burden) 0)
+       (= (total-nonadherence) 0)
+
+       ;;Cost consideration (price of treatment)
+       (= (nodeCost A0) 10)
+       (= (nodeCost A1) 10)
+       (= (nodeCost A2) 10)
+       (= (nodeCost A3) 10)
+       (= (nodeCost A7) 10)
+       (= (nodeCost A4) 10)
+       (= (nodeCost A5) 75)
+       (= (nodeCost T1) 0)
+       (= (nodeCost T2) 0)
+       (= (nodeCost T3) 0)
+       (= (nodeCost G1) 0)
+       (= (nodeCost G2) 0)
+       (= (nodeCost newAction) 100)
+       (= (nodeCost newAction0) 100)
+       (= (nodeCost A6) 20)
+
+       ;;Burden consideration (want to minimize burden)
+       (= (nodeBurden A0) 0)
+       (= (nodeBurden A1) 0)
+       (= (nodeBurden A2) 0)
+       (= (nodeBurden A3) 0)
+       (= (nodeBurden A7) 0)
+       (= (nodeBurden A4) 0)
+       (= (nodeBurden A5) 0)
+       (= (nodeBurden T1) 0)
+       (= (nodeBurden T2) 0)
+       (= (nodeBurden T3) 0)
+       (= (nodeBurden G1) 0)
+       (= (nodeBurden G2) 0)
+       (= (nodeBurden newAction) 0)
+       (= (nodeBurden newAction0) 0)
+       (= (nodeBurden A6) 0)
+
+       ;;Non-adherence consideration (want to minimize non-adherence)
+       (= (nodeNonAdherence A0) 0)
+       (= (nodeNonAdherence A1) 0)
+       (= (nodeNonAdherence A2) 0)
+       (= (nodeNonAdherence A3) 0)
+       (= (nodeNonAdherence A7) 0)
+       (= (nodeNonAdherence A4) 0)
+       (= (nodeNonAdherence A5) 0)
+       (= (nodeNonAdherence T1) 0)
+       (= (nodeNonAdherence T2) 0)
+       (= (nodeNonAdherence T3) 0)
+       (= (nodeNonAdherence G1) 0)
+       (= (nodeNonAdherence G2) 0)
+       (= (nodeNonAdherence newAction) 0)
+       (= (nodeNonAdherence newAction0) 0)
+       (= (nodeNonAdherence A6) 0)
+)
+
+(:goal (and (treatmentPlanReady d1 G1)
+            (treatmentPlanReady d2 G2)
+       )
+)
+
+(:metric minimize (total-cost))
+
+)
+
+;problem instance consisting of objects, initial and goal requirements.
