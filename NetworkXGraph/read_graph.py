@@ -135,8 +135,20 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
 
     # total-cost - ??
     file.write("\n")
-    file.write("\t(= (total-cost) 0)\n")
+    write_total_metrics(graph, file)
     file.write(")\n")
+
+
+def get_metric_name(metric):
+    metric_name = metric if metric == "cost" else metric.replace("Cost", "")
+    return metric_name
+
+
+def write_total_metrics(graph, file):
+    metrics = get_all_metrics(graph)
+    for metric in metrics:
+        metric_name = get_metric_name(metric)
+        file.write("\t(= (total-{}) 0)\n".format(metric_name.lower()))
 
 
 def write_decision_branch(graph, file):
@@ -164,15 +176,33 @@ def update_between_parallel_ndoes(graph, start_node, end_node):
             update_between_parallel_ndoes(graph, node, end_node)
 
 
+# Finds all the metrics in the graph
+# To be retrieved, a metric must have "Cost" at the end
+def get_all_metrics(graph):
+    action_nodes = get_type_nodes(graph, "action")
+    metrics = []
+    for node in action_nodes:
+        node_metrics = [
+            attr for attr in graph.nodes[node] if attr.lower().find("cost") != -1
+        ]
+        metrics.extend(node_metrics)
+    return list(set(metrics))
+
+
 def write_node_cost(graph, file):
     init_nodes = get_type_nodes(graph, "context")
-    for node, attr in graph.nodes.items():
-        if node not in init_nodes:
-            for prop in attr:
-                if prop.lower().find("cost") != -1:
-                    file.write(
-                        "\t(= ({} {}) {})\n".format(prop, node, attr.get(prop, 0))
+    metrics = get_all_metrics(graph)
+    for metric in metrics:
+        for node, attr in graph.nodes.items():
+            if node not in init_nodes:
+                metric_name = get_metric_name(metric)
+                metric_name = metric_name[0].upper() + metric_name[1:]
+                file.write(
+                    "\t(= (node{} {}) {})\n".format(
+                        metric_name, node, attr.get(metric, 0)
                     )
+                )
+        file.write("\n")
 
 
 def write_not_previous_node(graph, file):
@@ -196,8 +226,14 @@ def write_goal(graph, file):
     file.write(")\n")
 
 
+# TODO - revise this, no weights input for now
 def write_metric(graph, file):
-    file.write("(:metric minimize (total-cost))\n)\n")
+    file.write("(:metric minimize (+\n")
+    metrics = get_all_metrics(graph)
+    for metric in metrics:
+        metric_name = get_metric_name(metric)
+        file.write("\t(total-{})\n".format(metric_name.lower()))
+    file.write("\t)\n)\n ")
 
 
 def outputPDDL(graph, problem_name, domain_name):
@@ -227,8 +263,8 @@ def outputPDDL(graph, problem_name, domain_name):
 def run(path="../UseCases/AGFigures/testcase-5.dot"):
     graph = read_graph(path)
     outputPDDL(graph, "problem-test", "domain_test")
-    outputGraphViz(graph)
+    # outputGraphViz(graph)
 
 
 if __name__ == "__main__":
-    run("../UseCases/AGFigures/testcase-5-rev.dot")
+    run("../UseCases/AGFigures/testcase-afib-rev.dot")
