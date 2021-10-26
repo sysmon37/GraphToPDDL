@@ -332,7 +332,7 @@ def outputPDDL(graph, problem_name, domain_name):
 def run(path="../UseCases/AGFigures/testcase-5.dot"):
     graph = read_graph(path)
     outputPDDL(graph, "problem-test", "domain_test")
-    # outputGraphViz(graph)
+    outputGraphViz(graph)
 
 
 if __name__ == "__main__":
