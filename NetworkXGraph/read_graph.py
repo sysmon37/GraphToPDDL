@@ -242,8 +242,8 @@ def find_parallel_path(graph, p_nodes_found):#find_parallel_path(graph, parallel
             return False
         else:
             numParallelPaths = len(parallel_sequence)
-            print(f"{numParallelPaths} paths found")
-            print(parallel_sequence)
+            # print(f"{numParallelPaths} paths found")
+            # print(parallel_sequence)
 
             parallelNode += "(parallelStartNode {})\n\t".format(start_node)
             parallelNode += "(parallelEndNode {})\n\t".format(end_node)
@@ -258,8 +258,8 @@ def find_parallel_path(graph, p_nodes_found):#find_parallel_path(graph, parallel
             # print(tmp)
             # Testing, we only need one, parallelNode
 
-            print(parallelTypeNode)
-            print(untraversedParallelNode)
+            # print(parallelTypeNode)
+            # print(untraversedParallelNode)
             parallelNode += parallelTypeNode
             parallelNode += untraversedParallelNode
                                
