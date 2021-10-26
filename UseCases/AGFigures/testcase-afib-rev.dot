@@ -1,0 +1,42 @@
+digraph test_afib {
+newrank=true;
+ranksep = 0.25;
+node [shape=box, style=filled, fillcolor=deepskyblue, fontname=arial, fontsize=10];
+edge [fontname=arial, fontsize=9];
+
+// Contexts
+d1 [type=context];
+
+// Tests
+cha2sds2 [type=decision, dataItem=V1]
+
+// Alternatives
+altx12 [type=alternative];
+
+// Actions
+asp [type=action, finCost=100, burden=10, adherCost=100];
+warf [type=action, finCost=55, burden=100, adherCost=10]; // 315
+dabi [type=action, finCost=1200, burden=10, adherCost=100]; // 360
+
+// Goals
+g1 [type=goal];
+
+cha2sds2 -> asp [range=0..0.99];
+cha2sds2 -> altx12 [range=1..10];
+
+d1 -> cha2sds2
+altx12 -> warf;
+altx12 -> dabi;
+warf -> g1
+dabi-> g1
+asp -> g1
+
+// {g1, g2} -> ros [style=invis];
+// ros [shape=box, width=5, style=filled, fillcolor=white, color=white, align=center, label=<
+// <b>Revision operators:</b><br/>
+// 1. if <i>A2</i> and <i>A7</i>, then replace <i>A7</i> with <i>newAction</i> [cost=100]
+// >]
+
+{rank=same; warf; dabi; asp }
+}
+

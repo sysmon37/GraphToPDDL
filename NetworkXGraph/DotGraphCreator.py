@@ -25,6 +25,14 @@ class DotGraphCreator:
             "width": 0.3,
             "fixedsize": True,
         },
+        "alternative": {
+            "shape": "trapezium",
+            "height": 0.3,
+            "width": 0.9,
+            "fixedsize": True,
+            "fillcolor": "orange",
+            "fontcolor": "black",
+        },
     }
 
     @classmethod

@@ -29,7 +29,7 @@ def read_graph(path):
         if node["type"] == "action":
             node["is_original"] = True
     # TODO - add attributes to nodes between parallel nodes
-    update_between_parallel_ndoes(graph, "p1", "p2")
+    # update_between_parallel_ndoes(graph, "p1", "p2")
     return graph
 
 
@@ -216,4 +216,4 @@ def run(path="../UseCases/AGFigures/testcase-5.dot"):
 
 
 if __name__ == "__main__":
-    run("testcase-5-rev.dot")
+    run("../UseCases/AGFigures/testcase-5-rev.dot")
