@@ -14,9 +14,9 @@ cha2sds2 [type=decision, dataItem=V1]
 altx12 [type=alternative];
 
 // Actions
-asp [type=action, finCost=100, burden=10, adherCost=100];
-warf [type=action, finCost=55, burden=100, adherCost=10]; // 315
-dabi [type=action, finCost=1200, burden=10, adherCost=100]; // 360
+asp [type=action, finCost=100, burdenCost=10, adherCost=100];
+warf [type=action, finCost=55, burdenCost=100, adherCost=10]; // 315
+dabi [type=action, finCost=1200, burdenCost=10, adherCost=100]; // 360
 
 // Goals
 g1 [type=goal];

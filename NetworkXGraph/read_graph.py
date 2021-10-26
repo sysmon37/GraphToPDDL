@@ -73,7 +73,10 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
     file.write("\n")
 
     # patient value - NOT NOW
-    # noPreviousDecision- ???
+    # noPrevious nodes
+    # write_not_previous_node(graph, file)
+    # file.write("\n")
+
     # predecessorNode
     init_nodes = get_type_nodes(graph, "context")
     # for edge in graph.edges:
@@ -266,7 +269,19 @@ def write_node_cost(graph, file):
     init_nodes = get_type_nodes(graph, "context")
     for node, attr in graph.nodes.items():
         if node not in init_nodes:
-            file.write("\t(= (nodesCost {}) {})\n".format(node, attr.get("cost", 0)))
+            for prop in attr:
+                if prop.lower().find("cost") != -1:
+                    file.write(
+                        "\t(= ({} {}) {})\n".format(prop, node, attr.get(prop, 0))
+                    )
+
+
+def write_not_previous_node(graph, file):
+    init_nodes = get_type_nodes(graph, "context")
+    for node in init_nodes:
+        to_node = list(graph.out_edges(node))[0][1]
+        to_node_type = graph.nodes[to_node]["type"]
+        file.write("\t(noPrevious{} {})\n".format(to_node_type.capitalize(), node))
 
 
 def write_goal(graph, file):
