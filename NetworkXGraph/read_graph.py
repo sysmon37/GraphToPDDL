@@ -93,10 +93,12 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
     nodes = []
     predecessor = []
     original_node = []
+    parallel_node_found = []
+
     # TODO - work on parrallel Node
     for name, attributes in graph.nodes.items():
         node_type = attributes["type"]
-        if node_type not in ["context", "goal"]:
+        if node_type not in ["context", "goal", "parallel"]:
             nodes.append("\t({}Node {})\n".format(node_type, name))
         else:
             if node_type == "context":
@@ -109,6 +111,10 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
                     "\t(goalNode {} {})\n".format(name, find_goal_node(graph, name))
                 )
 
+            # Parallel node found
+            if node_type == "parallel":
+                    parallel_node_found.append(name)
+
         for pred in graph.predecessors(name):
             if pred not in init_nodes:
                 predecessor.append("\t(predecessorNode {} {})\n".format(pred, name))
@@ -116,6 +122,13 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
         # originalAction - added is_original to action nodes
         if attributes.get("is_original", False):
             original_node.append("\t(originalAction {})\n".format(name))
+    
+    # Parallel nodes processing
+    parallel_node = find_parallel_path(graph, parallel_node_found)
+
+    file.write("\n\t")
+    file.write("".join(parallel_node))
+    file.write("\n")
     file.write("".join(predecessor))
     file.write("\n")
     file.write("".join(nodes))
@@ -167,14 +180,102 @@ def write_decision_branch(graph, file):
                 )
             )
 
+# TODO: Benchmark number of paths
+def update_between_parallel_nodes(graph, start_node, end_node,parallelTypeNode,untraversedParallelNode, numParallelPaths=0):
+    #parallelTypeNode = ""  
+    #untraversedParallelNode = ""
 
-def update_between_parallel_ndoes(graph, start_node, end_node):
-    if graph.nodes[start_node]["type"] == "action":
+    #print("---")
+    #print(start_node)
+    #print(end_node)
+ 
+
+    first_path, *path_list = graph.out_edges(start_node)
+    
+  
+    if len(path_list) == 1:
+        #print("pathlist == 1")
+        _ , node = path_list.pop()
+        #print(node)
+        _ , nodefp = first_path
+        parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(graph, nodefp, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
+        return update_between_parallel_nodes(graph, node, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
+        
+    
+    # TODO: Case where we have more than two edges
+    elif len(path_list) > 1:
+        #print("pathlist > 1")
+        return update_between_parallel_nodes(graph, path_list, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
+
+    if start_node == end_node:
+        #print(parallelTypeNode)
+        return parallelTypeNode, untraversedParallelNode
+
+    if graph.nodes[start_node]["type"] != "parallel":
+        #print(start_node)
         graph.nodes[start_node]["is_in_parallel"] = True
-    for _, node in graph.out_edges(start_node):
-        if node != end_node:
-            update_between_parallel_ndoes(graph, node, end_node)
 
+        # TODO: Changed hard-code letter p?
+        parallelTypeNode += "(parallel{}Node p{})\n\t".format(graph.nodes[start_node]["type"].capitalize(),start_node)
+        untraversedParallelNode += "(untraversedParallelNode p{})\n\t".format(start_node)
+
+    # if numParallelPaths == 0:
+    #     numParallelPaths = len(graph.out_edges(start_node))
+
+
+    _ , node = first_path
+    return update_between_parallel_nodes(graph, node, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
+
+
+    # for _, node in graph.out_edges(start_node):
+        
+    #     #print(graph.out_edges(start_node))
+    #     #print(node)
+    #     parallelTypeNode,untraversedParallelNode = update_between_parallel_nodes(graph, node, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
+    #     return parallelTypeNode, untraversedParallelNode
+
+
+            
+
+def find_parallel_path(graph, p_nodes_found):#find_parallel_path(graph, parallel_node_found[p_nodes],parallel_node_found[p_nodes+1])
+    parallelNode = ""
+    parallelTypeNode = ""  
+    untraversedParallelNode = ""
+    # TODO: numParallelPaths for each diseases
+
+    for p_nodes in range(len(p_nodes_found) - 1):
+        
+        start_node = p_nodes_found[p_nodes]
+        end_node = p_nodes_found[p_nodes+1]
+
+        parallel_sequence = list(nwx.all_simple_paths(graph, source=start_node, target=end_node))
+        if not parallel_sequence:
+            #print("no path avalaible!")
+            return False
+        else:
+            numParallelPaths = len(parallel_sequence)
+            print(f"{numParallelPaths} paths found")
+            print(parallel_sequence)
+
+            parallelNode += "(parallelStartNode {})\n\t".format(start_node)
+            parallelNode += "(parallelEndNode {})\n\t".format(end_node)
+
+
+            # for path in parallel_sequence:
+
+            parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(graph,start_node,end_node,parallelTypeNode,untraversedParallelNode)
+            #print(parallelTypeNode)
+            #print(untraversedParallelNode)
+            # tmp =update_between_parallel_nodes(graph,start_node,end_node,parallelTypeNode,untraversedParallelNode)
+            # print(tmp)
+            # Testing, we only need one, parallelNode
+
+            print(parallelTypeNode)
+            print(untraversedParallelNode)
+            parallelNode += parallelTypeNode
+            parallelNode += untraversedParallelNode
+                               
+    return parallelNode
 
 # Finds all the metrics in the graph
 # To be retrieved, a metric must have "Cost" at the end
@@ -258,6 +359,10 @@ def outputPDDL(graph, problem_name, domain_name):
         write_metric(graph, pddl)
         pddl.write(")")
         pddl.close()
+        
+        # Debugging
+        # for node in graph.nodes:
+        #     print(node+ "=="+str(graph.nodes[node]))
 
 
 def run(path="../UseCases/AGFigures/testcase-5.dot"):
