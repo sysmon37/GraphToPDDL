@@ -182,6 +182,7 @@ def write_decision_branch(graph, file):
 
 # TODO: Benchmark number of paths
 def update_between_parallel_nodes(graph, start_node, end_node,parallelTypeNode,untraversedParallelNode, numParallelPaths=0):
+
     #parallelTypeNode = ""  
     #untraversedParallelNode = ""
 
@@ -244,14 +245,15 @@ def find_parallel_path(graph, p_nodes_found):#find_parallel_path(graph, parallel
     # TODO: numParallelPaths for each diseases
 
     for p_nodes in range(len(p_nodes_found) - 1):
-        
+        #print(p_nodes)
         start_node = p_nodes_found[p_nodes]
         end_node = p_nodes_found[p_nodes+1]
 
         parallel_sequence = list(nwx.all_simple_paths(graph, source=start_node, target=end_node))
+        #print(parallel_sequence)
         if not parallel_sequence:
             #print("no path avalaible!")
-            return False
+            continue
         else:
             numParallelPaths = len(parallel_sequence)
             # print(f"{numParallelPaths} paths found")
@@ -372,4 +374,4 @@ def run(path="../UseCases/AGFigures/testcase-5.dot"):
 
 
 if __name__ == "__main__":
-    run("../UseCases/AGFigures/testcase-afib-rev.dot")
+    run("../UseCases/AGFigures/testcase-6-rev.dot")
