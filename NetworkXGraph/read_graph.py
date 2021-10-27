@@ -193,8 +193,11 @@ def update_between_parallel_nodes(graph, start_node, end_node,parallelTypeNode,u
 
     first_path, *path_list = graph.out_edges(start_node)
     
-  
-    if len(path_list) == 1:
+    # print(graph.out_edges(start_node))
+    # print(path_list)
+    # print(len(path_list))
+
+    if len(path_list) >= 1:
         #print("pathlist == 1")
         _ , node = path_list.pop()
         #print(node)
@@ -204,9 +207,12 @@ def update_between_parallel_nodes(graph, start_node, end_node,parallelTypeNode,u
         
     
     # TODO: Case where we have more than two edges
-    elif len(path_list) > 1:
-        #print("pathlist > 1")
-        return update_between_parallel_nodes(graph, path_list, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
+    # elif len(path_list) > 1:
+    #     print("pathlist > 1")
+    #     _ , node = path_list.pop()
+    #     _ , nodefp = first_path
+    #     parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(graph, nodefp, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
+    #     return update_between_parallel_nodes(graph, node, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
 
     if start_node == end_node:
         #print(parallelTypeNode)
@@ -370,8 +376,8 @@ def outputPDDL(graph, problem_name, domain_name):
 def run(path="../UseCases/AGFigures/testcase-5.dot"):
     graph = read_graph(path)
     outputPDDL(graph, "problem-test", "domain_test")
-    # outputGraphViz(graph)
+    #outputGraphViz(graph)
 
 
 if __name__ == "__main__":
-    run("../UseCases/AGFigures/testcase-6-rev.dot")
+    run("../UseCases/AGFigures/testcase-7-rev.dot")
