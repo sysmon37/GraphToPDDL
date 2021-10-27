@@ -36,7 +36,7 @@ def read_graph(path):
 # outputs a graph to a pdf
 def outputGraphViz(graph):
     graph_view = dgc.DotGraphCreator.create_dot_graph(graph)
-    graph_view.render(format="png")
+    graph_view.render(filename="problem",format="png")
 
 
 def write_objects(graph: nwx.DiGraph, file: TextIOWrapper):
@@ -208,7 +208,7 @@ def update_between_parallel_nodes(graph, start_node, end_node,parallelTypeNode,u
     
     # TODO: Case where we have more than two edges
     # elif len(path_list) > 1:
-    #     print("pathlist > 1")
+    #     #print("pathlist > 1")
     #     _ , node = path_list.pop()
     #     _ , nodefp = first_path
     #     parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(graph, nodefp, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
@@ -246,42 +246,51 @@ def update_between_parallel_nodes(graph, start_node, end_node,parallelTypeNode,u
 
 def find_parallel_path(graph, p_nodes_found):#find_parallel_path(graph, parallel_node_found[p_nodes],parallel_node_found[p_nodes+1])
     parallelNode = ""
-    parallelTypeNode = ""  
-    untraversedParallelNode = ""
+    # parallelTypeNode = ""  
+    # untraversedParallelNode = ""
     # TODO: numParallelPaths for each diseases
 
-    for p_nodes in range(len(p_nodes_found) - 1):
+    for start_node in p_nodes_found:
         #print(p_nodes)
-        start_node = p_nodes_found[p_nodes]
-        end_node = p_nodes_found[p_nodes+1]
+        for end_node in p_nodes_found:
+            # start_node = p_nodes
+            # end_node = p_nodes_found[p_nodes]
+            # print("--")
+            # print(start_node)
+            # print(end_node)
 
-        parallel_sequence = list(nwx.all_simple_paths(graph, source=start_node, target=end_node))
-        #print(parallel_sequence)
-        if not parallel_sequence:
-            #print("no path avalaible!")
-            continue
-        else:
-            numParallelPaths = len(parallel_sequence)
-            # print(f"{numParallelPaths} paths found")
+            parallel_sequence = list(nwx.all_simple_paths(graph, source=start_node, target=end_node))
             # print(parallel_sequence)
+            if not parallel_sequence:
+                #print("no path avalaible!")
+                continue
+            elif len(parallel_sequence) == 1:
+                continue
+            else:
+                numParallelPaths = len(parallel_sequence)
+                # print(f"{numParallelPaths} paths found")
+                # print(parallel_sequence)
+                parallelTypeNode = ""  
+                untraversedParallelNode = ""
 
-            parallelNode += "(parallelStartNode {})\n\t".format(start_node)
-            parallelNode += "(parallelEndNode {})\n\t".format(end_node)
+                parallelNode += "(parallelStartNode {})\n\t".format(start_node)
+                parallelNode += "(parallelEndNode {})\n\t".format(end_node)
 
 
-            # for path in parallel_sequence:
+                # for path in parallel_sequence:
 
-            parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(graph,start_node,end_node,parallelTypeNode,untraversedParallelNode)
-            #print(parallelTypeNode)
-            #print(untraversedParallelNode)
-            # tmp =update_between_parallel_nodes(graph,start_node,end_node,parallelTypeNode,untraversedParallelNode)
-            # print(tmp)
-            # Testing, we only need one, parallelNode
+                parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(graph,start_node,end_node,parallelTypeNode,untraversedParallelNode)
+                #print(parallelTypeNode)
+                #print(untraversedParallelNode)
+                # tmp =update_between_parallel_nodes(graph,start_node,end_node,parallelTypeNode,untraversedParallelNode)
+                # print(tmp)
+                # Testing, we only need one, parallelNode
 
-            # print(parallelTypeNode)
-            # print(untraversedParallelNode)
-            parallelNode += parallelTypeNode
-            parallelNode += untraversedParallelNode
+                # print(parallelTypeNode)
+                # print(untraversedParallelNode)
+                parallelNode += parallelTypeNode
+                parallelNode += untraversedParallelNode
+                #parallelNode += "\n\t"
                                
     return parallelNode
 
@@ -376,8 +385,8 @@ def outputPDDL(graph, problem_name, domain_name):
 def run(path="../UseCases/AGFigures/testcase-5.dot"):
     graph = read_graph(path)
     outputPDDL(graph, "problem-test", "domain_test")
-    #outputGraphViz(graph)
+    outputGraphViz(graph)
 
 
 if __name__ == "__main__":
-    run("../UseCases/AGFigures/testcase-7-rev.dot")
+    run("../UseCases/AGFigures/testcase-6-rev.dot")
