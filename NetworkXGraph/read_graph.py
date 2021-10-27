@@ -182,22 +182,26 @@ def write_decision_branch(graph, file):
 
 # TODO: Benchmark number of paths
 def update_between_parallel_nodes(graph, start_node, end_node,parallelTypeNode,untraversedParallelNode, numParallelPaths=0):
-
+    if start_node == end_node:
+        #print(parallelTypeNode)
+        return parallelTypeNode, untraversedParallelNode
     #parallelTypeNode = ""  
     #untraversedParallelNode = ""
 
-    #print("---")
-    #print(start_node)
-    #print(end_node)
+    # print("---")
+    # print(start_node)
+    # print(end_node)
  
-
-    first_path, *path_list = graph.out_edges(start_node)
+    if type(start_node) == str:
+        first_path, *path_list = graph.out_edges(start_node)
+    else:
+        first_path, *path_list = start_node
     
     # print(graph.out_edges(start_node))
     # print(path_list)
     # print(len(path_list))
 
-    if len(path_list) >= 1:
+    if len(path_list) == 1:
         #print("pathlist == 1")
         _ , node = path_list.pop()
         #print(node)
@@ -205,18 +209,15 @@ def update_between_parallel_nodes(graph, start_node, end_node,parallelTypeNode,u
         parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(graph, nodefp, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
         return update_between_parallel_nodes(graph, node, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
         
-    
-    # TODO: Case where we have more than two edges
-    # elif len(path_list) > 1:
-    #     #print("pathlist > 1")
-    #     _ , node = path_list.pop()
-    #     _ , nodefp = first_path
-    #     parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(graph, nodefp, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
-    #     return update_between_parallel_nodes(graph, node, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
+    elif len(path_list) > 1:
 
-    if start_node == end_node:
-        #print(parallelTypeNode)
-        return parallelTypeNode, untraversedParallelNode
+        #print(path_list)
+        _ , nodefp = first_path
+        #print(first_path)
+        parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(graph, nodefp, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
+
+        return update_between_parallel_nodes(graph, path_list, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
+ 
 
     if graph.nodes[start_node]["type"] != "parallel":
         #print(start_node)
@@ -234,17 +235,10 @@ def update_between_parallel_nodes(graph, start_node, end_node,parallelTypeNode,u
     return update_between_parallel_nodes(graph, node, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
 
 
-    # for _, node in graph.out_edges(start_node):
-        
-    #     #print(graph.out_edges(start_node))
-    #     #print(node)
-    #     parallelTypeNode,untraversedParallelNode = update_between_parallel_nodes(graph, node, end_node, parallelTypeNode, untraversedParallelNode,numParallelPaths+1)
-    #     return parallelTypeNode, untraversedParallelNode
-
 
             
 
-def find_parallel_path(graph, p_nodes_found):#find_parallel_path(graph, parallel_node_found[p_nodes],parallel_node_found[p_nodes+1])
+def find_parallel_path(graph, p_nodes_found):
     parallelNode = ""
     # parallelTypeNode = ""  
     # untraversedParallelNode = ""
@@ -280,6 +274,7 @@ def find_parallel_path(graph, p_nodes_found):#find_parallel_path(graph, parallel
                 # for path in parallel_sequence:
 
                 parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(graph,start_node,end_node,parallelTypeNode,untraversedParallelNode)
+               
                 #print(parallelTypeNode)
                 #print(untraversedParallelNode)
                 # tmp =update_between_parallel_nodes(graph,start_node,end_node,parallelTypeNode,untraversedParallelNode)
@@ -290,7 +285,6 @@ def find_parallel_path(graph, p_nodes_found):#find_parallel_path(graph, parallel
                 # print(untraversedParallelNode)
                 parallelNode += parallelTypeNode
                 parallelNode += untraversedParallelNode
-                #parallelNode += "\n\t"
                                
     return parallelNode
 
