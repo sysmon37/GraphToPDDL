@@ -1,0 +1,34 @@
+[
+    {
+        "id": "ro1",
+        "trigger": ["A2", "A7"],
+
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "A7",
+                "newNodes": [
+                    { "id": "newAction", "cost": 100}
+                ]
+            }
+        ]
+    },
+    
+    {
+        "id": "ro2",
+        "trigger": ["A0", "A7"],
+
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "A7",
+                "newNodes": [
+                    { "id": "newAction0", "cost": 100}
+                ]
+            }
+
+     
+        ]
+    }
+
+]
