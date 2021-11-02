@@ -1,4 +1,4 @@
-digraph test_6 {
+digraph test_2 {
 newrank=true;
 ranksep = 0.25;
 node [fontname=arial, fontsize=10];
@@ -19,17 +19,9 @@ a2 [cost=10, type=action];
 a3 [cost=10, type=action];
 a7 [cost=10, type=action];
 a4 [cost=10, type=action];
-b1 [cost=10, type=action];
-b2 [cost=10, type=action];
-c1 [cost=10, type=action];
-c2 [cost=10, type=action];
-e1 [cost=10, type=action];
-e2 [cost=10, type=action];
+newAction [cost=100, type=action, idRO=ro1, trigger=a2..a7];
+newAction1 [cost=100, type=action, idRO=ro2, trigger=a4..a3];
 
-// Parallel
-p1 [type=parallel];
-p2 [type=parallel];
-p3 [type=parallel];
 
 // Goals
 g1 [type=goal];
@@ -38,24 +30,22 @@ g2 [type=goal];
 d1 -> t1;
 t1 -> a1 [range=0..4];
 t1 -> a2 [range=5..10];
-a1 -> p1;
-a2 -> p1;
-p1 -> p3; 
-p3 -> b1 -> b2 -> p2;
-p3 -> e1 -> e2 -> p2;
-p1 -> c1 -> c2 -> p2;
-p2 -> t2;
+{a1, a2} -> t2;
 t2 -> g1 [range=0..4];
 t2 -> a3 [range=5..10];
+t2 -> newAction1 [range=5..10];
 a3 -> g1;
+newAction1 -> g1;
 
 d2 -> a4 -> t3;
 t3 -> a7 [range=0..4];
+t3 -> newAction [range=0..4];
 t3 -> g2 [range=5..10];
 a7 -> g2;
+newAction -> g2;
 
-{rank=same; d1; d2 }
 {rank=same; a1; a2; a4}
-{rank=same; a3; a7 }
+{rank=same; d1; d2 }
+{rank=same; a3; a7; newAction; newAction1 }
 }
 
