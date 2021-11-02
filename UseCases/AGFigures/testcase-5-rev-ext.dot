@@ -23,7 +23,7 @@ b1 [cost=10, type=action];
 b2 [cost=10, type=action];
 c1 [cost=10, type=action];
 c2 [cost=10, type=action];
-newAction [cost=100, type=action, idRO=ro1, trigger=[a2, a7]];
+newAction [cost=100, type=action, idRO=ro1, trigger=a2..a7];
 
 // Parallel
 p1 [type=parallel];

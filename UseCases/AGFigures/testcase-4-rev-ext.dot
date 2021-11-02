@@ -22,8 +22,8 @@ a7 [cost=10, type=action];
 a4 [cost=10, type=action];
 a5 [cost=75, type=action];
 a6 [cost=20, type=action];
-newAction [cost=100, type=action, idRO=ro1, trigger=[a2, a7]];
-newAction0 [cost=100, type=action, idRO=ro2, trigger=[a0, a7]];
+newAction [cost=100, type=action, idRO=ro1, trigger=a2..a7];
+newAction0 [cost=100, type=action, idRO=ro2, trigger=a0..a7];
 
 // Goals
 g1 [type=goal];
