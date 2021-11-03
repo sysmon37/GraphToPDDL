@@ -48,6 +48,7 @@ def write_objects(graph: nwx.DiGraph, file: TextIOWrapper):
     nodes = [node for node in graph.nodes if graph.nodes[node]["type"] != "context"]
     file.write("(:objects {} - disease\n".format(" ".join(disease)))
     file.write("\t" * 3 + "{} - node\n".format(" ".join(nodes))) # TODO: Add Parallels Nodes
+    # TODO: Add revID
     file.write(")\n")
 
 
@@ -99,6 +100,8 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
     parallel_node_found = []
 
     revisionAction = []
+    revisionFlag = []
+    trigger = set()
 
     # TODO - work on parrallel Node
     for name, attributes in graph.nodes.items():
@@ -135,8 +138,14 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
         if attributes.get("is_original") == False:
             revisionAction.append("\t(revisionAction {})\n".format(name))
             
-        
-
+        # revisionFlags if the trigger exists && revision operators exist
+        if attributes.get("trigger"):            
+            # rev1 exemple is the same
+            trigger= trigger | set(attributes.get("trigger"))
+            # print(trigger)
+            #revisionFlag.append("\t(= (revisionFlag {} {}) 1)\n".format(name,"rev1"))
+            
+    
     # Parallel nodes processing
     parallel_node = find_parallel_path(graph, parallel_node_found)
 
@@ -154,6 +163,11 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
     file.write("".join(revisionAction))
 
     # revision flag - NOT NOW
+    # Write Revision Flag
+    revisionFlag = write_revisionFlag(graph.nodes.items(),trigger)
+    file.write("\n")
+    file.write("".join(revisionFlag))
+
     # tentativeGoalCount - ???
     # numgoals
     file.write("\n")
@@ -197,7 +211,19 @@ def write_decision_branch(graph, file):
                 )
             )
 
-
+def write_revisionFlag(nodes, revList):
+    revisionFlag = []
+    # revisionFlags if the trigger exists && revision operators exist
+    # for revID in revLIST:
+    for name, attributes in nodes:
+        if attributes["type"] in ["context"]:
+            continue
+        if name in revList:
+            print(name)
+            revisionFlag.append("\t(= (revisionFlag {} {}) 1)\n".format(name,"rev1"))
+        else:
+            revisionFlag.append("\t(= (revisionFlag {} {}) 0)\n".format(name,"rev1"))
+    return revisionFlag
 
 # TODO: Benchmark number of paths
 def update_between_parallel_nodes(
