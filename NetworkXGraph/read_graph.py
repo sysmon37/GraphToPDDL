@@ -47,8 +47,8 @@ def write_objects(graph: nwx.DiGraph, file: TextIOWrapper):
     disease = get_type_nodes(graph, "context")
     nodes = [node for node in graph.nodes if graph.nodes[node]["type"] != "context"]
     file.write("(:objects {} - disease\n".format(" ".join(disease)))
-    file.write("\t" * 3 + "{} - node\n".format(" ".join(nodes))) # TODO: Add Parallels Nodes
-    # TODO: Add revID
+    file.write("\t" * 3 + "{} - node\n".format(" ".join(nodes)))
+    file.write("\t" * 3 + "{} - revId\n".format(" ".join(get_all_revIds(graph))))
     file.write(")\n")
 
 
@@ -83,17 +83,7 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
 
     # predecessorNode
     init_nodes = get_type_nodes(graph, "context")
-    # for edge in graph.edges:
-    #     from_edge, to_edge, *_ = edge
-    #     if from_edge in init_nodes:
-    #         file.write("\t(initialNode {} {})\n".format(from_edge, to_edge))
-    #         file.write(
-    #             "\t(goalNode {} {})\n".format(from_edge, find_goal_node(graph, to_edge))
-    #         )
-    #         continue
-    #     file.write("\t(predecessorNode {} {})\n".format(from_edge, to_edge))
-    # file.write("\n")
-    # node types
+
     nodes = []
     predecessor = []
     original_node = []
@@ -163,11 +153,8 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
     file.write("".join(revisionAction))
 
     # revision flag - NOT NOW
-    # Write Revision Flag
-    revisionFlag = write_revisionFlag(graph.nodes.items(),trigger)
     file.write("\n")
-    file.write("".join(revisionFlag))
-
+    write_revision_flags(graph, file)
     # tentativeGoalCount - ???
     # numgoals
     file.write("\n")
@@ -463,7 +450,46 @@ def readRevOps(rev_ops_file):
     
 
 
-def outputPDDL(graph, problem_name, domain_name, rev={}):
+def get_all_revIds(graph):
+    revIds = []
+    for node, attr in graph.nodes.items():
+        idRO = attr.get("idRO", False)
+        if idRO and idRO not in revIds:
+            revIds.append(idRO)
+    return revIds
+
+
+def find_revId_involved_nodes(graph, revId):
+    nodes = []
+    for node, attr in graph.nodes.items():
+        node_revId = attr.get("idRO", False)
+        if node_revId and node_revId == revId:
+            nodes.extend(attr.get("trigger"))
+            parent_node = graph.predecessors(node)
+            # assuming only 1 PARENT/PREDECESSOR
+            for child in graph.successors(*parent_node):
+                child_attr = graph.nodes[child]
+                if not child_attr.get("is_original", True) and child != node:
+                    nodes.append(child)
+    return list(set(nodes))
+
+
+def write_revision_flags(graph, file):
+    revIds = get_all_revIds(graph)
+    for rev in revIds:
+        nodes_to_flag = find_revId_involved_nodes(graph, rev)
+        for node, attr in graph.nodes.items():
+            if attr.get("type") == "context":
+                continue
+            file.write(
+                "\t(= (revisionFlag {} {}) {})\n".format(
+                    node, rev, 1 if node in nodes_to_flag else 0
+                )
+            )
+        file.write("\n")
+
+
+def outputPDDL(graph, problem_name, domain_name):
     with open("problem.pddl", "w") as pddl:
         # define
         pddl.write(("(define (problem {})\n").format(problem_name))

@@ -40,7 +40,12 @@ def replace_action(graph: DiGraph, idRO, trigger, operation):
         # adding it to the graph
         # Currently assuming the added nodes are all actionNode
         graph.add_node(
-            new_node_id, type="action", is_original=False, trigger=trigger, **node_copy
+            new_node_id,
+            type="action",
+            is_original=False,
+            idRO=idRO,
+            trigger=trigger,
+            **node_copy
         )
 
         # copying the edge data if any but only to the first new node
