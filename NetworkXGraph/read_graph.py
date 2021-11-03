@@ -98,6 +98,8 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
     original_node = []
     parallel_node_found = []
 
+    revisionAction = []
+
     # TODO - work on parrallel Node
     for name, attributes in graph.nodes.items():
         node_type = attributes["type"]
@@ -118,14 +120,22 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
             # Parallel node found
             if node_type == "parallel":
                 parallel_node_found.append(name)
+            
+           
 
         for pred in graph.predecessors(name):
             if pred not in init_nodes:
                 predecessor.append("\t(predecessorNode {} {})\n".format(pred, name))
 
         # originalAction - added is_original to action nodes
-        if attributes.get("is_original", False):
+        if attributes.get("is_original") == True:
             original_node.append("\t(originalAction {})\n".format(name))
+
+        # revisionAction 
+        if attributes.get("is_original") == False:
+            revisionAction.append("\t(revisionAction {})\n".format(name))
+            
+        
 
     # Parallel nodes processing
     parallel_node = find_parallel_path(graph, parallel_node_found)
@@ -140,6 +150,9 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
     file.write("".join(original_node))
 
     # revisionAction - NOT NOW
+    file.write("\n")
+    file.write("".join(revisionAction))
+
     # revision flag - NOT NOW
     # tentativeGoalCount - ???
     # numgoals
@@ -183,6 +196,7 @@ def write_decision_branch(graph, file):
                     find_init_node(graph, node), node, out_edge, upper
                 )
             )
+
 
 
 # TODO: Benchmark number of paths
