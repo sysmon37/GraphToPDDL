@@ -4,11 +4,6 @@ from networkx.classes.digraph import DiGraph
 import DotGraphCreator as dgc
 
 
-def outputGraphViz(graph, filename="problem"):
-    graph_view = dgc.DotGraphCreator.create_dot_graph(graph)
-    graph_view.render(filename=filename, format="png")
-
-
 def read_RO(path):
     with open(path) as file:
         ros = json.load(file)
