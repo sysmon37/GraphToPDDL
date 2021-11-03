@@ -4,6 +4,7 @@ from graphviz.files import File  # We only need Digraph
 import networkx as nwx
 import matplotlib.pyplot as plt
 import DotGraphCreator as dgc
+import json
 
 test_path = "testcase-5.dot"
 test_path2 = "testcase-afib.dot"
@@ -17,7 +18,8 @@ def get_type_nodes(graph, node_type):
 # removing useless nodes
 def read_graph(path):
     graph = nwx.drawing.nx_pydot.read_dot(path)
-    # bit of preprocessing clean up
+
+    # bit of preprocessing clean up, this will need to be reviewed
     if graph.has_node(","):
         graph.remove_node(",")
     if graph.has_node("ros"):
@@ -44,7 +46,7 @@ def write_objects(graph: nwx.DiGraph, file: TextIOWrapper):
     disease = get_type_nodes(graph, "context")
     nodes = [node for node in graph.nodes if graph.nodes[node]["type"] != "context"]
     file.write("(:objects {} - disease\n".format(" ".join(disease)))
-    file.write("\t" * 3 + "{} - node\n".format(" ".join(nodes)))
+    file.write("\t" * 3 + "{} - node\n".format(" ".join(nodes))) # TODO: Add Parallels Nodes
     file.write(")\n")
 
 
@@ -98,6 +100,7 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
     # TODO - work on parrallel Node
     for name, attributes in graph.nodes.items():
         node_type = attributes["type"]
+
         if node_type not in ["context", "goal", "parallel"]:
             nodes.append("\t({}Node {})\n".format(node_type, name))
         else:
@@ -347,8 +350,26 @@ def write_metric(graph, file):
         file.write("\t(total-{})\n".format(metric_name.lower()))
     file.write("\t)\n)\n ")
 
+# TODO: Read JSON Revisions Operators
+def readRevOps(rev_ops_file):
+    if rev_ops_file:
+        f = open(rev_ops_file,)
+        rev_data = json.load(f)
+        f.close()
+        return rev_data
 
-def outputPDDL(graph, problem_name, domain_name):
+
+    # for i in rev_data:
+    #     print(i["id"]) #Revision Operators IDs
+    #     print(i["trigger"]) #Revision Operators triggers
+    #     print(i["operations"]) #Revision Operators operations
+
+
+
+    
+
+
+def outputPDDL(graph, problem_name, domain_name, rev={}):
     with open("problem.pddl", "w") as pddl:
         # define
         pddl.write(("(define (problem {})\n").format(problem_name))
@@ -375,12 +396,13 @@ def outputPDDL(graph, problem_name, domain_name):
         # for node in graph.nodes:
         #     print(node+ "=="+str(graph.nodes[node]))
 
-
-def run(path="../UseCases/AGFigures/testcase-5.dot"):
+#
+def run(path="../UseCases/AGFigures/testcase-5.dot",rev=""):
     graph = read_graph(path)
-    outputPDDL(graph, "problem-test", "domain_test")
-    outputGraphViz(graph)
+    readRevOps(rev)
+    outputPDDL(graph, "problem-test", "domain_test", rev)
+    # outputGraphViz(graph)
 
 
 if __name__ == "__main__":
-    run("../UseCases/AGFigures/testcase-6-rev.dot")
+    run("../UseCases/AGFigures/testcase-1-rev-ext.dot","../UseCases/Revision_Operators/testcase-1-ro.json")
