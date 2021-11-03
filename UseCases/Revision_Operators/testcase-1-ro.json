@@ -1,34 +1,40 @@
 [
     {
         "id": "ro1",
-        "trigger": ["A2", "A7"],
-
+        "trigger": [
+            "a2",
+            "a7"
+        ],
         "operations": [
             {
                 "type": "replace",
-                "existingNode": "A7",
+                "existingNode": "a7",
                 "newNodes": [
-                    { "id": "newAction", "cost": 100}
+                    {
+                        "id": "newAction",
+                        "cost": 100
+                    }
                 ]
             }
         ]
     },
-    
     {
         "id": "ro2",
-        "trigger": ["A2", "A7"],
-
+        "trigger": [
+            "a2",
+            "a7"
+        ],
         "operations": [
             {
                 "type": "replace",
-                "existingNode": "A7",
+                "existingNode": "a7",
                 "newNodes": [
-                    { "id": "newAction2", "cost": 50}
+                    {
+                        "id": "newAction2",
+                        "cost": 50
+                    }
                 ]
             }
-
-     
         ]
     }
-
 ]
