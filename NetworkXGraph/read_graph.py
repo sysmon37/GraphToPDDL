@@ -187,6 +187,16 @@ def write_decision_branch(graph, file):
                 )
             )
 
+def get_all_parallel_nodes(graph):
+    parallel_nodes = []
+    for node, attributes in graph.nodes.items():
+        print(node)
+        print(attributes)
+
+        if attributes.get("is_in_parallel") == True:
+            parallel_nodes.append(f"p{node}")
+
+    return parallel_nodes
 
 # TODO: Benchmark number of paths
 def update_between_parallel_nodes(
