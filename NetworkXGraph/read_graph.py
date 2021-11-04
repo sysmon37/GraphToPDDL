@@ -69,7 +69,7 @@ def find_init_node(graph, start_node):
     return start_node
 
 
-def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
+def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper, ros):
     file.write("(:init ")
     # decision branching min/max
     write_decision_branch(graph, file)
@@ -141,7 +141,9 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
 
     # revision flag - NOT NOW
     file.write("\n")
-    write_revision_flags(graph, file)
+    write_revision_flags(graph, file, ros)
+    file.write("\n")
+    write_all_revisions_pass(graph, file)
     # tentativeGoalCount - ???
     # numgoals
     file.write("\n")
@@ -403,22 +405,41 @@ def find_revId_involved_nodes(graph, revId):
     return list(set(nodes))
 
 
-def write_revision_flags(graph, file):
-    revIds = get_all_revIds(graph)
-    for rev in revIds:
-        nodes_to_flag = find_revId_involved_nodes(graph, rev)
+def write_all_revisions_pass(graph, file):
+    disease = get_type_nodes(graph, "context")
+    for d in disease:
+        file.write("\t(= (allRevisionsPass {}) 0)\n".format(d))
+
+
+def write_revision_flags(graph, file, ros):
+    disease = get_type_nodes(graph, "context")
+    for ro in ros:
+        revId = ro["id"]
+        nodes_to_flag = find_revId_involved_nodes(graph, revId)
         for node, attr in graph.nodes.items():
             if attr.get("type") == "context":
                 continue
             file.write(
                 "\t(= (revisionFlag {} {}) {})\n".format(
-                    node, rev, 1 if node in nodes_to_flag else 0
+                    node, revId, 1 if node in nodes_to_flag else 0
                 )
             )
         file.write("\n")
+        file.write(
+            "\t(= (revisionSequenceNumNodes {}) {})\n".format(revId, len(ro["trigger"]))
+        )
+        file.write(
+            "\t(= (numNodesToReplace {}) {})\n".format(
+                revId, len(ro.get("operations", 0))  # not sure...
+            )
+        )
+        file.write("\t(= (revisionCount {}) 0)\n".format(revId))
+        for d in disease:
+            file.write("\t(= (revisionIDPass {} {}) 0)\n".format(d, revId))
+        file.write("\n")
 
 
-def outputPDDL(graph, problem_name, domain_name):
+def outputPDDL(graph, ros, problem_name, domain_name):
     with open("problem.pddl", "w") as pddl:
         # define
         pddl.write(("(define (problem {})\n").format(problem_name))
@@ -429,7 +450,7 @@ def outputPDDL(graph, problem_name, domain_name):
 
         # :init
         pddl.write("\n")
-        write_initial_state(graph, pddl)
+        write_initial_state(graph, pddl, ros)
 
         # :goal
         pddl.write("\n")
@@ -453,12 +474,12 @@ def run(
     graph = read_graph(path)
     ros = read_RO(ros_path)
     update_graph_with_ROs(graph, ros)
-    outputPDDL(graph, "problem-test", "domain_test")
+    outputPDDL(graph, ros, "problem-test", "domain_test")
     outputGraphViz(graph)
 
 
 if __name__ == "__main__":
     run(
-        "../UseCases/AGFigures/testcase-1-rev.dot",
-        "../UseCases/Revision_Operators/testcase-1-ro.json",
+        "../UseCases/AGFigures/testcase-4-rev.dot",
+        "../UseCases/Revision_Operators/testcase-4-ro.json",
     )
