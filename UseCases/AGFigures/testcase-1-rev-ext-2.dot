@@ -12,7 +12,7 @@ d2 [type=context];
 t1 [type=decision, dataItem=v1]
 t2 [type=decision, dataItem=v2]
 t3 [type=decision, dataItem=v3]
-t4 [type=decision, dataItem=v3]
+t4 [type=decision, dataItem=v4]
 
 // Actions
 a1 [cost=10, type=action];

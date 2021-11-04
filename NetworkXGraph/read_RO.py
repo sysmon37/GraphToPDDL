@@ -27,39 +27,42 @@ def update_graph_with_ROs(graph, ros):
 
 # Creating sibling nodes
 def replace_action(graph: DiGraph, idRO, trigger, operation):
-    # assuming there is always only 1 parent
     existing_node = operation["existingNode"]
-    parent_node = list(graph.predecessors(existing_node))[0]
-    is_first_new_node = True
-    for node in operation["newNodes"]:
-        # taking node id and the rest of its attributes
-        node_copy = {**node}
-        new_node_id = node_copy["id"]
-        del node_copy["id"]
+    parent_nodes = list(graph.predecessors(existing_node))
 
-        # adding it to the graph
-        # Currently assuming the added nodes are all actionNode
-        graph.add_node(
-            new_node_id,
-            type="action",
-            is_original=False,
-            idRO=idRO,
-            trigger=trigger,
-            **node_copy
-        )
+    # Loop over all the parents of the existing node
+    for parent_node in parent_nodes:
+        is_first_new_node = True
+ 
+        for node in operation["newNodes"]:
+            # taking node id and the rest of its attributes
+            node_copy = {**node}
+            new_node_id = node_copy["id"]
+            del node_copy["id"]
 
-        # copying the edge data if any but only to the first new node
-        edge_range = graph.get_edge_data(parent_node, existing_node)
-        edge_range = edge_range[0] if edge_range else {}
-        graph.add_edge(
-            parent_node, new_node_id, **edge_range if is_first_new_node else {}
-        )
+            # adding it to the graph
+            # Currently assuming the added nodes are all actionNode
+            graph.add_node(
+                new_node_id,
+                type="action",
+                is_original=False,
+                idRO=idRO,
+                trigger=trigger,
+                **node_copy
+            )
 
-        # wont copy edge attributes further
-        is_first_new_node = False
+            # copying the edge data if any but only to the first new node
+            edge_range = graph.get_edge_data(parent_node, existing_node)
+            edge_range = edge_range[0] if edge_range else {}
+            graph.add_edge(
+                parent_node, new_node_id, **edge_range if is_first_new_node else {}
+            )
 
-        # updating the parent node so the next new node has the correct edge
-        parent_node = new_node_id
+            # wont copy edge attributes further
+            is_first_new_node = False
+
+            # updating the parent node so the next new node has the correct edge
+            parent_node = new_node_id
 
     # need one last edge from the last added node to the same node 'Existing_node' is pointing too
     graph.add_edge(parent_node, list(graph.successors(existing_node))[0])

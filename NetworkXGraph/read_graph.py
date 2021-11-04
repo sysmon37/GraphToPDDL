@@ -198,7 +198,6 @@ def get_all_parallel_nodes(graph):
 
     return parallel_nodes
 
-# TODO: Benchmark number of paths
 def update_between_parallel_nodes(
     graph,
     start_node,
@@ -406,12 +405,13 @@ def find_revId_involved_nodes(graph, revId):
         node_revId = attr.get("idRO", False)
         if node_revId and node_revId == revId:
             nodes.extend(attr.get("trigger"))
-            parent_node = graph.predecessors(node)
-            # assuming only 1 PARENT/PREDECESSOR
-            for child in graph.successors(*parent_node):
-                child_attr = graph.nodes[child]
-                if not child_attr.get("is_original", True) and child != node:
-                    nodes.append(child)
+            parent_nodes = list(graph.predecessors(node))
+            # Loop over all the parents of the existing node
+            for parent_node in parent_nodes:
+                for child in graph.successors(parent_node):
+                    child_attr = graph.nodes[child]
+                    if not child_attr.get("is_original", True) and child != node:
+                        nodes.append(child)
     return list(set(nodes))
 
 
@@ -490,6 +490,6 @@ def run(
 
 if __name__ == "__main__":
     run(
-        "../UseCases/AGFigures/testcase-4-rev.dot",
-        "../UseCases/Revision_Operators/testcase-4-ro.json",
+        "../UseCases/AGFigures/testcase-1-rev-ext-2.dot",
+        "../UseCases/Revision_Operators/testcase-1-ro.json",
     )
