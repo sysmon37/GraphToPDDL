@@ -7,9 +7,6 @@ import DotGraphCreator as dgc
 import json
 from read_RO import read_RO, update_graph_with_ROs
 
-test_path = "testcase-5.dot"
-test_path2 = "testcase-afib.dot"
-
 # return a list of nodes of the given type
 def get_type_nodes(graph, node_type):
     return [node for node, attr in graph.nodes.items() if attr["type"] == node_type]
@@ -47,7 +44,9 @@ def write_objects(graph: nwx.DiGraph, file: TextIOWrapper):
     disease = get_type_nodes(graph, "context")
     nodes = [node for node in graph.nodes if graph.nodes[node]["type"] != "context"]
     file.write("(:objects {} - disease\n".format(" ".join(disease)))
-    file.write("\t" * 3 + "{} - node\n".format(" ".join(nodes)))
+    file.write(
+        "\t" * 3 + "{} - node\n".format(" ".join(nodes))
+    )  # TODO: add parallel nodes
     file.write("\t" * 3 + "{} - revId\n".format(" ".join(get_all_revIds(graph))))
     file.write(")\n")
 
@@ -111,8 +110,6 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
             # Parallel node found
             if node_type == "parallel":
                 parallel_node_found.append(name)
-            
-           
 
         for pred in graph.predecessors(name):
             if pred not in init_nodes:
@@ -122,11 +119,9 @@ def write_initial_state(graph: nwx.DiGraph, file: TextIOWrapper):
         if attributes.get("is_original") == True:
             original_node.append("\t(originalAction {})\n".format(name))
 
-        # revisionAction 
+        # revisionAction
         if attributes.get("is_original") == False:
             revisionAction.append("\t(revisionAction {})\n".format(name))
-            
-        
 
     # Parallel nodes processing
     parallel_node = find_parallel_path(graph, parallel_node_found)
@@ -191,7 +186,6 @@ def write_decision_branch(graph, file):
             )
 
 
-
 # TODO: Benchmark number of paths
 def update_between_parallel_nodes(
     graph,
@@ -202,23 +196,12 @@ def update_between_parallel_nodes(
     numParallelPaths=0,
 ):
     if start_node == end_node:
-        # print(parallelTypeNode)
         return parallelTypeNode, untraversedParallelNode
-    # parallelTypeNode = ""
-    # untraversedParallelNode = ""
-
-    # print("---")
-    # print(start_node)
-    # print(end_node)
 
     if type(start_node) == str:
         first_path, *path_list = graph.out_edges(start_node)
     else:
         first_path, *path_list = start_node
-
-    # print(graph.out_edges(start_node))
-    # print(path_list)
-    # print(len(path_list))
 
     if len(path_list) == 1:
         # print("pathlist == 1")
@@ -293,18 +276,10 @@ def update_between_parallel_nodes(
 
 def find_parallel_path(graph, p_nodes_found):
     parallelNode = ""
-    # parallelTypeNode = ""
-    # untraversedParallelNode = ""
     # TODO: numParallelPaths for each diseases
 
     for start_node in p_nodes_found:
-        # print(p_nodes)
         for end_node in p_nodes_found:
-            # start_node = p_nodes
-            # end_node = p_nodes_found[p_nodes]
-            # print("--")
-            # print(start_node)
-            # print(end_node)
 
             parallel_sequence = list(
                 nwx.all_simple_paths(graph, source=start_node, target=end_node)
@@ -338,14 +313,6 @@ def find_parallel_path(graph, p_nodes_found):
                     untraversedParallelNode,
                 )
 
-                # print(parallelTypeNode)
-                # print(untraversedParallelNode)
-                # tmp =update_between_parallel_nodes(graph,start_node,end_node,parallelTypeNode,untraversedParallelNode)
-                # print(tmp)
-                # Testing, we only need one, parallelNode
-
-                # print(parallelTypeNode)
-                # print(untraversedParallelNode)
                 parallelNode += parallelTypeNode
                 parallelNode += untraversedParallelNode
 
@@ -411,28 +378,7 @@ def write_metric(graph, file):
         file.write("\t(total-{})\n".format(metric_name.lower()))
     file.write("\t)\n)\n ")
 
-# TODO: Read JSON Revisions Operators
-def readRevOps(rev_ops_file):
-    if rev_ops_file:
-        f = open(rev_ops_file,)
-        rev_data = json.load(f)
-        f.close()
-        return rev_data
 
-
-    # for i in rev_data:
-    #     print(i["id"]) #Revision Operators IDs
-    #     print(i["trigger"]) #Revision Operators triggers
-    #     print(i["operations"]) #Revision Operators operations
-
-
-
-    
-
-
-<<<<<<< HEAD
-def outputPDDL(graph, problem_name, domain_name, rev={}):
-=======
 def get_all_revIds(graph):
     revIds = []
     for node, attr in graph.nodes.items():
@@ -473,7 +419,6 @@ def write_revision_flags(graph, file):
 
 
 def outputPDDL(graph, problem_name, domain_name):
->>>>>>> readROFile
     with open("problem.pddl", "w") as pddl:
         # define
         pddl.write(("(define (problem {})\n").format(problem_name))
