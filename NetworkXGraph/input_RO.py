@@ -1,6 +1,5 @@
 import json
 from operator import itemgetter
-from networkx.classes.digraph import DiGraph
 import DotGraphCreator as dgc
 from input_output_graph import outputGraphViz
 
@@ -19,16 +18,15 @@ def update_graph_with_ROs(graph, ros):
         for op in operations:
             type = op["type"]
             if type == "replace":
-                replace_action(graph, id, trigger, op)
+                replace_operation(graph, id, trigger, op)
             elif type == "delete":
-                # not sure what to do here
-                print("deleting")
+                delete_operation(graph, op)
             else:
                 print("Adding")
 
 
 # Creating sibling nodes
-def replace_action(graph: DiGraph, idRO, trigger, operation):
+def replace_operation(graph, idRO, trigger, operation):
     existing_node = operation["existingNode"]
     parent_nodes = list(graph.predecessors(existing_node))
     current_existing_nodes_successors = list(graph.successors(existing_node))[0]
@@ -68,3 +66,22 @@ def replace_action(graph: DiGraph, idRO, trigger, operation):
     if not graph.has_edge(parent_node, current_existing_nodes_successors):
         # need one last edge from the last added node to the same node 'Existing_node' is pointing too
         graph.add_edge(parent_node, current_existing_nodes_successors)
+
+
+# Assuming the goal nodes will never be deleted`
+# Assuming the nodes being delete are not part of any following RO
+def delete_operation(graph, operation):
+    node_to_delete = operation["existingNode"]
+    print(node_to_delete)
+    predecessors = graph.predecessors(node_to_delete)
+    successors = graph.successors(node_to_delete)
+
+    for pred in predecessors:
+        print(pred)
+        for succ in successors:
+            print(succ)
+            pred_edge_data = graph.get_edge_data(pred, node_to_delete)[0]
+            succ_edge_data = graph.get_edge_data(node_to_delete, succ)[0]
+            if not graph.has_edge(pred, succ):
+                graph.add_edge(pred, succ, **pred_edge_data, **succ_edge_data)
+            graph.remove_node(node_to_delete)

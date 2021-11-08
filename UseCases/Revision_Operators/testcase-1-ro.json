@@ -13,8 +13,16 @@
                     {
                         "id": "newAction",
                         "cost": 100
+                    },
+                    {
+                        "id": "hidden",
+                        "cost": 100
                     }
                 ]
+            },
+            {
+                "type": "delete",
+                "existingNode": "hidden"
             }
         ]
     },
