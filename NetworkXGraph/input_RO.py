@@ -2,6 +2,7 @@ import json
 from operator import itemgetter
 from networkx.classes.digraph import DiGraph
 import DotGraphCreator as dgc
+from input_output_graph import outputGraphViz
 
 
 def read_RO(path):
@@ -30,11 +31,10 @@ def update_graph_with_ROs(graph, ros):
 def replace_action(graph: DiGraph, idRO, trigger, operation):
     existing_node = operation["existingNode"]
     parent_nodes = list(graph.predecessors(existing_node))
-
+    current_existing_nodes_successors = list(graph.successors(existing_node))[0]
     # Loop over all the parents of the existing node
     for parent_node in parent_nodes:
         is_first_new_node = True
-
         for node in operation["newNodes"]:
             # taking node id and the rest of its attributes
             node_copy = {**node}
@@ -55,15 +55,16 @@ def replace_action(graph: DiGraph, idRO, trigger, operation):
             # copying the edge data if any but only to the first new node
             edge_range = graph.get_edge_data(parent_node, existing_node)
             edge_range = edge_range[0] if edge_range else {}
-            graph.add_edge(
-                parent_node, new_node_id, **edge_range if is_first_new_node else {}
-            )
+            if not graph.has_edge(parent_node, new_node_id):
+                graph.add_edge(
+                    parent_node, new_node_id, **edge_range if is_first_new_node else {}
+                )
 
             # wont copy edge attributes further
             is_first_new_node = False
 
             # updating the parent node so the next new node has the correct edge
             parent_node = new_node_id
-
-    # need one last edge from the last added node to the same node 'Existing_node' is pointing too
-    graph.add_edge(parent_node, list(graph.successors(existing_node))[0])
+    if not graph.has_edge(parent_node, current_existing_nodes_successors):
+        # need one last edge from the last added node to the same node 'Existing_node' is pointing too
+        graph.add_edge(parent_node, current_existing_nodes_successors)
