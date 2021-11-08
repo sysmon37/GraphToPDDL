@@ -25,6 +25,7 @@ def update_graph_with_ROs(graph, ros):
             else:
                 print("Adding")
 
+
 # Creating sibling nodes
 def replace_action(graph: DiGraph, idRO, trigger, operation):
     existing_node = operation["existingNode"]
@@ -33,7 +34,7 @@ def replace_action(graph: DiGraph, idRO, trigger, operation):
     # Loop over all the parents of the existing node
     for parent_node in parent_nodes:
         is_first_new_node = True
- 
+
         for node in operation["newNodes"]:
             # taking node id and the rest of its attributes
             node_copy = {**node}
