@@ -16,6 +16,6 @@ def run(
 
 if __name__ == "__main__":
     run(
-        "../UseCases/AGFigures/testcase-3-rev-ext.dot",
-        "../UseCases/Revision_Operators/testcase-3-ro.json",
+        "../UseCases/AGFigures/testcase-1-rev.dot",
+        "../UseCases/Revision_Operators/testcase-1-ro.json",
     )

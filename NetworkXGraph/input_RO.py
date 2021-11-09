@@ -72,14 +72,11 @@ def replace_operation(graph, idRO, trigger, operation):
 # Assuming the nodes being delete are not part of any following RO
 def delete_operation(graph, operation):
     node_to_delete = operation["existingNode"]
-    print(node_to_delete)
     predecessors = graph.predecessors(node_to_delete)
     successors = graph.successors(node_to_delete)
 
     for pred in predecessors:
-        print(pred)
         for succ in successors:
-            print(succ)
             pred_edge_data = graph.get_edge_data(pred, node_to_delete)[0]
             succ_edge_data = graph.get_edge_data(node_to_delete, succ)[0]
             if not graph.has_edge(pred, succ):

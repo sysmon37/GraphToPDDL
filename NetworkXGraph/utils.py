@@ -32,8 +32,6 @@ def get_metric_name(metric):
 def get_all_parallel_nodes(graph):
     parallel_nodes = []
     for node, attributes in graph.nodes.items():
-        print(node)
-        print(attributes)
 
         if attributes.get("is_in_parallel") == True:
             parallel_nodes.append(f"p{node}")
@@ -188,8 +186,15 @@ def find_revId_involved_nodes(graph, revId):
             parent_nodes = list(graph.predecessors(node))
             # Loop over all the parents of the existing node
             for parent_node in parent_nodes:
-                for child in graph.successors(parent_node):
+                children = list(graph.successors(parent_node))
+                while len(children) > 0:
+                    child = children.pop()
                     child_attr = graph.nodes[child]
-                    if not child_attr.get("is_original", True) and child != node:
+
+                    # need to check the revision flags when the added nodes are not just action nodes
+                    if child_attr.get("idRO", None) != revId and not child_attr.get(
+                        "is_original", True
+                    ):
                         nodes.append(child)
+                        children.extend(list(graph.successors(child)))
     return list(set(nodes))

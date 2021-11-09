@@ -17,6 +17,10 @@
                     {
                         "id": "hidden",
                         "cost": 100
+                    },
+                    {
+                        "id": "Hello",
+                        "cost": 100
                     }
                 ]
             },
