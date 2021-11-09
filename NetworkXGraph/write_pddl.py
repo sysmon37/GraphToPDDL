@@ -29,10 +29,40 @@ def write_initial_state(graph, file, ros):
     file.write("\n")
 
     # patient value - NOT NOW
+
     # noPrevious nodes
     # write_not_previous_node(graph, file)
     # file.write("\n")
 
+    # initialNode
+    # goalNode
+    # predecessorNode
+    # node type
+    # originalAction
+    # revisionAction
+    write_predecessors_and_node_type(graph, file)
+
+    # revision flag
+    file.write("\n")
+    write_revision_flags(graph, file, ros)
+    file.write("\n")
+    write_all_revisions_pass(graph, file)
+    # tentativeGoalCount - ???
+    # numgoals
+    file.write("\n")
+    file.write("\t(= (numGoals) {})\n".format(len(get_type_nodes(graph, "goal"))))
+
+    # nodeCost - ask with afib example for different costs
+    file.write("\n")
+    write_node_cost(graph, file)
+
+    # total-cost - ??
+    file.write("\n")
+    write_total_metrics(graph, file)
+    file.write(")\n")
+
+
+def write_predecessors_and_node_type(graph, file):
     # predecessorNode
     init_nodes = get_type_nodes(graph, "context")
 
@@ -40,10 +70,8 @@ def write_initial_state(graph, file, ros):
     predecessor = []
     original_node = []
     parallel_node_found = []
-
     revisionAction = []
 
-    # TODO - work on parrallel Node
     for name, attributes in graph.nodes.items():
         node_type = attributes["type"]
 
@@ -88,28 +116,9 @@ def write_initial_state(graph, file, ros):
     file.write("\n")
     file.write("".join(original_node))
 
-    # revisionAction - NOT NOW
+    # revisionAction
     file.write("\n")
     file.write("".join(revisionAction))
-
-    # revision flag - NOT NOW
-    file.write("\n")
-    write_revision_flags(graph, file, ros)
-    file.write("\n")
-    write_all_revisions_pass(graph, file)
-    # tentativeGoalCount - ???
-    # numgoals
-    file.write("\n")
-    file.write("\t(= (numGoals) {})\n".format(len(get_type_nodes(graph, "goal"))))
-
-    # nodeCost - ask with afib example for different costs
-    file.write("\n")
-    write_node_cost(graph, file)
-
-    # total-cost - ??
-    file.write("\n")
-    write_total_metrics(graph, file)
-    file.write(")\n")
 
 
 def write_total_metrics(graph, file):
