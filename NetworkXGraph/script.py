@@ -26,11 +26,9 @@ def run(
 if __name__ == "__main__":
     parser = ap.ArgumentParser()
     parser.add_argument(
-        "--ag", type=str, help="Path to the AG file. It must be a DOT file."
+        "ag", type=str, help="Path to the AG file. It must be a DOT file."
     )
-    parser.add_argument(
-        "--agx", type=str, help="Path to the Extended AG file. It must be a DOT file."
-    )
+
     parser.add_argument(
         "--ro",
         type=str,
@@ -38,16 +36,13 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     try:
-        if not args.ag and not args.agx:
+        if not args.ag:
             raise Exception(
                 "An AG (extended or not) file is needed. Please use the flag --ag or --agx followed by the path to the file.\nUse the flag -h for more information"
             )
 
         if args.ag and args.ag[-3:].lower() != "dot":
             raise Exception("The AG file (--ag) must be a DOT file.")
-
-        if args.agx and args.agx[-3:].lower() != "dot":
-            raise Exception("The AG file (--agx) must be a DOT file.")
 
         if not args.ro:
             raise Exception(
