@@ -36,12 +36,9 @@ a3 -> g1;
 
 d2 -> a4 -> t3;
 t3 -> a7 [range=0..4];
-t3 -> newAction [range=0..4];
-t3 -> newAction2 [range=0..4];
 t3 -> g2 [range=5..10];
 a7 -> g2;
-newAction -> g2;
-newAction2 -> g2;
+
 
 
 {rank=same; a1; a2; a4}

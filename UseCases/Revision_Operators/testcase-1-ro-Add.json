@@ -1,0 +1,52 @@
+[
+    {
+        "id": "ro1",
+        "trigger": [
+            "a2",
+            "a7"
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "a7",
+                "newNodes": [
+                    {
+                        "id": "newAction",
+                        "cost": 100
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "ro2",
+        "trigger": [
+            "a2",
+            "a7"
+        ],
+        "operations": [
+            {
+                "type": "add",
+                "predecessors":["t2","t3"],
+                "successors":["a3"],
+                "newNodes": [
+                    {
+                        "id": "newAction2",
+                        "cost": 50
+                    }
+                ]
+            },
+            {
+                "type": "add",
+                "predecessors":["t1","t2"],
+                "successors":["g1"],
+                "newNodes": [
+                    {
+                        "id": "newAction3",
+                        "cost": 100
+                    }
+                ]
+            }
+        ]
+    }
+]
