@@ -1,10 +1,18 @@
 import json
 from operator import itemgetter
 import DotGraphCreator as dgc
-from input_output_graph import outputGraphViz
 
 
 def read_RO(path):
+    """
+    Reads the revision operator file. The file MUST be JSON format.
+
+    Args:
+        path (str): Path to the file.
+
+    Returns:
+        json: JSON object
+    """
     with open(path) as file:
         ros = json.load(file)
         file.close()
@@ -12,6 +20,13 @@ def read_RO(path):
 
 
 def update_graph_with_ROs(graph, ros):
+    """
+    Excutes the operations (replace, delete, add) of every revision operators.
+
+    Args:
+        graph (networkx graph): The graph.
+        ros (list): List of JSON like object.
+    """
     for ro in ros:
         id, trigger, operations = itemgetter("id", "trigger", "operations")(ro)
         operations = ro["operations"]
@@ -25,8 +40,16 @@ def update_graph_with_ROs(graph, ros):
                 print("Adding")
 
 
-# Creating sibling nodes
-def replace_operation(graph, idRO, trigger, operation):
+def replace_operation(graph, id_ro, trigger, operation):
+    """
+    Replace operation inserts a sequence of new nodes. The first node of the sequence is a sibling of the node to 'replace' with the same edge attributs to the predecessor.
+
+    Args:
+        graph (networkx graph): The graph.
+        id_ro (str): The ID of the revision operator.
+        trigger (list): List of triggering nodes.
+        operation (str): The operation object
+    """
     existing_node = operation["existingNode"]
     parent_nodes = list(graph.predecessors(existing_node))
     current_existing_nodes_successors = list(graph.successors(existing_node))[0]
@@ -45,7 +68,7 @@ def replace_operation(graph, idRO, trigger, operation):
                 new_node_id,
                 type="action",
                 is_original=False,
-                idRO=idRO,
+                idRO=id_ro,
                 trigger=trigger,
                 **node_copy
             )
@@ -68,9 +91,14 @@ def replace_operation(graph, idRO, trigger, operation):
         graph.add_edge(parent_node, current_existing_nodes_successors)
 
 
-# Assuming the goal nodes will never be deleted`
-# Assuming the nodes being delete are not part of any following RO
 def delete_operation(graph, operation):
+    """
+    Deletes a node. Links its predecessors and successors together.
+
+    Args:
+        graph (networkx graph): The graph.
+        operation (str): The operation object
+    """
     node_to_delete = operation["existingNode"]
     predecessors = graph.predecessors(node_to_delete)
     successors = graph.successors(node_to_delete)

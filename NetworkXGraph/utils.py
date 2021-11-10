@@ -1,23 +1,55 @@
 import networkx as nwx
 
 
-# return a list of nodes of the given type
 def get_type_nodes(graph, node_type):
+    """
+    Retrieves list of nodes of the given type
+
+    Args:
+        graph (networkx graph): The graph.
+        node_type (str): Type of the nodes to retrieve.
+
+    Returns:
+        list: List of node of the given type.
+
+    """
     return [node for node, attr in graph.nodes.items() if attr["type"] == node_type]
 
 
-# find a goalNode recursivly for a given start node
-# goal nodes MUST NOT have out_edges.
-# Need to make sure the edge from goal node to ros is removed
 def find_goal_node(graph, start_node):
+    """
+    Finds a goal node recursively from a given start_node.
+
+    Goal node MUST NOT have any out edges.
+
+    Args:
+        graph (networkx graph): The graph.
+        start_node (str): Node to start the search.
+
+    Returns:
+        str: Name of the goal node.
+
+    """
     out_edges = graph.out_edges(start_node)
     if len(out_edges):
         return find_goal_node(graph, list(out_edges)[0][1])
     return start_node
 
 
-# find a goalNode recursivly for a given start node
 def find_init_node(graph, start_node):
+    """
+    Finds a initial node recursively from a given start_node.
+
+    Initial node MUST NOT have any in edges.
+
+    Args:
+        graph (networkx graph): The graph.
+        start_node (str): Node to start the search.
+
+    Returns:
+        str: Name of the goal node.
+
+    """
     in_edges = graph.in_edges(start_node)
     if len(in_edges):
         return find_init_node(graph, list(in_edges)[0][0])
@@ -25,16 +57,39 @@ def find_init_node(graph, start_node):
 
 
 def get_metric_name(metric):
+    """
+    Extract the name of the metric.
+
+    Metrics are node attributs that contains the word 'Cost'.
+
+    Args:
+        metric (str): The metric.
+
+    Returns:
+        str: Name of the metric.
+
+    """
     metric_name = metric if metric == "cost" else metric.replace("Cost", "")
     return metric_name
 
 
 def get_all_parallel_nodes(graph):
+    """
+    Finds all the nodes involved in parallel paths.
+
+    Args:
+        graph (networkx graph): The graph.
+
+
+    Returns:
+        list: List of parallel nodes.
+
+    """
     parallel_nodes = []
     for node, attributes in graph.nodes.items():
 
         if attributes.get("is_in_parallel") == True:
-            parallel_nodes.append(f"p{node}")
+            parallel_nodes.append(f"{node}")
 
     return parallel_nodes
 
@@ -155,9 +210,20 @@ def update_between_parallel_nodes(
     )
 
 
-# Finds all the metrics in the graph
-# To be retrieved, a metric must have "Cost" at the end
 def get_all_metrics(graph):
+    """
+    Finds all the metrics.
+
+    Metrics are node attributs that contains the word 'Cost'.
+
+    Args:
+        graph (networkx graph): The graph.
+
+
+    Returns:
+        list: List of metrics.
+
+    """
     action_nodes = get_type_nodes(graph, "action")
     metrics = []
     for node in action_nodes:
@@ -169,8 +235,17 @@ def get_all_metrics(graph):
 
 
 def get_all_revIds(graph):
+    """
+    Finds all revision IDs.
+
+    Args:
+        graph (networkx graph): The graph.
+
+    Returns:
+        list: List of revision IDs.
+    """
     revIds = []
-    for node, attr in graph.nodes.items():
+    for _, attr in graph.nodes.items():
         idRO = attr.get("idRO", False)
         if idRO and idRO not in revIds:
             revIds.append(idRO)
@@ -178,6 +253,16 @@ def get_all_revIds(graph):
 
 
 def find_revId_involved_nodes(graph, revId):
+    """
+    Finds all the nodes involved in a given revision ID. This includes the list of triggering nodes and the inserted nodes
+
+    Args:
+        graph (networkx graph): The graph.
+        revId (str): The revision ID.
+
+    Returns:
+        list: List of node's name.
+    """
     nodes = []
     for node, attr in graph.nodes.items():
         node_revId = attr.get("idRO", False)

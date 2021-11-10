@@ -4,6 +4,13 @@ import DotGraphCreator as dgc
 # reads in a graph from a Dot file.
 # removing useless nodes
 def read_graph(path):
+    """
+    Reads in the graph. Also pre-processes the nodes by adding is_original to the action nodes.
+
+    Args:
+        path (str): Path to the file.
+
+    """
     graph = nwx.drawing.nx_pydot.read_dot(path)
 
     # bit of preprocessing clean up, this will need to be reviewed
@@ -21,5 +28,12 @@ def read_graph(path):
 
 # outputs a graph to a pdf
 def outputGraphViz(graph, filename="problem"):
+    """
+    Ouputs the graph to a PNG file
+
+    Args:
+        graph (networkx graph): The graph.
+
+    """
     graph_view = dgc.DotGraphCreator.create_dot_graph(graph)
     graph_view.render(filename=filename, format="png")

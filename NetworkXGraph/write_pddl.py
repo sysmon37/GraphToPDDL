@@ -11,18 +11,31 @@ from utils import (
 
 
 def write_objects(graph, file):
-    # might be able to refactor this into a function that returns {diseases, node, revId} once we'll add RO
+    """
+    Writes the objects (disease, node and revId) to the file.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    """
     disease = get_type_nodes(graph, "context")
     nodes = [node for node in graph.nodes if graph.nodes[node]["type"] != "context"]
     file.write("(:objects {} - disease\n".format(" ".join(disease)))
-    file.write(
-        "\t" * 3 + "{} - node\n".format(" ".join(nodes))
-    )  # TODO: add parallel nodes
+    file.write("\t" * 3 + "{} - node\n".format(" ".join(nodes)))
     file.write("\t" * 3 + "{} - revId\n".format(" ".join(get_all_revIds(graph))))
     file.write(")\n")
 
 
 def write_initial_state(graph, file, ros):
+    """
+    Writes all the predicates of the initial (:init) state to the file.
+
+    Calls a subfunction for each predicates in the initial state
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    """
     file.write("(:init ")
     # decision branching min/max
     write_decision_branch(graph, file)
@@ -63,7 +76,22 @@ def write_initial_state(graph, file, ros):
 
 
 def write_predecessors_and_node_type(graph, file):
-    # predecessorNode
+    """
+    Write the following predicates to the file:
+
+    - predecessorNode
+    - originalAction
+    - node type (e.g. actionNode)
+    - revisionAction
+    - parallelStartNode
+    - parallelEndNode
+    - parallel node type
+    - untraversedParallelNode
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    """
     init_nodes = get_type_nodes(graph, "context")
 
     nodes = []
@@ -122,6 +150,13 @@ def write_predecessors_and_node_type(graph, file):
 
 
 def write_total_metrics(graph, file):
+    """
+    Writes the total metrics predicates.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    """
     metrics = get_all_metrics(graph)
     for metric in metrics:
         metric_name = get_metric_name(metric)
@@ -129,6 +164,13 @@ def write_total_metrics(graph, file):
 
 
 def write_decision_branch(graph, file):
+    """
+    Writes the decision branch min/max predicates (e.g. decisionBranchMax).
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    """
     decision_nodes = get_type_nodes(graph, "decision")
     for node in decision_nodes:
         for _, out_edge in graph.out_edges(node):
@@ -146,6 +188,13 @@ def write_decision_branch(graph, file):
 
 
 def write_node_cost(graph, file):
+    """
+    Writes node costs predicates.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    """
     init_nodes = get_type_nodes(graph, "context")
     metrics = get_all_metrics(graph)
     for metric in metrics:
@@ -162,6 +211,13 @@ def write_node_cost(graph, file):
 
 
 def write_not_previous_node(graph, file):
+    """
+    Writes the no previous predicates (e.g: noPreviousDecision).
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    """
     init_nodes = get_type_nodes(graph, "context")
     for node in init_nodes:
         to_node = list(graph.out_edges(node))[0][1]
@@ -170,6 +226,13 @@ def write_not_previous_node(graph, file):
 
 
 def write_goal(graph, file):
+    """
+    Writes treatment plan ready predicate in the goal section of the PDDL file.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    """
     goal_nodes = [node for node in graph.nodes if graph.nodes[node]["type"] == "goal"]
     file.write("(:goal ")
     if len(goal_nodes) > 1:
@@ -184,6 +247,13 @@ def write_goal(graph, file):
 
 # TODO - revise this, no weights input for now
 def write_metric(graph, file):
+    """
+    Writes the metric section of the PDDL file with all the metrics found in the graph.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    """
     file.write("(:metric minimize (+\n")
     metrics = get_all_metrics(graph)
     for metric in metrics:
@@ -193,12 +263,27 @@ def write_metric(graph, file):
 
 
 def write_all_revisions_pass(graph, file):
+    """
+    Writes all revision pass predicate.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    """
     disease = get_type_nodes(graph, "context")
     for d in disease:
         file.write("\t(= (allRevisionsPass {}) 0)\n".format(d))
 
 
 def write_revision_flags(graph, file, ros):
+    """
+    Writes treatment plan ready predicate in the goal section of the PDDL file.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+        ros (list) : The list of revision operator objects
+    """
     disease = get_type_nodes(graph, "context")
     for ro in ros:
         revId = ro["id"]
@@ -227,6 +312,15 @@ def write_revision_flags(graph, file, ros):
 
 
 def outputPDDL(graph, ros, problem_name, domain_name):
+    """
+    Ouputs the PDDL file.
+
+    Args:
+        graph (networkx graph): The graph.
+        ros (list) : The list of revision operator objects
+        problem_name (str): The name of the problem to be in the PDDL file.
+        domain_name (str): The name of the domain to be in the PDDL file.
+    """
     with open("problem.pddl", "w") as pddl:
         # define
         pddl.write(("(define (problem {})\n").format(problem_name))
