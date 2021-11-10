@@ -1,0 +1,1 @@
+pdoc --html --output-dir docs --force --template-dir templates .

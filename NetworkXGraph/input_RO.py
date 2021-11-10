@@ -150,10 +150,10 @@ def add_action(graph, idRO, trigger, operation):
                 # nwx.add_path(graph,[predecessor, new_node_id, successor])
 
                 # Case where the Predecessor node and successor node are adjecent
-                if graph.get_edge_data(predecessor, successor):
+                if graph.has_edge(predecessor, successor):
                     # Adding the edge between the new node and the predecessor with the edge data
                     # We only want one edge between the predecessor and the new node
-                    if not graph.get_edge_data(predecessor, new_node_id):
+                    if not graph.has_edge(predecessor, new_node_id):
                         graph.add_edge(
                             predecessor, new_node_id, **graph.get_edge_data(predecessor, successor)[0])
 
@@ -171,7 +171,7 @@ def add_action(graph, idRO, trigger, operation):
                             tmpData = graph.get_edge_data(
                                 predecessor, tmpSuccessor)[0]
                             # We only want one edge between the predecessor and the new node
-                            if not graph.get_edge_data(predecessor, new_node_id):
+                            if not graph.has_edge(predecessor, new_node_id):
                                 graph.add_edge(
                                     predecessor, new_node_id, **tmpData)
                             break
@@ -179,5 +179,5 @@ def add_action(graph, idRO, trigger, operation):
             # Adding the edge between the new node and the successor with the edge data
 
             # We only want one edge between the new node and the successor
-            if not graph.get_edge_data(new_node_id, successor):
+            if not graph.has_edge(new_node_id, successor):
                 graph.add_edge(new_node_id, successor)

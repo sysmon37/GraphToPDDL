@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>NetworkXGraph.utils API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}#lunr-search{width:100%;font-size:1em;padding:6px 9px 5px 9px;border:1px solid silver}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>NetworkXGraph.utils</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import networkx as nwx
+
+
+def get_type_nodes(graph, node_type):
+    &#34;&#34;&#34;
+    Retrieves list of nodes of the given type
+
+    Args:
+        graph (networkx graph): The graph.
+        node_type (str): Type of the nodes to retrieve.
+
+    Returns:
+        list: List of node of the given type.
+
+    &#34;&#34;&#34;
+    return [node for node, attr in graph.nodes.items() if attr[&#34;type&#34;] == node_type]
+
+
+def find_goal_node(graph, start_node):
+    &#34;&#34;&#34;
+    Finds a goal node recursively from a given start_node.
+
+    Goal node MUST NOT have any out edges.
+
+    Args:
+        graph (networkx graph): The graph.
+        start_node (str): Node to start the search.
+
+    Returns:
+        str: Name of the goal node.
+
+    &#34;&#34;&#34;
+    out_edges = graph.out_edges(start_node)
+    if len(out_edges):
+        return find_goal_node(graph, list(out_edges)[0][1])
+    return start_node
+
+
+def find_init_node(graph, start_node):
+    &#34;&#34;&#34;
+    Finds a initial node recursively from a given start_node.
+
+    Initial node MUST NOT have any in edges.
+
+    Args:
+        graph (networkx graph): The graph.
+        start_node (str): Node to start the search.
+
+    Returns:
+        str: Name of the goal node.
+
+    &#34;&#34;&#34;
+    in_edges = graph.in_edges(start_node)
+    if len(in_edges):
+        return find_init_node(graph, list(in_edges)[0][0])
+    return start_node
+
+
+def get_metric_name(metric):
+    &#34;&#34;&#34;
+    Extract the name of the metric.
+
+    Metrics are node attributs that contains the word &#39;Cost&#39;.
+
+    Args:
+        metric (str): The metric.
+
+    Returns:
+        str: Name of the metric.
+
+    &#34;&#34;&#34;
+    metric_name = metric if metric == &#34;cost&#34; else metric.replace(&#34;Cost&#34;, &#34;&#34;)
+    return metric_name
+
+
+def get_all_parallel_nodes(graph):
+    &#34;&#34;&#34;
+    Finds all the nodes involved in parallel paths.
+
+    Args:
+        graph (networkx graph): The graph.
+
+
+    Returns:
+        list: List of parallel nodes.
+
+    &#34;&#34;&#34;
+    parallel_nodes = []
+    for node, attributes in graph.nodes.items():
+
+        if attributes.get(&#34;is_in_parallel&#34;) == True:
+            parallel_nodes.append(f&#34;{node}&#34;)
+
+    return parallel_nodes
+
+
+def find_parallel_path(graph, p_nodes_found):
+    &#34;&#34;&#34;
+    Finds all parallel paths from a list of parallel nodes.
+
+    Args:
+        graph (networkx graph): The graph.
+        p_nodes_found (list): List of parallel start and end nodes.
+
+
+    Returns:
+        str: PDDL representation of the parallel path.
+
+    &#34;&#34;&#34;
+    parallelNode = &#34;&#34;
+    # TODO: numParallelPaths for each diseases
+
+    for start_node in p_nodes_found:
+        for end_node in p_nodes_found:
+
+            parallel_sequence = list(
+                nwx.all_simple_paths(graph, source=start_node, target=end_node)
+            )
+            if not parallel_sequence:
+                continue
+            elif len(parallel_sequence) == 1:
+                continue
+            else:
+                parallelTypeNode = &#34;&#34;
+                untraversedParallelNode = &#34;&#34;
+
+                parallelNode += &#34;(parallelStartNode {})\n\t&#34;.format(start_node)
+                parallelNode += &#34;(parallelEndNode {})\n\t&#34;.format(end_node)
+
+                # for path in parallel_sequence:
+                (
+                    parallelTypeNode,
+                    untraversedParallelNode,
+                ) = update_between_parallel_nodes(
+                    graph,
+                    start_node,
+                    end_node,
+                    parallelTypeNode,
+                    untraversedParallelNode,
+                )
+
+                parallelNode += parallelTypeNode
+                parallelNode += untraversedParallelNode
+
+    return parallelNode
+
+
+def update_between_parallel_nodes(
+    graph,
+    start_node,
+    end_node,
+    parallelTypeNode,
+    untraversedParallelNode,
+    numParallelPaths=0,
+):
+    &#34;&#34;&#34;
+    Updates the PDDL representation of the parallel nodes between a parallel start node and a parallel end node.
+
+
+
+    Args:
+        graph (networkx graph): The graph.
+        start_node (str): Start node of the parallel path, Parallel Start Node.
+        end_node (str): End node of the parallel path, Parallel End Node.
+        parallelTypeNode (str): PDDL representation of the parallel node.
+        untraversedParallelNode (str): PDDL representation of the untraversed parallel node.
+        numParallelPaths (int): Number of parallel paths.
+
+    Returns:
+        str: PDDL representation of the parallel nodes.
+    &#34;&#34;&#34;
+    if start_node == end_node:
+        return parallelTypeNode, untraversedParallelNode
+
+    if type(start_node) == str:
+        first_path, *path_list = graph.out_edges(start_node)
+    else:
+        first_path, *path_list = start_node
+
+    if len(path_list) == 1:
+        _, node = path_list.pop()
+        _, nodefp = first_path
+        parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(
+            graph,
+            nodefp,
+            end_node,
+            parallelTypeNode,
+            untraversedParallelNode,
+            numParallelPaths + 1,
+        )
+        return update_between_parallel_nodes(
+            graph,
+            node,
+            end_node,
+            parallelTypeNode,
+            untraversedParallelNode,
+            numParallelPaths + 1,
+        )
+
+    elif len(path_list) &gt; 1:
+        _, nodefp = first_path
+        parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(
+            graph,
+            nodefp,
+            end_node,
+            parallelTypeNode,
+            untraversedParallelNode,
+            numParallelPaths + 1,
+        )
+
+        return update_between_parallel_nodes(
+            graph,
+            path_list,
+            end_node,
+            parallelTypeNode,
+            untraversedParallelNode,
+            numParallelPaths + 1,
+        )
+
+    if graph.nodes[start_node][&#34;type&#34;] != &#34;parallel&#34;:
+        graph.nodes[start_node][&#34;is_in_parallel&#34;] = True
+
+        parallelTypeNode += &#34;(parallel{}Node {})\n\t&#34;.format(
+            graph.nodes[start_node][&#34;type&#34;].capitalize(), start_node
+        )
+        untraversedParallelNode += &#34;(untraversedParallelNode p{})\n\t&#34;.format(
+            start_node
+        )
+
+    _, node = first_path
+    return update_between_parallel_nodes(
+        graph,
+        node,
+        end_node,
+        parallelTypeNode,
+        untraversedParallelNode,
+        numParallelPaths + 1,
+    )
+
+
+def get_all_metrics(graph):
+    &#34;&#34;&#34;
+    Finds all the metrics.
+
+    Metrics are node attributs that contains the word &#39;Cost&#39;.
+
+    Args:
+        graph (networkx graph): The graph.
+
+
+    Returns:
+        list: List of metrics.
+
+    &#34;&#34;&#34;
+    action_nodes = get_type_nodes(graph, &#34;action&#34;)
+    metrics = []
+    for node in action_nodes:
+        node_metrics = [
+            attr for attr in graph.nodes[node] if attr.lower().find(&#34;cost&#34;) != -1
+        ]
+        metrics.extend(node_metrics)
+    return list(set(metrics))
+
+
+def get_all_revIds(graph):
+    &#34;&#34;&#34;
+    Finds all revision IDs.
+
+    Args:
+        graph (networkx graph): The graph.
+
+    Returns:
+        list: List of revision IDs.
+    &#34;&#34;&#34;
+    revIds = []
+    for _, attr in graph.nodes.items():
+        idRO = attr.get(&#34;idRO&#34;, False)
+        if idRO and idRO not in revIds:
+            revIds.append(idRO)
+    return revIds
+
+
+def find_revId_involved_nodes(graph, revId):
+    &#34;&#34;&#34;
+    Finds all the nodes involved in a given revision ID. This includes the list of triggering nodes and the inserted nodes
+
+    Args:
+        graph (networkx graph): The graph.
+        revId (str): The revision ID.
+
+    Returns:
+        list: List of node&#39;s name.
+    &#34;&#34;&#34;
+    nodes = []
+    for node, attr in graph.nodes.items():
+        node_revId = attr.get(&#34;idRO&#34;, False)
+        if node_revId and node_revId == revId:
+            nodes.extend(attr.get(&#34;trigger&#34;))
+            parent_nodes = list(graph.predecessors(node))
+            # Loop over all the parents of the existing node
+            for parent_node in parent_nodes:
+                children = list(graph.successors(parent_node))
+                while len(children) &gt; 0:
+                    child = children.pop()
+                    child_attr = graph.nodes[child]
+
+                    # need to check the revision flags when the added nodes are not just action nodes
+                    if child_attr.get(&#34;idRO&#34;, None) != revId and not child_attr.get(
+                        &#34;is_original&#34;, True
+                    ):
+                        nodes.append(child)
+                        children.extend(list(graph.successors(child)))
+    return list(set(nodes))</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="NetworkXGraph.utils.find_goal_node"><code class="name flex">
+<span>def <span class="ident">find_goal_node</span></span>(<span>graph, start_node)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds a goal node recursively from a given start_node.</p>
+<p>Goal node MUST NOT have any out edges.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+<dt><strong><code>start_node</code></strong> :&ensp;<code>str</code></dt>
+<dd>Node to start the search.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Name of the goal node.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_goal_node(graph, start_node):
+    &#34;&#34;&#34;
+    Finds a goal node recursively from a given start_node.
+
+    Goal node MUST NOT have any out edges.
+
+    Args:
+        graph (networkx graph): The graph.
+        start_node (str): Node to start the search.
+
+    Returns:
+        str: Name of the goal node.
+
+    &#34;&#34;&#34;
+    out_edges = graph.out_edges(start_node)
+    if len(out_edges):
+        return find_goal_node(graph, list(out_edges)[0][1])
+    return start_node</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.utils.find_init_node"><code class="name flex">
+<span>def <span class="ident">find_init_node</span></span>(<span>graph, start_node)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds a initial node recursively from a given start_node.</p>
+<p>Initial node MUST NOT have any in edges.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+<dt><strong><code>start_node</code></strong> :&ensp;<code>str</code></dt>
+<dd>Node to start the search.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Name of the goal node.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_init_node(graph, start_node):
+    &#34;&#34;&#34;
+    Finds a initial node recursively from a given start_node.
+
+    Initial node MUST NOT have any in edges.
+
+    Args:
+        graph (networkx graph): The graph.
+        start_node (str): Node to start the search.
+
+    Returns:
+        str: Name of the goal node.
+
+    &#34;&#34;&#34;
+    in_edges = graph.in_edges(start_node)
+    if len(in_edges):
+        return find_init_node(graph, list(in_edges)[0][0])
+    return start_node</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.utils.find_parallel_path"><code class="name flex">
+<span>def <span class="ident">find_parallel_path</span></span>(<span>graph, p_nodes_found)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds all parallel paths from a list of parallel nodes.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+<dt><strong><code>p_nodes_found</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of parallel start and end nodes.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>PDDL representation of the parallel path.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_parallel_path(graph, p_nodes_found):
+    &#34;&#34;&#34;
+    Finds all parallel paths from a list of parallel nodes.
+
+    Args:
+        graph (networkx graph): The graph.
+        p_nodes_found (list): List of parallel start and end nodes.
+
+
+    Returns:
+        str: PDDL representation of the parallel path.
+
+    &#34;&#34;&#34;
+    parallelNode = &#34;&#34;
+    # TODO: numParallelPaths for each diseases
+
+    for start_node in p_nodes_found:
+        for end_node in p_nodes_found:
+
+            parallel_sequence = list(
+                nwx.all_simple_paths(graph, source=start_node, target=end_node)
+            )
+            if not parallel_sequence:
+                continue
+            elif len(parallel_sequence) == 1:
+                continue
+            else:
+                parallelTypeNode = &#34;&#34;
+                untraversedParallelNode = &#34;&#34;
+
+                parallelNode += &#34;(parallelStartNode {})\n\t&#34;.format(start_node)
+                parallelNode += &#34;(parallelEndNode {})\n\t&#34;.format(end_node)
+
+                # for path in parallel_sequence:
+                (
+                    parallelTypeNode,
+                    untraversedParallelNode,
+                ) = update_between_parallel_nodes(
+                    graph,
+                    start_node,
+                    end_node,
+                    parallelTypeNode,
+                    untraversedParallelNode,
+                )
+
+                parallelNode += parallelTypeNode
+                parallelNode += untraversedParallelNode
+
+    return parallelNode</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.utils.find_revId_involved_nodes"><code class="name flex">
+<span>def <span class="ident">find_revId_involved_nodes</span></span>(<span>graph, revId)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds all the nodes involved in a given revision ID. This includes the list of triggering nodes and the inserted nodes</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+<dt><strong><code>revId</code></strong> :&ensp;<code>str</code></dt>
+<dd>The revision ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of node's name.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_revId_involved_nodes(graph, revId):
+    &#34;&#34;&#34;
+    Finds all the nodes involved in a given revision ID. This includes the list of triggering nodes and the inserted nodes
+
+    Args:
+        graph (networkx graph): The graph.
+        revId (str): The revision ID.
+
+    Returns:
+        list: List of node&#39;s name.
+    &#34;&#34;&#34;
+    nodes = []
+    for node, attr in graph.nodes.items():
+        node_revId = attr.get(&#34;idRO&#34;, False)
+        if node_revId and node_revId == revId:
+            nodes.extend(attr.get(&#34;trigger&#34;))
+            parent_nodes = list(graph.predecessors(node))
+            # Loop over all the parents of the existing node
+            for parent_node in parent_nodes:
+                children = list(graph.successors(parent_node))
+                while len(children) &gt; 0:
+                    child = children.pop()
+                    child_attr = graph.nodes[child]
+
+                    # need to check the revision flags when the added nodes are not just action nodes
+                    if child_attr.get(&#34;idRO&#34;, None) != revId and not child_attr.get(
+                        &#34;is_original&#34;, True
+                    ):
+                        nodes.append(child)
+                        children.extend(list(graph.successors(child)))
+    return list(set(nodes))</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.utils.get_all_metrics"><code class="name flex">
+<span>def <span class="ident">get_all_metrics</span></span>(<span>graph)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds all the metrics.</p>
+<p>Metrics are node attributs that contains the word 'Cost'.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of metrics.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_all_metrics(graph):
+    &#34;&#34;&#34;
+    Finds all the metrics.
+
+    Metrics are node attributs that contains the word &#39;Cost&#39;.
+
+    Args:
+        graph (networkx graph): The graph.
+
+
+    Returns:
+        list: List of metrics.
+
+    &#34;&#34;&#34;
+    action_nodes = get_type_nodes(graph, &#34;action&#34;)
+    metrics = []
+    for node in action_nodes:
+        node_metrics = [
+            attr for attr in graph.nodes[node] if attr.lower().find(&#34;cost&#34;) != -1
+        ]
+        metrics.extend(node_metrics)
+    return list(set(metrics))</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.utils.get_all_parallel_nodes"><code class="name flex">
+<span>def <span class="ident">get_all_parallel_nodes</span></span>(<span>graph)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds all the nodes involved in parallel paths.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of parallel nodes.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_all_parallel_nodes(graph):
+    &#34;&#34;&#34;
+    Finds all the nodes involved in parallel paths.
+
+    Args:
+        graph (networkx graph): The graph.
+
+
+    Returns:
+        list: List of parallel nodes.
+
+    &#34;&#34;&#34;
+    parallel_nodes = []
+    for node, attributes in graph.nodes.items():
+
+        if attributes.get(&#34;is_in_parallel&#34;) == True:
+            parallel_nodes.append(f&#34;{node}&#34;)
+
+    return parallel_nodes</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.utils.get_all_revIds"><code class="name flex">
+<span>def <span class="ident">get_all_revIds</span></span>(<span>graph)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds all revision IDs.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of revision IDs.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_all_revIds(graph):
+    &#34;&#34;&#34;
+    Finds all revision IDs.
+
+    Args:
+        graph (networkx graph): The graph.
+
+    Returns:
+        list: List of revision IDs.
+    &#34;&#34;&#34;
+    revIds = []
+    for _, attr in graph.nodes.items():
+        idRO = attr.get(&#34;idRO&#34;, False)
+        if idRO and idRO not in revIds:
+            revIds.append(idRO)
+    return revIds</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.utils.get_metric_name"><code class="name flex">
+<span>def <span class="ident">get_metric_name</span></span>(<span>metric)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extract the name of the metric.</p>
+<p>Metrics are node attributs that contains the word 'Cost'.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>metric</code></strong> :&ensp;<code>str</code></dt>
+<dd>The metric.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Name of the metric.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_metric_name(metric):
+    &#34;&#34;&#34;
+    Extract the name of the metric.
+
+    Metrics are node attributs that contains the word &#39;Cost&#39;.
+
+    Args:
+        metric (str): The metric.
+
+    Returns:
+        str: Name of the metric.
+
+    &#34;&#34;&#34;
+    metric_name = metric if metric == &#34;cost&#34; else metric.replace(&#34;Cost&#34;, &#34;&#34;)
+    return metric_name</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.utils.get_type_nodes"><code class="name flex">
+<span>def <span class="ident">get_type_nodes</span></span>(<span>graph, node_type)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Retrieves list of nodes of the given type</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+<dt><strong><code>node_type</code></strong> :&ensp;<code>str</code></dt>
+<dd>Type of the nodes to retrieve.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of node of the given type.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_type_nodes(graph, node_type):
+    &#34;&#34;&#34;
+    Retrieves list of nodes of the given type
+
+    Args:
+        graph (networkx graph): The graph.
+        node_type (str): Type of the nodes to retrieve.
+
+    Returns:
+        list: List of node of the given type.
+
+    &#34;&#34;&#34;
+    return [node for node, attr in graph.nodes.items() if attr[&#34;type&#34;] == node_type]</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.utils.update_between_parallel_nodes"><code class="name flex">
+<span>def <span class="ident">update_between_parallel_nodes</span></span>(<span>graph, start_node, end_node, parallelTypeNode, untraversedParallelNode, numParallelPaths=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Updates the PDDL representation of the parallel nodes between a parallel start node and a parallel end node.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+<dt><strong><code>start_node</code></strong> :&ensp;<code>str</code></dt>
+<dd>Start node of the parallel path, Parallel Start Node.</dd>
+<dt><strong><code>end_node</code></strong> :&ensp;<code>str</code></dt>
+<dd>End node of the parallel path, Parallel End Node.</dd>
+<dt><strong><code>parallelTypeNode</code></strong> :&ensp;<code>str</code></dt>
+<dd>PDDL representation of the parallel node.</dd>
+<dt><strong><code>untraversedParallelNode</code></strong> :&ensp;<code>str</code></dt>
+<dd>PDDL representation of the untraversed parallel node.</dd>
+<dt><strong><code>numParallelPaths</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of parallel paths.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>PDDL representation of the parallel nodes.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_between_parallel_nodes(
+    graph,
+    start_node,
+    end_node,
+    parallelTypeNode,
+    untraversedParallelNode,
+    numParallelPaths=0,
+):
+    &#34;&#34;&#34;
+    Updates the PDDL representation of the parallel nodes between a parallel start node and a parallel end node.
+
+
+
+    Args:
+        graph (networkx graph): The graph.
+        start_node (str): Start node of the parallel path, Parallel Start Node.
+        end_node (str): End node of the parallel path, Parallel End Node.
+        parallelTypeNode (str): PDDL representation of the parallel node.
+        untraversedParallelNode (str): PDDL representation of the untraversed parallel node.
+        numParallelPaths (int): Number of parallel paths.
+
+    Returns:
+        str: PDDL representation of the parallel nodes.
+    &#34;&#34;&#34;
+    if start_node == end_node:
+        return parallelTypeNode, untraversedParallelNode
+
+    if type(start_node) == str:
+        first_path, *path_list = graph.out_edges(start_node)
+    else:
+        first_path, *path_list = start_node
+
+    if len(path_list) == 1:
+        _, node = path_list.pop()
+        _, nodefp = first_path
+        parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(
+            graph,
+            nodefp,
+            end_node,
+            parallelTypeNode,
+            untraversedParallelNode,
+            numParallelPaths + 1,
+        )
+        return update_between_parallel_nodes(
+            graph,
+            node,
+            end_node,
+            parallelTypeNode,
+            untraversedParallelNode,
+            numParallelPaths + 1,
+        )
+
+    elif len(path_list) &gt; 1:
+        _, nodefp = first_path
+        parallelTypeNode, untraversedParallelNode = update_between_parallel_nodes(
+            graph,
+            nodefp,
+            end_node,
+            parallelTypeNode,
+            untraversedParallelNode,
+            numParallelPaths + 1,
+        )
+
+        return update_between_parallel_nodes(
+            graph,
+            path_list,
+            end_node,
+            parallelTypeNode,
+            untraversedParallelNode,
+            numParallelPaths + 1,
+        )
+
+    if graph.nodes[start_node][&#34;type&#34;] != &#34;parallel&#34;:
+        graph.nodes[start_node][&#34;is_in_parallel&#34;] = True
+
+        parallelTypeNode += &#34;(parallel{}Node {})\n\t&#34;.format(
+            graph.nodes[start_node][&#34;type&#34;].capitalize(), start_node
+        )
+        untraversedParallelNode += &#34;(untraversedParallelNode p{})\n\t&#34;.format(
+            start_node
+        )
+
+    _, node = first_path
+    return update_between_parallel_nodes(
+        graph,
+        node,
+        end_node,
+        parallelTypeNode,
+        untraversedParallelNode,
+        numParallelPaths + 1,
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<form>
+<input id="lunr-search" name="q" placeholder="🔎 Search ..." aria-label="Search"
+disabled minlength="2">
+</form>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/tingle/0.15.3/tingle.min.css" integrity="sha512-j1u8eUJ4f23xPPxwOrLUPQaCD2dwzNqqmDDcWS4deWsMv2ohLqmXXuP3hU7g8TyzbMSakP/mMqoNBYWj8AEIFg==" crossorigin>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tingle/0.15.3/tingle.min.js" integrity="sha512-plGUER9JkeEWPPqQBE4sdLqBoQug5Ap+BCGMc7bJ8BXkm+VVj6QzkpBz5Yv2yPkkq+cqg9IpkBaGCas6uDbW8g==" crossorigin></script>
+<style>
+.modal-dialog iframe {
+width: 100vw;
+height: calc(100vh - 80px);
+}
+@media screen and (min-width: 700px) {
+.modal-dialog iframe {
+width: 70vw;
+height: 80vh;
+}
+}
+.modal-dialog .tingle-modal-box {width: auto;}
+.modal-dialog .tingle-modal-box__content {padding: 0;}
+</style>
+<script>
+const input = document.getElementById('lunr-search');
+input.disabled = false;
+input.form.addEventListener('submit', (ev) => {
+ev.preventDefault();
+const url = new URL(window.location);
+url.searchParams.set('q', input.value);
+history.replaceState({}, null, url.toString());
+search(input.value);
+});
+const query = new URL(window.location).searchParams.get('q');
+if (query)
+search(query);
+function search(query) {
+const url = '../doc-search.html#' + encodeURIComponent(query);
+new tingle.modal({
+cssClass: ['modal-dialog'],
+onClose: () => {
+const url = new URL(window.location);
+url.searchParams.delete('q');
+history.replaceState({}, null, url.toString());
+setTimeout(() => input.focus(), 100);
+}
+}).setContent('<iframe src="' + url + '"></iframe>').open();
+}
+</script>
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="NetworkXGraph" href="index.html">NetworkXGraph</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="NetworkXGraph.utils.find_goal_node" href="#NetworkXGraph.utils.find_goal_node">find_goal_node</a></code></li>
+<li><code><a title="NetworkXGraph.utils.find_init_node" href="#NetworkXGraph.utils.find_init_node">find_init_node</a></code></li>
+<li><code><a title="NetworkXGraph.utils.find_parallel_path" href="#NetworkXGraph.utils.find_parallel_path">find_parallel_path</a></code></li>
+<li><code><a title="NetworkXGraph.utils.find_revId_involved_nodes" href="#NetworkXGraph.utils.find_revId_involved_nodes">find_revId_involved_nodes</a></code></li>
+<li><code><a title="NetworkXGraph.utils.get_all_metrics" href="#NetworkXGraph.utils.get_all_metrics">get_all_metrics</a></code></li>
+<li><code><a title="NetworkXGraph.utils.get_all_parallel_nodes" href="#NetworkXGraph.utils.get_all_parallel_nodes">get_all_parallel_nodes</a></code></li>
+<li><code><a title="NetworkXGraph.utils.get_all_revIds" href="#NetworkXGraph.utils.get_all_revIds">get_all_revIds</a></code></li>
+<li><code><a title="NetworkXGraph.utils.get_metric_name" href="#NetworkXGraph.utils.get_metric_name">get_metric_name</a></code></li>
+<li><code><a title="NetworkXGraph.utils.get_type_nodes" href="#NetworkXGraph.utils.get_type_nodes">get_type_nodes</a></code></li>
+<li><code><a title="NetworkXGraph.utils.update_between_parallel_nodes" href="#NetworkXGraph.utils.update_between_parallel_nodes">update_between_parallel_nodes</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
