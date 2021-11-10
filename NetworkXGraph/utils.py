@@ -95,6 +95,18 @@ def get_all_parallel_nodes(graph):
 
 
 def find_parallel_path(graph, p_nodes_found):
+    """
+    Finds all parallel paths from a list of parallel nodes.
+
+    Args:
+        graph (networkx graph): The graph.
+        p_nodes_found (list): List of parallel start and end nodes.
+
+
+    Returns:
+        str: PDDL representation of the parallel path.
+
+    """
     parallelNode = ""
     # TODO: numParallelPaths for each diseases
 
@@ -141,6 +153,22 @@ def update_between_parallel_nodes(
     untraversedParallelNode,
     numParallelPaths=0,
 ):
+    """
+    Updates the PDDL representation of the parallel nodes between a parallel start node and a parallel end node.
+
+
+
+    Args:
+        graph (networkx graph): The graph.
+        start_node (str): Start node of the parallel path, Parallel Start Node.
+        end_node (str): End node of the parallel path, Parallel End Node.
+        parallelTypeNode (str): PDDL representation of the parallel node.
+        untraversedParallelNode (str): PDDL representation of the untraversed parallel node.
+        numParallelPaths (int): Number of parallel paths.
+
+    Returns:
+        str: PDDL representation of the parallel nodes.
+    """
     if start_node == end_node:
         return parallelTypeNode, untraversedParallelNode
 

@@ -113,9 +113,16 @@ def delete_operation(graph, operation):
             graph.remove_node(node_to_delete)
 
 
-# Insert(ADD) a nodes in the graph from a predeccessors and a successors list
 def add_action(graph, idRO, trigger, operation):
+    """
+    Add operation inserts a node(s) between a list of predeccessors and successors. 
 
+    Args:
+        graph (networkx graph): The graph.
+        idRO (str): The ID of the revision operator.
+        trigger (list): List of triggering nodes.
+        operation (str): The operation object
+    """
     predecessors = operation["predecessors"]
     successors = operation["successors"]
 

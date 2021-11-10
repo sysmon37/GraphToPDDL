@@ -1,2 +1,4 @@
 graphviz
+pydot
 networkx
+pdoc
