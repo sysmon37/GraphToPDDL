@@ -44,12 +44,7 @@ if __name__ == "__main__":
         if args.ag and args.ag[-3:].lower() != "dot":
             raise Exception("The AG file (--ag) must be a DOT file.")
 
-        if not args.ro:
-            raise Exception(
-                "A Revision Operators file is needed. Please use the flag --ro followed by the path to the file.\nUse the flag -h for more information"
-            )
-
-        if args.ro[-4:].lower() != "json":
+        if args.ro != None and args.ro[-4:].lower() != "json":
             raise Exception("The Revision operators file (--ro) must be a JSON file.")
 
         run(
