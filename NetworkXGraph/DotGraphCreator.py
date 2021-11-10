@@ -2,6 +2,14 @@ from graphviz import Digraph  # We only need Digraph
 
 
 class DotGraphCreator:
+    """
+    This class creates a graphviz dot graph from a NetworkX graph.
+
+    Attributes:
+        graph (NetworkXGraph): The graph to be converted to a dot graph.
+        dot_graph (Digraph): The dot graph created from the NetworkX graph.
+    """
+
     __FORMAT = {
         "context": {"shape": "oval", "fillcolor": "grey", "fontcolor": "black"},
         "action": {"shape": "box", "fillcolor": "deepskyblue", "fontcolor": "black"},
@@ -37,6 +45,16 @@ class DotGraphCreator:
 
     @classmethod
     def __create_node_label(cls, id, node_props):
+        """
+        Creates a node label.
+
+        Args:
+            id: Node id.
+            node_props: Node properties.
+
+        Returns:
+            Node label.
+        """
         extra_label = (
             f"<br/>[cost={node_props['cost']}]"
             if node_props["type"] == "action"
@@ -46,6 +64,16 @@ class DotGraphCreator:
 
     @classmethod
     def __create_edge_label(cls, in_node_props, edge_props):
+        """
+        Creates the edge label.
+
+        Args:
+            in_node_props: The properties of the node the edge is coming from.
+            edge_props: The properties of the edge.
+
+        Returns:
+            The edge label.
+        """
         return (
             f"{in_node_props['dataItem']}={edge_props['range']}"
             if in_node_props["type"] == "decision"
@@ -54,6 +82,15 @@ class DotGraphCreator:
 
     @classmethod
     def create_dot_graph(cls, nx_graph):
+        """
+        Creates a graphviz dot graph from a NetworkX graph.
+
+        Args:
+            nx_graph: NetworkX graph.
+
+        Returns:
+            graphviz dot graph.
+        """
         dot_graph = Digraph(name=nx_graph.graph["name"])
         for n in nx_graph.nodes:
             node_props = nx_graph.nodes[n]
@@ -70,6 +107,7 @@ class DotGraphCreator:
             for e in nx_graph.out_edges(n):
                 edge_props = nx_graph[e[0]][e[1]][0]
                 dot_graph.edge(
-                    e[0], e[1], label=cls.__create_edge_label(node_props, edge_props)
+                    e[0], e[1], label=cls.__create_edge_label(
+                        node_props, edge_props)
                 )
         return dot_graph
