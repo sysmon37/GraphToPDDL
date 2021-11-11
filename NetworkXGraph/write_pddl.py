@@ -2,6 +2,7 @@ from utils import (
     find_goal_node,
     find_init_node,
     find_parallel_path,
+    match_nodes_to_disease,
     find_revId_involved_nodes,
     get_all_metrics,
     get_all_revIds,
@@ -60,6 +61,10 @@ def write_initial_state(graph, file, ros):
     write_revision_flags(graph, file, ros)
     file.write("\n")
     write_all_revisions_pass(graph, file)
+
+    # numRevisionIDs
+    write_num_revision_Ids(graph, file)
+    file.write("\n")
     # tentativeGoalCount - ???
     # numgoals
     file.write("\n")
@@ -309,6 +314,19 @@ def write_revision_flags(graph, file, ros):
         for d in disease:
             file.write("\t(= (revisionIDPass {} {}) 0)\n".format(d, revId))
         file.write("\n")
+
+
+def write_num_revision_Ids(graph, file):
+    """
+    Writes the numRevisionIDs predicate to the PDDL file.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    """
+    ro_diseases = match_nodes_to_disease(graph)
+    for disease, ro in ro_diseases.items():
+        file.write("\t(= (numRevisionIDs {}) {})\n".format(disease, len(ro)))
 
 
 def outputPDDL(graph, ros, problem_name, domain_name):

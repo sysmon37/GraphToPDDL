@@ -311,3 +311,38 @@ def find_revId_involved_nodes(graph, revId):
                         nodes.append(child)
                         children.extend(list(graph.successors(child)))
     return list(set(nodes))
+
+
+def match_nodes_to_disease(graph):
+    """
+    For each disease, find the revision operators that involve the disease.
+
+    Format of the return object:
+
+        {
+            "disease1": ['ro1', 'ro2'],
+            ...
+        }
+
+
+    Args:
+        graph (networkx graph): The graph.
+
+    Returns:
+        object: Object where the keys are the diseases and the values are a list of revision operations IDs.
+    """
+    revIds = get_all_revIds(graph)
+    diseases = get_type_nodes(graph, "context")
+
+    ro_disease = {}
+    for disease in diseases:
+        ro_disease[disease] = set()
+
+    for revId in revIds:
+        nodes = find_revId_involved_nodes(graph, revId)
+        diseases_involved = []
+        for node in nodes:
+            diseases_involved.append(find_init_node(graph, node))
+        for disease in diseases_involved:
+            ro_disease[disease].add(revId)
+    return ro_disease
