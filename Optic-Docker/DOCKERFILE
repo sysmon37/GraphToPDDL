@@ -1,0 +1,27 @@
+FROM ubuntu:18.04
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt-get update && apt-get install -y build-essential
+RUN apt-get install wget -y
+RUN apt-get install -y cmake coinor-libcbc-dev coinor-libclp-dev \
+                     coinor-libcoinutils-dev coinor-libosi-dev coinor-libcgl-dev doxygen libbz2-dev bison flex libgsl-dev
+
+WORKDIR /tmp/optic
+
+RUN wget https://sourceforge.net/projects/tsgp/files/OPTIC/optic-patched-for-gcc8.tar.bz2 
+RUN tar -xjf optic-patched-for-gcc8.tar.bz2
+
+WORKDIR /tmp/optic/optic
+RUN "./run-cmake-release"
+
+COPY link.txt .
+
+RUN cp link.txt release/optic/CMakeFiles/optic-clp.dir/link.txt
+
+RUN "./build-release"
+
+VOLUME /tmp/optic/optic/release/optic
+WORKDIR /tmp/optic/optic/release/optic
+ENTRYPOINT ["/bin/bash"]
+
