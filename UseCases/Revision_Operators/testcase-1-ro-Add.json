@@ -12,7 +12,8 @@
                 "newNodes": [
                     {
                         "id": "newAction",
-                        "cost": 100
+                        "cost": 100,
+                        "type": "action"
                     }
                 ]
             }
@@ -27,23 +28,47 @@
         "operations": [
             {
                 "type": "add",
-                "predecessors":["t2","t3"],
+                "predecessors":["t2"],
                 "successors":["a3"],
                 "newNodes": [
                     {
                         "id": "newAction2",
-                        "cost": 50
+                        "cost": 50,
+                        "type": "action"
                     }
                 ]
             },
             {
                 "type": "add",
-                "predecessors":["t1","t2"],
+                "predecessors":["t2"],
                 "successors":["g1"],
                 "newNodes": [
                     {
                         "id": "newAction3",
-                        "cost": 100
+                        "cost": 100,
+                        "type": "action"
+                    }
+                ]
+            },
+            {
+                "type": "add",
+                "predecessors":["a3"],
+                "successors":["g1", "newAction3"],
+                "newNodes": [
+                    {
+                        "id": "newDecision1",
+                        "type": "decision",
+                        "dataItem": "v5",
+                        "range":[
+                            {
+                            "value":"0..5",
+                            "successors":"g1"
+                        },
+                        {
+                            "value":"6..10",
+                            "successors":"newAction3"
+                        }
+                     ]
                     }
                 ]
             }

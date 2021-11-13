@@ -22,7 +22,6 @@ def read_RO(path):
 def update_graph_with_ROs(graph, ros):
     """
     Excutes the operations (replace, delete, add) of every revision operators.
-
     Args:
         graph (networkx graph): The graph.
         ros (list): List of JSON like object.
@@ -38,7 +37,6 @@ def update_graph_with_ROs(graph, ros):
                 delete_operation(graph, op)
             else:
                 add_action(graph, id, trigger, op)
-
 
 def replace_operation(graph, id_ro, trigger, operation):
     """
@@ -132,13 +130,24 @@ def add_action(graph, idRO, trigger, operation):
                 # taking node id and the rest of its attributes
                 node_copy = {**node}
                 new_node_id = node_copy["id"]
+    
+                node_type = node_copy["type"]
                 del node_copy["id"]
+                del node_copy["type"]
+                
+                # Decision node attributes
+                #node_dataItem = node_copy.get("dataItem", None)
+                node_range = node_copy.get("range", None)
+                #node_copy.pop("dataItem", None)
+                node_copy.pop("range", None)
+
 
                 # adding it to the graph
                 # Currently assuming the added nodes are all actionNode
+       
                 graph.add_node(
                     new_node_id,
-                    type="action",
+                    type=node_type,
                     is_original=False,
                     idRO=idRO,
                     trigger=trigger,
@@ -152,11 +161,17 @@ def add_action(graph, idRO, trigger, operation):
                     # Adding the edge between the new node and the predecessor with the edge data
                     # We only want one edge between the predecessor and the new node
                     if not graph.has_edge(predecessor, new_node_id):
-                        graph.add_edge(
-                            predecessor,
-                            new_node_id,
-                            **graph.get_edge_data(predecessor, successor)[0]
-                        )
+                        if node_type == "decision":
+                            for ranges in node_range:
+                                if ranges.get("successors", None) == successor:
+                                    graph.add_edge(new_node_id, successor,range=ranges.get("value", None))
+
+                        else:
+                            graph.add_edge(
+                                predecessor,
+                                new_node_id,
+                                **graph.get_edge_data(predecessor, successor)[0]
+                            )
 
                     # We need to remove the edges between the predecessor and the successor
                     graph.remove_edge(predecessor, successor)
