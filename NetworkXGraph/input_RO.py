@@ -52,8 +52,7 @@ def replace_operation(graph, id_ro, trigger, operation):
     """
     existing_node = operation["existingNode"]
     parent_nodes = list(graph.predecessors(existing_node))
-    current_existing_nodes_successors = list(
-        graph.successors(existing_node))[0]
+    current_existing_nodes_successors = list(graph.successors(existing_node))[0]
     # Loop over all the parents of the existing node
     for parent_node in parent_nodes:
         is_first_new_node = True
@@ -110,12 +109,11 @@ def delete_operation(graph, operation):
             succ_edge_data = graph.get_edge_data(node_to_delete, succ)[0]
             if not graph.has_edge(pred, succ):
                 graph.add_edge(pred, succ, **pred_edge_data, **succ_edge_data)
-            graph.remove_node(node_to_delete)
 
 
 def add_action(graph, idRO, trigger, operation):
     """
-    Add operation inserts a node(s) between a list of predeccessors and successors. 
+    Add operation inserts a node(s) between a list of predeccessors and successors.
 
     Args:
         graph (networkx graph): The graph.
@@ -155,7 +153,10 @@ def add_action(graph, idRO, trigger, operation):
                     # We only want one edge between the predecessor and the new node
                     if not graph.has_edge(predecessor, new_node_id):
                         graph.add_edge(
-                            predecessor, new_node_id, **graph.get_edge_data(predecessor, successor)[0])
+                            predecessor,
+                            new_node_id,
+                            **graph.get_edge_data(predecessor, successor)[0]
+                        )
 
                     # We need to remove the edges between the predecessor and the successor
                     graph.remove_edge(predecessor, successor)
@@ -168,12 +169,10 @@ def add_action(graph, idRO, trigger, operation):
                         # What range data do we want to copy/overlap?
                         # Using the first edge data for now
                         if graph.get_edge_data(predecessor, tmpSuccessor):
-                            tmpData = graph.get_edge_data(
-                                predecessor, tmpSuccessor)[0]
+                            tmpData = graph.get_edge_data(predecessor, tmpSuccessor)[0]
                             # We only want one edge between the predecessor and the new node
                             if not graph.has_edge(predecessor, new_node_id):
-                                graph.add_edge(
-                                    predecessor, new_node_id, **tmpData)
+                                graph.add_edge(predecessor, new_node_id, **tmpData)
                             break
                 # print(graph.edges(new_node_id))
             # Adding the edge between the new node and the successor with the edge data
