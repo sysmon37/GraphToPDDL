@@ -1,6 +1,5 @@
 import json
 from operator import itemgetter
-import DotGraphCreator as dgc
 
 
 def read_RO(path):
@@ -52,8 +51,7 @@ def replace_operation(graph, id_ro, trigger, operation):
     """
     existing_node = operation["existingNode"]
     parent_nodes = list(graph.predecessors(existing_node))
-    current_existing_nodes_successors = list(
-        graph.successors(existing_node))[0]
+    current_existing_nodes_successors = list(graph.successors(existing_node))[0]
     # Loop over all the parents of the existing node
     for parent_node in parent_nodes:
         is_first_new_node = True
@@ -61,17 +59,16 @@ def replace_operation(graph, id_ro, trigger, operation):
             # taking node id and the rest of its attributes
             node_copy = {**node}
             new_node_id = node_copy["id"]
+            node_type = node_copy["type"]
+            if node_type == "action":
+                node_copy["is_original"] = False
             del node_copy["id"]
+            del node_copy["type"]
 
             # adding it to the graph
             # Currently assuming the added nodes are all actionNode
             graph.add_node(
-                new_node_id,
-                type="action",
-                is_original=False,
-                idRO=id_ro,
-                trigger=trigger,
-                **node_copy
+                new_node_id, type=node_type, idRO=id_ro, trigger=trigger, **node_copy
             )
 
             # copying the edge data if any but only to the first new node
@@ -115,7 +112,7 @@ def delete_operation(graph, operation):
 
 def add_action(graph, idRO, trigger, operation):
     """
-    Add operation inserts a node(s) between a list of predeccessors and successors. 
+    Add operation inserts a node(s) between a list of predeccessors and successors.
 
     Args:
         graph (networkx graph): The graph.
@@ -155,7 +152,10 @@ def add_action(graph, idRO, trigger, operation):
                     # We only want one edge between the predecessor and the new node
                     if not graph.has_edge(predecessor, new_node_id):
                         graph.add_edge(
-                            predecessor, new_node_id, **graph.get_edge_data(predecessor, successor)[0])
+                            predecessor,
+                            new_node_id,
+                            **graph.get_edge_data(predecessor, successor)[0]
+                        )
 
                     # We need to remove the edges between the predecessor and the successor
                     graph.remove_edge(predecessor, successor)
@@ -168,12 +168,10 @@ def add_action(graph, idRO, trigger, operation):
                         # What range data do we want to copy/overlap?
                         # Using the first edge data for now
                         if graph.get_edge_data(predecessor, tmpSuccessor):
-                            tmpData = graph.get_edge_data(
-                                predecessor, tmpSuccessor)[0]
+                            tmpData = graph.get_edge_data(predecessor, tmpSuccessor)[0]
                             # We only want one edge between the predecessor and the new node
                             if not graph.has_edge(predecessor, new_node_id):
-                                graph.add_edge(
-                                    predecessor, new_node_id, **tmpData)
+                                graph.add_edge(predecessor, new_node_id, **tmpData)
                             break
                 # print(graph.edges(new_node_id))
             # Adding the edge between the new node and the successor with the edge data
