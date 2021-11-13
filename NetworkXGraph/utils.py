@@ -346,3 +346,22 @@ def match_nodes_to_disease(graph):
         for disease in diseases_involved:
             ro_disease[disease].add(revId)
     return ro_disease
+
+
+def handle_alternative_nodes(graph):
+    """
+    Modifies the alternative nodes to decision nodes where all successors have the same edges value.
+    That way, the planner will look into all successors for an optimize solution.
+
+
+    The patient values provided should include a value called "default" with the value of 0 or 1 that will be used for the alternative nodes.
+
+    Args:
+        graph (networkx graph): The graph.
+    """
+    for node, attr in graph.nodes.items():
+        if attr.get("type") == "alternative":
+            graph.nodes[node]["type"] = "decision"
+            graph.nodes[node]["dataItem"] = "default_value"
+            for succ in graph.successors(node):
+                graph.edges[node, succ, 0]["range"] = "0..1"
