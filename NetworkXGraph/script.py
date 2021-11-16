@@ -2,6 +2,7 @@ from input_output_graph import outputGraphViz, read_graph
 from write_pddl import outputPDDL
 from input_RO import read_RO, update_graph_with_ROs
 import argparse as ap
+import traceback
 
 
 def run(
@@ -53,3 +54,4 @@ if __name__ == "__main__":
         )
     except Exception as e:
         print(e)
+        traceback.print_exc()

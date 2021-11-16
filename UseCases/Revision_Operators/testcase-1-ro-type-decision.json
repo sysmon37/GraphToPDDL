@@ -1,0 +1,83 @@
+[
+    {
+        "id": "ro1",
+        "trigger": [
+            "a2",
+            "a7"
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "a7",
+                "newNodes": [
+                    {
+                        "id": "t5",
+                        "type": "decision",
+                        "dataItem": "v5",
+                        "edgeToSuccessors": true,
+                        "edgeToSuccessorsAttr": {
+                            "range": "0..4"
+                        }
+                    },
+                    {
+                        "id": "newAction",
+                        "cost": 100,
+                        "type": "action",
+                        "predecessors": [
+                            {
+                                "nodeId": "t5",
+                                "range": "5..8"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "hidden",
+                        "cost": 100,
+                        "type": "action",
+                        "predecessors": [
+                            {
+                                "nodeId": "newAction"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "Hello",
+                        "type": "action",
+                        "cost": 100,
+                        "predecessors": [
+                            {
+                                "nodeId": "hidden"
+                            }
+                        ],
+                        "edgeToSuccessors": true
+                    }
+                ]
+            },
+            {
+                "type": "delete",
+                "existingNode": "hidden"
+            }
+        ]
+    },
+    {
+        "id": "ro2",
+        "trigger": [
+            "a2",
+            "a7"
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "a7",
+                "newNodes": [
+                    {
+                        "id": "newAction2",
+                        "cost": 50,
+                        "type": "action",
+                        "edgeToSuccessors": true
+                    }
+                ]
+            }
+        ]
+    }
+]
