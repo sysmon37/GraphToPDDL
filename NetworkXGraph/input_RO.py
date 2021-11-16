@@ -53,40 +53,48 @@ def replace_operation(graph, id_ro, trigger, operation):
     parent_nodes = list(graph.predecessors(existing_node))
     current_existing_nodes_successors = list(graph.successors(existing_node))[0]
     # Loop over all the parents of the existing node
-    for parent_node in parent_nodes:
-        is_first_new_node = True
-        for node in operation["newNodes"]:
-            # taking node id and the rest of its attributes
-            node_copy = {**node}
-            new_node_id = node_copy["id"]
-            node_type = node_copy["type"]
-            if node_type == "action":
-                node_copy["is_original"] = False
-            del node_copy["id"]
-            del node_copy["type"]
+    # for parent_node in parent_nodes:
+    is_first_new_node = True
+    for node in operation["newNodes"]:
+        # taking node id and the rest of its attributes
+        node_copy = {**node}
+        new_node_id = node_copy["id"]
+        node_type = node_copy["type"]
+        predecessor_list = node_copy.get(
+            "predecessors", list(graph.predecessors(existing_node))
+        )
+        if node_type == "action":
+            node_copy["is_original"] = False
+        del node_copy["id"]
+        del node_copy["type"]
 
-            # adding it to the graph
-            # Currently assuming the added nodes are all actionNode
-            graph.add_node(
-                new_node_id, type=node_type, idRO=id_ro, trigger=trigger, **node_copy
-            )
+        if "predecessors" in node_copy:
+            del node_copy["predecessors"]
 
+        # adding it to the graph
+        # Currently assuming the added nodes are all actionNode
+        graph.add_node(
+            new_node_id, type=node_type, idRO=id_ro, trigger=trigger, **node_copy
+        )
+        for pred in predecessor_list:
+            if isinstance(pred, str):
+                pred = {"nodeId": pred}
+            pred_node = pred["nodeId"]
+            del pred["nodeId"]
             # copying the edge data if any but only to the first new node
-            edge_range = graph.get_edge_data(parent_node, existing_node)
-            edge_range = edge_range[0] if edge_range else {}
-            if not graph.has_edge(parent_node, new_node_id):
-                graph.add_edge(
-                    parent_node, new_node_id, **edge_range if is_first_new_node else {}
-                )
+            edge_data = graph.get_edge_data(pred_node, existing_node)
+            edge_data = edge_data[0] if edge_data else {}
+            if not graph.has_edge(pred_node, new_node_id):
+                graph.add_edge(pred_node, new_node_id, **pred, **edge_data)
 
-            # wont copy edge attributes further
-            is_first_new_node = False
+        # wont copy edge attributes further
+        is_first_new_node = False
 
-            # updating the parent node so the next new node has the correct edge
-            parent_node = new_node_id
-    if not graph.has_edge(parent_node, current_existing_nodes_successors):
+        # updating the parent node so the next new node has the correct edge
+        parent_node = new_node_id
+    if not graph.has_edge(pred_node, current_existing_nodes_successors):
         # need one last edge from the last added node to the same node 'Existing_node' is pointing too
-        graph.add_edge(parent_node, current_existing_nodes_successors)
+        graph.add_edge(pred_node, current_existing_nodes_successors)
 
 
 def delete_operation(graph, operation):
@@ -105,9 +113,11 @@ def delete_operation(graph, operation):
         for succ in successors:
             pred_edge_data = graph.get_edge_data(pred, node_to_delete)[0]
             succ_edge_data = graph.get_edge_data(node_to_delete, succ)[0]
+            print("pred: {}".format(pred) + str(type(pred_edge_data)))
+            print("succ: {}".format(succ) + str(type(succ_edge_data)))
+
             if not graph.has_edge(pred, succ):
                 graph.add_edge(pred, succ, **pred_edge_data, **succ_edge_data)
-            graph.remove_node(node_to_delete)
 
 
 def add_action(graph, idRO, trigger, operation):

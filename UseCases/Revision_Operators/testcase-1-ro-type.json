@@ -18,12 +18,22 @@
                     {
                         "id": "hidden",
                         "cost": 100,
-                        "type": "action"
+                        "type": "action",
+                        "predecessors": [
+                            {
+                                "nodeId": "newAction"
+                            }
+                        ]
                     },
                     {
                         "id": "Hello",
                         "type": "action",
-                        "cost": 100
+                        "cost": 100,
+                        "predecessors": [
+                            {
+                                "nodeId": "hidden"
+                            }
+                        ]
                     }
                 ]
             },
