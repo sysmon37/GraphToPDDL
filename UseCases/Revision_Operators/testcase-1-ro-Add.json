@@ -13,7 +13,8 @@
                     {
                         "id": "newAction",
                         "cost": 100,
-                        "type": "action"
+                        "type": "action",
+                        "edgeToSuccessors": true
                     }
                 ]
             }

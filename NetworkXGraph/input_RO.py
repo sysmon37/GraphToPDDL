@@ -173,17 +173,11 @@ def add_action(graph, idRO, trigger, operation):
                     # Adding the edge between the new node and the predecessor with the edge data
                     # We only want one edge between the predecessor and the new node
                     if not graph.has_edge(predecessor, new_node_id):
-                        if node_type == "decision":
-                            for ranges in node_range:
-                                if ranges.get("successors", None) == successor:
-                                    graph.add_edge(new_node_id, successor,range=ranges.get("value", None))
-
-                        else:
-                            graph.add_edge(
-                                predecessor,
-                                new_node_id,
-                                **graph.get_edge_data(predecessor, successor)[0]
-                            )
+                        graph.add_edge(
+                            predecessor,
+                            new_node_id,
+                            **graph.get_edge_data(predecessor, successor)[0]
+                        )
 
                     # We need to remove the edges between the predecessor and the successor
                     graph.remove_edge(predecessor, successor)
@@ -206,4 +200,9 @@ def add_action(graph, idRO, trigger, operation):
 
             # We only want one edge between the new node and the successor
             if not graph.has_edge(new_node_id, successor):
-                graph.add_edge(new_node_id, successor)
+                if node_type == "decision":
+                    for ranges in node_range:
+                        if ranges.get("successors", None) == successor:
+                            graph.add_edge(new_node_id, successor,range=ranges.get("value", None))
+                else:
+                    graph.add_edge(new_node_id, successor)
