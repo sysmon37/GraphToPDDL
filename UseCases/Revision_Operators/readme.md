@@ -54,8 +54,8 @@ Every operation must have the followings attributes:
 ```
 
  There are 3 possibles operations:
- - [Replace](####Replace-operation)
- - [Delete](####Delete-operation)
+ - [Replace](#Replace-operation)
+ - [Delete](#Delete-operation)
  - Add
 
 
