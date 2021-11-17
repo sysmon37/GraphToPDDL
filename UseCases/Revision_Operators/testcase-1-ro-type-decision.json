@@ -36,13 +36,13 @@
                         "cost": 100,
                         "predecessors": [
                             {
-                                "nodeId": "hidden"
+                                "nodeId": "deleted"
                             }
                         ],
                         "edgeToSuccessors": true
                     },
                     {
-                        "id": "hidden",
+                        "id": "deleted",
                         "cost": 100,
                         "type": "action",
                         "predecessors": [
@@ -55,7 +55,7 @@
             },
             {
                 "type": "delete",
-                "existingNode": "hidden"
+                "existingNode": "deleted"
             }
         ]
     },
