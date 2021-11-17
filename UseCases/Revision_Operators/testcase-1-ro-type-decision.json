@@ -11,15 +11,6 @@
                 "existingNode": "a7",
                 "newNodes": [
                     {
-                        "id": "t5",
-                        "type": "decision",
-                        "dataItem": "v5",
-                        "edgeToSuccessors": true,
-                        "edgeToSuccessorsAttr": {
-                            "range": "0..4"
-                        }
-                    },
-                    {
                         "id": "newAction",
                         "cost": 100,
                         "type": "action",
@@ -31,14 +22,13 @@
                         ]
                     },
                     {
-                        "id": "hidden",
-                        "cost": 100,
-                        "type": "action",
-                        "predecessors": [
-                            {
-                                "nodeId": "newAction"
-                            }
-                        ]
+                        "id": "t5",
+                        "type": "decision",
+                        "dataItem": "v5",
+                        "edgeToSuccessors": true,
+                        "edgeToSuccessorsAttr": {
+                            "range": "0..4"
+                        }
                     },
                     {
                         "id": "Hello",
@@ -50,6 +40,16 @@
                             }
                         ],
                         "edgeToSuccessors": true
+                    },
+                    {
+                        "id": "hidden",
+                        "cost": 100,
+                        "type": "action",
+                        "predecessors": [
+                            {
+                                "nodeId": "newAction"
+                            }
+                        ]
                     }
                 ]
             },
