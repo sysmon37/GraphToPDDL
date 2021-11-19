@@ -1,0 +1,45 @@
+[
+    {
+        "id": "ro2",
+        "trigger": [
+            "a2"
+        ],
+        "operations": [
+            {
+                "type": "add",
+                "predecessors":["a1"],
+                "successors":["a2"],
+                "newNodes": [
+                    {
+                        "id": "newAction1",
+                        "cost": 50,
+                        "type": "action"
+                    }
+                ]
+            },
+            {
+                "type": "add",
+                "predecessors":["a3"],
+                "successors":["g1", "a4"],
+                "newNodes": [
+                    {
+                        "id": "newDecision1",
+                        "type": "decision",
+                        "dataItem": "v2",
+                        "range":[
+                            {
+                            "value":"0..5",
+                            "successors":"a4"
+                        },
+                        {
+                            "value":"6..10",
+                            "successors":"g1"
+                        }
+                     ]
+                    }
+                ]
+            }
+            
+        ]
+    }
+]
