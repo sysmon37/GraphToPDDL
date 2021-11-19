@@ -35,7 +35,7 @@ def update_graph_with_ROs(graph, ros):
             elif type == "delete":
                 delete_operation(graph, op)
             else:
-                add_action(graph, id, trigger, op)
+                add_operation(graph, id, trigger, op)
 
 def replace_operation(graph, id_ro, trigger, operation):
     """
@@ -121,7 +121,7 @@ def delete_operation(graph, operation):
                 graph.add_edge(pred, succ, **pred_edge_data, **succ_edge_data)
 
 
-def add_action(graph, idRO, trigger, operation):
+def add_operation(graph, idRO, trigger, operation):
     """
     Add operation inserts a node(s) between a list of predeccessors and successors.
 
@@ -178,12 +178,13 @@ def add_action(graph, idRO, trigger, operation):
                             new_node_id,
                             **graph.get_edge_data(predecessor, successor)[0]
                         )
-
+                    
+                    # UPDATE: We keep the edge between the predecessor and the successor
                     # We need to remove the edges between the predecessor and the successor
-                    graph.remove_edge(predecessor, successor)
+                    # graph.remove_edge(predecessor, successor) 
 
                 # Case where the predecessor node is not adjacent to the successor node
-                else:
+                else: # Probably not needed since we will not add a "new edge", Will need to test with a bigger problem
                     tmpSuccessors = list(graph.successors(predecessor))
 
                     for tmpSuccessor in tmpSuccessors:
