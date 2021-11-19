@@ -7,35 +7,46 @@
         "operations": [
             {
                 "type": "add",
-                "predecessors":["a1"],
-                "successors":["a2"],
                 "newNodes": [
                     {
                         "id": "newAction1",
                         "cost": 50,
-                        "type": "action"
+                        "type": "action",
+                        "predecessors": [
+                            {
+                                "nodeId": "a1"
+                            }
+                        ],
+                        "successors": [
+                            {
+                                "nodeId": "a2"
+                            }
+                        ]
                     }
                 ]
             },
             {
                 "type": "add",
-                "predecessors":["a3"],
-                "successors":["g1", "a4"],
                 "newNodes": [
                     {
                         "id": "newDecision1",
                         "type": "decision",
                         "dataItem": "v2",
-                        "range":[
+                        "predecessors": [
                             {
-                            "value":"0..5",
-                            "successors":"a4"
-                        },
-                        {
-                            "value":"6..10",
-                            "successors":"g1"
-                        }
-                     ]
+                                "nodeId": "a3"
+                            }
+                        ],
+                        "successors": [
+                            {
+                                "nodeId": "a4",
+                                "range": "0..5"
+                            },
+                            {
+                                "nodeId": "g1",
+                                "range": "6..10"
+                            }
+                        ]
                     }
                 ]
             }

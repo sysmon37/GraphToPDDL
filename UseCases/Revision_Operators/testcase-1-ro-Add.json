@@ -2,74 +2,71 @@
     {
         "id": "ro1",
         "trigger": [
-            "a2",
-            "a7"
-        ],
-        "operations": [
-            {
-                "type": "replace",
-                "existingNode": "a7",
-                "newNodes": [
-                    {
-                        "id": "newAction",
-                        "cost": 100,
-                        "type": "action",
-                        "edgeToSuccessors": true
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "id": "ro2",
-        "trigger": [
-            "a2",
-            "a7"
+            "a2"
         ],
         "operations": [
             {
                 "type": "add",
-                "predecessors":["t2"],
-                "successors":["a3"],
                 "newNodes": [
                     {
                         "id": "newAction2",
                         "cost": 50,
-                        "type": "action"
+                        "type": "action",
+                        "predecessors": [
+                            {
+                                "nodeId": "t2"
+                            }
+                        ],
+                        "successors": [
+                            {
+                                "nodeId": "a3"
+                            }
+                        ]
                     }
                 ]
             },
             {
                 "type": "add",
-                "predecessors":["t2"],
-                "successors":["g1"],
                 "newNodes": [
                     {
                         "id": "newAction3",
                         "cost": 100,
-                        "type": "action"
+                        "type": "action",
+                        "predecessors": [
+                            {
+                                "nodeId": "t2"
+                            }
+                        ],
+                        "successors": [
+                            {
+                                "nodeId": "g1"
+                            }
+                        ]
                     }
                 ]
             },
             {
                 "type": "add",
-                "predecessors":["a3"],
-                "successors":["g1", "newAction3"],
                 "newNodes": [
                     {
                         "id": "newDecision1",
                         "type": "decision",
                         "dataItem": "v5",
-                        "range":[
+                        "predecessors": [
                             {
-                            "value":"0..5",
-                            "successors":"g1"
-                        },
-                        {
-                            "value":"6..10",
-                            "successors":"newAction3"
-                        }
-                     ]
+                                "nodeId": "a3"
+                            }
+                        ],
+                        "successors": [
+                            {
+                                "nodeId": "g1",
+                                "range": "0..5"
+                            },
+                            {
+                                "nodeId": "newAction3",
+                                "range": "6..10"
+                            }
+                        ]
                     }
                 ]
             }
