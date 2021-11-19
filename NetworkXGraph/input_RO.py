@@ -131,32 +131,31 @@ def add_operation(graph, idRO, trigger, operation):
         trigger (list): List of triggering nodes.
         operation (str): The operation object
     """
-    predecessors = operation["predecessors"]
-    successors = operation["successors"]
 
     addedNodes = operation["newNodes"]
 
-    for predecessor in predecessors:
-        for successor in successors:
-            for node in addedNodes:
-                # taking node id and the rest of its attributes
-                node_copy = {**node}
-                new_node_id = node_copy["id"]
-    
-                node_type = node_copy["type"]
-                del node_copy["id"]
-                del node_copy["type"]
-                
-                # Decision node attributes
-                #node_dataItem = node_copy.get("dataItem", None)
-                node_range = node_copy.get("range", None)
-                #node_copy.pop("dataItem", None)
-                node_copy.pop("range", None)
+    # for predecessor in predecessors:
+    #     for successor in successors:
+    for node in addedNodes:
+        # taking node id and the rest of its attributes
+        node_copy = {**node} # cost ...
+        new_node_id = node_copy["id"]
 
+        node_type = node_copy["type"]
+        del node_copy["id"]
+        del node_copy["type"]
+        
+        # Predecessors and successors are lists of dictionaries
+        predecessors_list = node_copy.get("predecessors", None)
+        successors_list = node_copy.get("successors", None)
+        node_copy.pop("predecessors", None)
+        node_copy.pop("successors", None)
 
+        for predecessor in predecessors_list:
+            for successor in successors_list:
                 # adding it to the graph
                 # Currently assuming the added nodes are all actionNode
-       
+
                 graph.add_node(
                     new_node_id,
                     type=node_type,
@@ -165,18 +164,24 @@ def add_operation(graph, idRO, trigger, operation):
                     trigger=trigger,
                     **node_copy
                 )
-                # print(graph.get_edge_data(predecessor, successor)[0])
-                # nwx.add_path(graph,[predecessor, new_node_id, successor])
+
+                # Get nodeId of predecessor and successor
+                predecessor_node = predecessor["nodeId"]
+                successor_node = successor["nodeId"]
+
+                # Get range of predecessor and successor
+                predecessor_range = predecessor.get("range", None)
+                successor_range = successor.get("range", None)
 
                 # Case where the Predecessor node and successor node are adjecent
-                if graph.has_edge(predecessor, successor):
+                if graph.has_edge(predecessor_node, successor_node):
                     # Adding the edge between the new node and the predecessor with the edge data
                     # We only want one edge between the predecessor and the new node
-                    if not graph.has_edge(predecessor, new_node_id):
+                    if not graph.has_edge(predecessor_node, new_node_id):
                         graph.add_edge(
-                            predecessor,
+                            predecessor_node,
                             new_node_id,
-                            **graph.get_edge_data(predecessor, successor)[0]
+                            **graph.get_edge_data(predecessor_node, successor_node)[0]
                         )
                     
                     # UPDATE: We keep the edge between the predecessor and the successor
@@ -185,25 +190,22 @@ def add_operation(graph, idRO, trigger, operation):
 
                 # Case where the predecessor node is not adjacent to the successor node
                 else: # Probably not needed since we will not add a "new edge", Will need to test with a bigger problem
-                    tmpSuccessors = list(graph.successors(predecessor))
+                    tmpSuccessors = list(graph.successors(predecessor_node))
 
                     for tmpSuccessor in tmpSuccessors:
                         # What range data do we want to copy/overlap?
                         # Using the first edge data for now
-                        if graph.get_edge_data(predecessor, tmpSuccessor):
-                            tmpData = graph.get_edge_data(predecessor, tmpSuccessor)[0]
+                        if graph.get_edge_data(predecessor_node, tmpSuccessor):
+                            tmpData = graph.get_edge_data(predecessor_node, tmpSuccessor)[0]
                             # We only want one edge between the predecessor and the new node
-                            if not graph.has_edge(predecessor, new_node_id):
-                                graph.add_edge(predecessor, new_node_id, **tmpData)
-                            break
-                # print(graph.edges(new_node_id))
-            # Adding the edge between the new node and the successor with the edge data
+                            if not graph.has_edge(predecessor_node, new_node_id):
+                                graph.add_edge(predecessor_node, new_node_id, **tmpData)
 
-            # We only want one edge between the new node and the successor
-            if not graph.has_edge(new_node_id, successor):
-                if node_type == "decision":
-                    for ranges in node_range:
-                        if ranges.get("successors", None) == successor:
-                            graph.add_edge(new_node_id, successor,range=ranges.get("value", None))
-                else:
-                    graph.add_edge(new_node_id, successor)
+                # We only want one edge between the new node and the successor
+                if not graph.has_edge(new_node_id, successor_node):
+                    if node_type == "decision":
+                    #     for ranges in node_range:
+                    #         if ranges.get("successors", None) == successor_node:
+                        graph.add_edge(new_node_id, successor_node,range=successor_range)
+                    else:
+                        graph.add_edge(new_node_id, successor_node)
