@@ -151,6 +151,14 @@ def add_operation(graph, idRO, trigger, operation):
         node_copy.pop("predecessors", None)
         node_copy.pop("successors", None)
 
+        # disease/goal case
+        if not predecessors_list:
+            # print("No predecessors")
+            predecessors_list = ["disease"]
+        if not successors_list:
+            # print("No successors")
+            successors_list = ["goal"]
+
         for predecessor in predecessors_list:
             for successor in successors_list:
                 # adding it to the graph
@@ -166,46 +174,78 @@ def add_operation(graph, idRO, trigger, operation):
                 )
 
                 # Get nodeId of predecessor and successor
-                predecessor_node = predecessor["nodeId"]
-                successor_node = successor["nodeId"]
+                if not predecessor == "disease":
+                    pred = {**predecessor}
+                    predecessor_node = pred.get("nodeId", None)
+                    pred.pop("nodeId", None)
+                if not successor == "goal":
+                    succ = {**successor}
+                    successor_node = succ.get("nodeId", None)
+                    succ.pop("nodeId", None)
 
                 # Get range of predecessor and successor
-                predecessor_range = predecessor.get("range", None)
-                successor_range = successor.get("range", None)
-
+                if not predecessor == "disease":
+                    predecessor_range = pred.get("range", None)
+                    pred.pop("range", None)
+                if not successor == "goal":
+                    successor_range = succ.get("range", None)
+                    succ.pop("range", None)
+                
                 # Case where the Predecessor node and successor node are adjecent
-                if graph.has_edge(predecessor_node, successor_node):
-                    # Adding the edge between the new node and the predecessor with the edge data
-                    # We only want one edge between the predecessor and the new node
-                    if not graph.has_edge(predecessor_node, new_node_id):
-                        graph.add_edge(
-                            predecessor_node,
-                            new_node_id,
-                            **graph.get_edge_data(predecessor_node, successor_node)[0]
-                        )
-                    
+                # if graph.has_edge(predecessor_node, successor_node) :
+                # Adding the edge between the new node and the predecessor with the edge data
+                # We only want one edge between the predecessor and the new node
+                if not graph.has_edge(predecessor_node, new_node_id):
+                    if not predecessor == "disease":
+
+                        if graph.has_edge(predecessor_node, successor_node) and not predecessor_range : # if the range is not specified from the predecessor
+                            graph.add_edge(
+                                predecessor_node,
+                                new_node_id,
+                                **graph.get_edge_data(predecessor_node, successor_node)[0]
+                            )
+                        else:
+                            graph.add_edge(
+                                predecessor_node,
+                                new_node_id,
+                                range=predecessor_range,
+                                **pred
+                            )
+                
+                # else:
+               
+                #     graph.add_edge(
+                #         predecessor_node,
+                #         new_node_id,
+                #         range=predecessor_range,
+                #         **pred
+                #     )
+
                     # UPDATE: We keep the edge between the predecessor and the successor
                     # We need to remove the edges between the predecessor and the successor
                     # graph.remove_edge(predecessor, successor) 
 
                 # Case where the predecessor node is not adjacent to the successor node
-                else: # Probably not needed since we will not add a "new edge", Will need to test with a bigger problem
-                    tmpSuccessors = list(graph.successors(predecessor_node))
+                # else: # Probably not needed since we will not add a "new edge", Will need to test with a bigger problem
+                #     tmpSuccessors = list(graph.successors(predecessor_node))
 
-                    for tmpSuccessor in tmpSuccessors:
-                        # What range data do we want to copy/overlap?
-                        # Using the first edge data for now
-                        if graph.get_edge_data(predecessor_node, tmpSuccessor):
-                            tmpData = graph.get_edge_data(predecessor_node, tmpSuccessor)[0]
-                            # We only want one edge between the predecessor and the new node
-                            if not graph.has_edge(predecessor_node, new_node_id):
-                                graph.add_edge(predecessor_node, new_node_id, **tmpData)
+                #     for tmpSuccessor in tmpSuccessors:
+                #         # What range data do we want to copy/overlap?
+                #         # Using the first edge data for now
+                #         if graph.get_edge_data(predecessor_node, tmpSuccessor):
+                #             if not successor == "disease":
+                #                 # print(new_node_id)
+                #                 tmpData = graph.get_edge_data(predecessor_node, tmpSuccessor)[0]
+                #                 # We only want one edge between the predecessor and the new node
+                #                 if not graph.has_edge(predecessor_node, new_node_id):
+                #                     graph.add_edge(predecessor_node, new_node_id, **tmpData)
 
                 # We only want one edge between the new node and the successor
                 if not graph.has_edge(new_node_id, successor_node):
-                    if node_type == "decision":
-                    #     for ranges in node_range:
-                    #         if ranges.get("successors", None) == successor_node:
-                        graph.add_edge(new_node_id, successor_node,range=successor_range)
-                    else:
-                        graph.add_edge(new_node_id, successor_node)
+                    if not successor == "goal":
+                        if node_type == "decision":
+                        #     for ranges in node_range:
+                        #         if ranges.get("successors", None) == successor_node:
+                            graph.add_edge(new_node_id, successor_node,range=successor_range,**succ)
+                        else:
+                            graph.add_edge(new_node_id, successor_node,**succ)

@@ -62,8 +62,41 @@
                                 "range": "6..10"
                             }
                         ]
+                    },
+                    {
+                        "id": "newGoal1",
+                        "type": "goal",
+                        "predecessors": [
+                            {
+                                "nodeId": "a3"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "newDisease1",
+                        "type": "context",
+                        "successors": [
+                            {
+                                "nodeId": "a3"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "newAction5",
+                        "type": "action",
+                        "cost": 50,
+                        "predecessors": [
+                            {
+                                "nodeId": "t1",
+                                "range": "0..8"
+                            }
+                        ],
+                        "successors": [
+                            {
+                                "nodeId": "g1"
+                            }
+                        ]
                     }
-                    
 
                 ]
             }
