@@ -6,8 +6,9 @@ import traceback
 
 
 def run(
-    path="../UseCases/AGFigures/testcase-5-rev.dot",
-    ros_path="../UseCases/Revision_Operators/testcase-5-ro.json",
+    path,
+    ros_path,
+    og
 ):
     """
     Function to run the automation pipeline.
@@ -18,9 +19,12 @@ def run(
 
     """
     graph = read_graph(path)
-    ros = read_RO(ros_path)
-    update_graph_with_ROs(graph, ros)
-    outputPDDL(graph, ros, "problem-test", "domain_test")
+    if not og:
+        ros = read_RO(ros_path)
+        update_graph_with_ROs(graph, ros)
+        outputPDDL(graph, ros, "problem-test", "domain_test")
+    else:
+        outputPDDL(graph, [], "problem-test", "domain_test")
     outputGraphViz(graph)
 
 
@@ -35,6 +39,13 @@ if __name__ == "__main__":
         type=str,
         help="Path to the revision operator file. It must be a JSON file.",
     )
+
+    parser.add_argument(
+        "--og",
+        action='store_true',
+        help="Original Graph only",
+    )
+
     args = parser.parse_args()
     try:
         if not args.ag:
@@ -51,6 +62,7 @@ if __name__ == "__main__":
         run(
             args.ag,
             args.ro,
+            args.og
         )
     except Exception as e:
         print(e)
