@@ -1,26 +1,30 @@
 from input_output_graph import outputGraphViz, read_graph
 from write_pddl import outputPDDL
-from input_RO import read_RO, update_graph_with_ROs
+from input_RO import read_JSON, update_graph_with_ROs
 import argparse as ap
 import traceback
 
 
-def run(
-    path="../UseCases/AGFigures/testcase-5-rev.dot",
-    ros_path="../UseCases/Revision_Operators/testcase-5-ro.json",
-):
+def run(path, ros_path, patient_values_path):
     """
     Function to run the automation pipeline.
 
     Args:
         path (str): Path to the file.
         ros_path (str): Path to the revision operators file.
+        patient_values_path (str): Path to the patient values file.
 
     """
     graph = read_graph(path)
-    ros = read_RO(ros_path)
+
+    # ROs
+    ros = read_JSON(ros_path)
     update_graph_with_ROs(graph, ros)
-    outputPDDL(graph, ros, "problem-test", "domain_test")
+
+    # Patient values
+    patient_values = read_JSON(patient_values_path)
+
+    outputPDDL(graph, ros, patient_values, "problem-test", "domain_test")
     outputGraphViz(graph)
 
 
@@ -35,6 +39,11 @@ if __name__ == "__main__":
         type=str,
         help="Path to the revision operator file. It must be a JSON file.",
     )
+    parser.add_argument(
+        "--p",
+        type=str,
+        help="Path to the patient values file. It must be a JSON file.",
+    )
     args = parser.parse_args()
     try:
         if not args.ag:
@@ -48,10 +57,10 @@ if __name__ == "__main__":
         if args.ro != None and args.ro[-4:].lower() != "json":
             raise Exception("The Revision operators file (--ro) must be a JSON file.")
 
-        run(
-            args.ag,
-            args.ro,
-        )
+        if args.p != None and args.p[-4:].lower() != "json":
+            raise Exception("The Revision operators file (--ro) must be a JSON file.")
+
+        run(args.ag, args.ro, args.p)
     except Exception as e:
         print(e)
         traceback.print_exc()

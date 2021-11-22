@@ -27,7 +27,7 @@ def write_objects(graph, file):
     file.write(")\n")
 
 
-def write_initial_state(graph, file, ros):
+def write_initial_state(graph, file, ros, patient_values):
     """
     Writes all the predicates of the initial (:init) state to the file.
 
@@ -36,13 +36,18 @@ def write_initial_state(graph, file, ros):
     Args:
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
+        ros (list) : List of revision operators.
+        patient_values (dict) : Dictonary of the patient values.
+
     """
     file.write("(:init ")
     # decision branching min/max
     write_decision_branch(graph, file)
     file.write("\n")
 
-    # patient value - NOT NOW
+    # patient value
+    write_patient_values(graph, file, patient_values)
+    file.write("\n")
 
     # noPrevious nodes
     # write_not_previous_node(graph, file)
@@ -329,13 +334,41 @@ def write_num_revision_Ids(graph, file):
         file.write("\t(= (numRevisionIDs {}) {})\n".format(disease, len(ro)))
 
 
-def outputPDDL(graph, ros, problem_name, domain_name):
+def write_patient_values(graph, file, patient_values):
+    """
+    Writes the patient value predicate. There is one predicate per successor
+    each decision node.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+        patient_values (dict) : Dictonary of the patient values.
+
+    """
+    for node, attr in graph.nodes.items():
+        if attr["type"] == "decision":
+            disease = find_init_node(graph, node)
+            file.write(
+                "\n\t;; {} = {}\n".format(
+                    attr["dataItem"], patient_values[attr["dataItem"]]
+                )
+            )
+            for successor in graph.successors(node):
+                file.write(
+                    "\t(= (patientValue {} {} {}) {})\n".format(
+                        disease, node, successor, patient_values[attr["dataItem"]]
+                    )
+                )
+
+
+def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
     """
     Ouputs the PDDL file.
 
     Args:
         graph (networkx graph): The graph.
         ros (list) : The list of revision operator objects
+        patient_values (dict) : Dictonary of the patient values.
         problem_name (str): The name of the problem to be in the PDDL file.
         domain_name (str): The name of the domain to be in the PDDL file.
     """
@@ -349,7 +382,7 @@ def outputPDDL(graph, ros, problem_name, domain_name):
 
         # :init
         pddl.write("\n")
-        write_initial_state(graph, pddl, ros)
+        write_initial_state(graph, pddl, ros, patient_values)
 
         # :goal
         pddl.write("\n")
