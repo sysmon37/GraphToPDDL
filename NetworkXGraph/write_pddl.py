@@ -74,7 +74,8 @@ def write_initial_state(graph, file, ros, patient_values):
     # anyRevisionOps | noRevisionOps
     write_any_no_revision_ops(graph, file, ros)
     file.write("\n")
-    # tentativeGoalCount - ???
+    # tentativeGoalCount
+    write_tentative_goal_count(graph, file)
     # numgoals
     file.write("\n")
     file.write("\t(= (numGoals) {})\n".format(len(get_type_nodes(graph, "goal"))))
@@ -175,6 +176,17 @@ def write_total_metrics(graph, file):
     for metric in metrics:
         metric_name = get_metric_name(metric)
         file.write("\t(= (total-{}) 0)\n".format(metric_name.lower()))
+
+
+def write_tentative_goal_count(graph, file):
+    """
+    Writes the tentative goal count predicate. Currently is hardcoded to 0.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    """
+    file.write("\t(= (tentativeGoalCount) 0)\n")
 
 
 def write_decision_branch(graph, file):
@@ -366,6 +378,14 @@ def write_patient_values(graph, file, patient_values):
 
 
 def write_any_no_revision_ops(graph, file, ros):
+    """
+    Writes anyRevisionOps or noRevsionOps predicates.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+        ros (list) : The list of revision operator objects
+    """
     all_triggers = [trigger for ro in ros for trigger in ro["trigger"]]
     all_triggers = list(set(all_triggers))
     diseases = get_type_nodes(graph, "context")
