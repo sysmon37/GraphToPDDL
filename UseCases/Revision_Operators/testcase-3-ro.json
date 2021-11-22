@@ -12,7 +12,9 @@
                 "newNodes": [
                     {
                         "id": "newAction",
-                        "cost": 100
+                        "cost": 100,
+                        "type": "action",
+                        "edgeToSuccessors": true
                     }
                 ]
             }
@@ -31,7 +33,9 @@
                 "newNodes": [
                     {
                         "id": "newAction0",
-                        "cost": 100
+                        "cost": 100,
+                        "type": "action",
+                        "edgeToSuccessors": true
                     }
                 ]
             }
