@@ -2,9 +2,9 @@ import json
 from operator import itemgetter
 
 
-def read_RO(path):
+def read_JSON(path):
     """
-    Reads the revision operator file. The file MUST be JSON format.
+    Reads a JSON file and returns its content.
 
     Args:
         path (str): Path to the file.
@@ -13,9 +13,9 @@ def read_RO(path):
         json: JSON object
     """
     with open(path) as file:
-        ros = json.load(file)
+        obj = json.load(file)
         file.close()
-    return ros
+    return obj
 
 
 def update_graph_with_ROs(graph, ros):
