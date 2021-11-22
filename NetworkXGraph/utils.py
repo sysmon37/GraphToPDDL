@@ -109,7 +109,8 @@ def find_parallel_path(graph, p_nodes_found):
     """
     parallelNode = ""
     # TODO: numParallelPaths for each diseases
-
+    end_nodes = []
+    
     for start_node in p_nodes_found:
         for end_node in p_nodes_found:
 
@@ -125,7 +126,10 @@ def find_parallel_path(graph, p_nodes_found):
                 untraversedParallelNode = ""
 
                 parallelNode += "(parallelStartNode {})\n\t".format(start_node)
-                parallelNode += "(parallelEndNode {})\n\t".format(end_node)
+                if end_node not in end_nodes:
+                    end_nodes.append(end_node)
+                    parallelNode += "(parallelEndNode {})\n\t".format(end_node)
+
 
                 # for path in parallel_sequence:
                 (
