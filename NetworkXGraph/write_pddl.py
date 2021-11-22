@@ -70,6 +70,10 @@ def write_initial_state(graph, file, ros, patient_values):
     # numRevisionIDs
     write_num_revision_Ids(graph, file)
     file.write("\n")
+
+    # anyRevisionOps | noRevisionOps
+    write_any_no_revision_ops(graph, file, ros)
+    file.write("\n")
     # tentativeGoalCount - ???
     # numgoals
     file.write("\n")
@@ -359,6 +363,26 @@ def write_patient_values(graph, file, patient_values):
                         disease, node, successor, patient_values[attr["dataItem"]]
                     )
                 )
+
+
+def write_any_no_revision_ops(graph, file, ros):
+    all_triggers = [trigger for ro in ros for trigger in ro["trigger"]]
+    all_triggers = list(set(all_triggers))
+    diseases = get_type_nodes(graph, "context")
+    any_revision_ops = []
+
+    for trigger in all_triggers:
+        disease = find_init_node(graph, trigger)
+
+        if not disease in any_revision_ops:
+            diseases.remove(disease)
+            any_revision_ops.append(disease)
+
+    for rev_op in any_revision_ops:
+        file.write("\t(anyRevisionOps {})\n".format(rev_op))
+
+    for rev_op in diseases:
+        file.write("\t(noRevisionOps {})\n".format(rev_op))
 
 
 def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
