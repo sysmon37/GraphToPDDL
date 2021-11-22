@@ -77,6 +77,7 @@ class DotGraphCreator:
         return (
             f"{in_node_props['dataItem']}={edge_props['range']}"
             if in_node_props["type"] == "decision"
+            and not in_node_props.get("is_alternative", False)
             else ""
         )
 
@@ -94,7 +95,12 @@ class DotGraphCreator:
         dot_graph = Digraph(name=nx_graph.graph["name"])
         for n in nx_graph.nodes:
             node_props = nx_graph.nodes[n]
-            node_format = cls.__FORMAT[node_props["type"]]
+            node_type = (
+                "alternative"
+                if node_props.get("is_alternative")
+                else node_props["type"]
+            )
+            node_format = cls.__FORMAT[node_type]
             dot_graph.node(
                 n,
                 label=cls.__create_node_label(n, node_props),
@@ -107,7 +113,6 @@ class DotGraphCreator:
             for e in nx_graph.out_edges(n):
                 edge_props = nx_graph[e[0]][e[1]][0]
                 dot_graph.edge(
-                    e[0], e[1], label=cls.__create_edge_label(
-                        node_props, edge_props)
+                    e[0], e[1], label=cls.__create_edge_label(node_props, edge_props)
                 )
         return dot_graph

@@ -110,7 +110,7 @@ def find_parallel_path(graph, p_nodes_found):
     parallelNode = ""
     # TODO: numParallelPaths for each diseases
     end_nodes = []
-    
+
     for start_node in p_nodes_found:
         for end_node in p_nodes_found:
 
@@ -129,7 +129,6 @@ def find_parallel_path(graph, p_nodes_found):
                 if end_node not in end_nodes:
                     end_nodes.append(end_node)
                     parallelNode += "(parallelEndNode {})\n\t".format(end_node)
-
 
                 # for path in parallel_sequence:
                 (
@@ -367,5 +366,6 @@ def handle_alternative_nodes(graph):
         if attr.get("type") == "alternative":
             graph.nodes[node]["type"] = "decision"
             graph.nodes[node]["dataItem"] = "default_value"
+            graph.nodes[node]["is_alternative"] = True
             for succ in graph.successors(node):
                 graph.edges[node, succ, 0]["range"] = "0..1"

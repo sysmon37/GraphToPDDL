@@ -1,3 +1,4 @@
+from utils import handle_alternative_nodes
 from input_output_graph import outputGraphViz, read_graph
 from write_pddl import outputPDDL
 from input_RO import read_JSON, update_graph_with_ROs
@@ -20,6 +21,7 @@ def run(path, ros_path, patient_values_path):
     # ROs
     ros = read_JSON(ros_path)
     update_graph_with_ROs(graph, ros)
+    handle_alternative_nodes(graph)
 
     # Patient values
     patient_values = read_JSON(patient_values_path)
