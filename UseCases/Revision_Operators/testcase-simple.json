@@ -1,6 +1,6 @@
 [
     {
-        "id": "ro1",
+        "id": "ro2",
         "trigger": [
             "a2"
         ],
@@ -9,37 +9,32 @@
                 "type": "add",
                 "newNodes": [
                     {
+                        "id": "newAction1",
+                        "cost": 50,
+                        "type": "action",
+                        "predecessors": [
+                            {
+                                "nodeId": "a1"
+                            }
+                        ],
+                        "successors": [
+                            {
+                                "nodeId": "a2"
+                            }
+                        ]
+                    },
+                    {
                         "id": "newAction2",
                         "cost": 50,
                         "type": "action",
                         "predecessors": [
                             {
-                                "nodeId": "t2"
+                                "nodeId": "a2"
                             }
                         ],
                         "successors": [
                             {
                                 "nodeId": "a3"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "type": "add",
-                "newNodes": [
-                    {
-                        "id": "newAction3",
-                        "cost": 100,
-                        "type": "action",
-                        "predecessors": [
-                            {
-                                "nodeId": "t2"
-                            }
-                        ],
-                        "successors": [
-                            {
-                                "nodeId": "g1"
                             }
                         ]
                     }
@@ -51,7 +46,7 @@
                     {
                         "id": "newDecision1",
                         "type": "decision",
-                        "dataItem": "v5",
+                        "dataItem": "v2",
                         "predecessors": [
                             {
                                 "nodeId": "a3"
@@ -59,17 +54,20 @@
                         ],
                         "successors": [
                             {
-                                "nodeId": "g1",
+                                "nodeId": "a4",
                                 "range": "0..5"
                             },
                             {
-                                "nodeId": "newAction3",
+                                "nodeId": "g1",
                                 "range": "6..10"
                             }
                         ]
                     }
+                    
+
                 ]
             }
+            
         ]
     }
 ]

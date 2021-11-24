@@ -6,7 +6,12 @@ import argparse as ap
 import traceback
 
 
-def run(path, ros_path, patient_values_path):
+def run(
+    path,
+    ros_path,
+    patient_values_path,
+    og
+):
     """
     Function to run the automation pipeline.
 
@@ -46,6 +51,13 @@ if __name__ == "__main__":
         type=str,
         help="Path to the patient values file. It must be a JSON file.",
     )
+
+    parser.add_argument(
+        "--og",
+        action='store_true',
+        help="Original Graph only",
+    )
+
     args = parser.parse_args()
     try:
         if not args.ag:
@@ -62,7 +74,7 @@ if __name__ == "__main__":
         if args.p != None and args.p[-4:].lower() != "json":
             raise Exception("The Revision operators file (--ro) must be a JSON file.")
 
-        run(args.ag, args.ro, args.p)
+        run(args.ag, args.ro, args.p, args.og)
     except Exception as e:
         print(e)
         traceback.print_exc()

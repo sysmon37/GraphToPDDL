@@ -93,6 +93,35 @@ def get_all_parallel_nodes(graph):
 
     return parallel_nodes
 
+def get_number_parallel_paths(graph):
+    """
+    Finds the number of parallel paths.
+
+    Args:
+        graph (networkx graph): The graph.
+
+    Returns:
+        int: Number of parallel paths.
+    """#find_init_node
+    p_start = ""
+    p_end = ""
+    n_path_found = {}
+    for node, attributes in graph.nodes.items():
+        if find_init_node(graph, node) not in n_path_found:
+            n_path_found[find_init_node(graph, node)] = 0
+        if attributes.get("parallelStartNode") == True:
+            p_start = node
+        if attributes.get("parallelEndNode") == True:
+            p_end = node
+        if p_start != "" and p_end != "":
+            parallel_sequence = list(
+                nwx.all_simple_paths(graph, source=p_start, target=p_end)
+            )
+            n_paths = len(parallel_sequence)
+            context = find_init_node(graph, p_start)
+            n_path_found[context] = n_paths + n_path_found.get(context, 0)
+            p_start = ""
+    return n_path_found
 
 def find_parallel_path(graph, p_nodes_found):
     """
@@ -126,9 +155,11 @@ def find_parallel_path(graph, p_nodes_found):
                 untraversedParallelNode = ""
 
                 parallelNode += "(parallelStartNode {})\n\t".format(start_node)
+                graph.nodes[start_node]["parallelStartNode"] = True
                 if end_node not in end_nodes:
                     end_nodes.append(end_node)
                     parallelNode += "(parallelEndNode {})\n\t".format(end_node)
+                    graph.nodes[end_node]["parallelEndNode"] = True
 
                 # for path in parallel_sequence:
                 (
