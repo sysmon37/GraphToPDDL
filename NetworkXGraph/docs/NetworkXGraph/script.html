@@ -26,15 +26,19 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from input_output_graph import outputGraphViz, read_graph
+<pre><code class="python">from utils import handle_alternative_nodes
+from input_output_graph import outputGraphViz, read_graph
 from write_pddl import outputPDDL
-from input_RO import read_RO, update_graph_with_ROs
+from input_RO import read_JSON, update_graph_with_ROs
 import argparse as ap
+import traceback
 
 
 def run(
-    path=&#34;../UseCases/AGFigures/testcase-5-rev.dot&#34;,
-    ros_path=&#34;../UseCases/Revision_Operators/testcase-5-ro.json&#34;,
+    path,
+    ros_path,
+    patient_values_path,
+    og
 ):
     &#34;&#34;&#34;
     Function to run the automation pipeline.
@@ -42,12 +46,20 @@ def run(
     Args:
         path (str): Path to the file.
         ros_path (str): Path to the revision operators file.
+        patient_values_path (str): Path to the patient values file.
 
     &#34;&#34;&#34;
     graph = read_graph(path)
-    ros = read_RO(ros_path)
+
+    # ROs
+    ros = read_JSON(ros_path)
     update_graph_with_ROs(graph, ros)
-    outputPDDL(graph, ros, &#34;problem-test&#34;, &#34;domain_test&#34;)
+    handle_alternative_nodes(graph)
+
+    # Patient values
+    patient_values = read_JSON(patient_values_path)
+
+    outputPDDL(graph, ros, patient_values, &#34;problem-test&#34;, &#34;domain_test&#34;)
     outputGraphViz(graph)
 
 
@@ -62,6 +74,18 @@ if __name__ == &#34;__main__&#34;:
         type=str,
         help=&#34;Path to the revision operator file. It must be a JSON file.&#34;,
     )
+    parser.add_argument(
+        &#34;--p&#34;,
+        type=str,
+        help=&#34;Path to the patient values file. It must be a JSON file.&#34;,
+    )
+
+    parser.add_argument(
+        &#34;--og&#34;,
+        action=&#39;store_true&#39;,
+        help=&#34;Original Graph only&#34;,
+    )
+
     args = parser.parse_args()
     try:
         if not args.ag:
@@ -72,20 +96,16 @@ if __name__ == &#34;__main__&#34;:
         if args.ag and args.ag[-3:].lower() != &#34;dot&#34;:
             raise Exception(&#34;The AG file (--ag) must be a DOT file.&#34;)
 
-        if not args.ro:
-            raise Exception(
-                &#34;A Revision Operators file is needed. Please use the flag --ro followed by the path to the file.\nUse the flag -h for more information&#34;
-            )
-
-        if args.ro[-4:].lower() != &#34;json&#34;:
+        if args.ro != None and args.ro[-4:].lower() != &#34;json&#34;:
             raise Exception(&#34;The Revision operators file (--ro) must be a JSON file.&#34;)
 
-        run(
-            args.ag,
-            args.ro,
-        )
+        if args.p != None and args.p[-4:].lower() != &#34;json&#34;:
+            raise Exception(&#34;The Revision operators file (--ro) must be a JSON file.&#34;)
+
+        run(args.ag, args.ro, args.p, args.og)
     except Exception as e:
-        print(e)</code></pre>
+        print(e)
+        traceback.print_exc()</code></pre>
 </details>
 </section>
 <section>
@@ -96,7 +116,7 @@ if __name__ == &#34;__main__&#34;:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="NetworkXGraph.script.run"><code class="name flex">
-<span>def <span class="ident">run</span></span>(<span>path='../UseCases/AGFigures/testcase-5-rev.dot', ros_path='../UseCases/Revision_Operators/testcase-5-ro.json')</span>
+<span>def <span class="ident">run</span></span>(<span>path, ros_path, patient_values_path, og)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function to run the automation pipeline.</p>
@@ -106,14 +126,18 @@ if __name__ == &#34;__main__&#34;:
 <dd>Path to the file.</dd>
 <dt><strong><code>ros_path</code></strong> :&ensp;<code>str</code></dt>
 <dd>Path to the revision operators file.</dd>
+<dt><strong><code>patient_values_path</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path to the patient values file.</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def run(
-    path=&#34;../UseCases/AGFigures/testcase-5-rev.dot&#34;,
-    ros_path=&#34;../UseCases/Revision_Operators/testcase-5-ro.json&#34;,
+    path,
+    ros_path,
+    patient_values_path,
+    og
 ):
     &#34;&#34;&#34;
     Function to run the automation pipeline.
@@ -121,12 +145,20 @@ if __name__ == &#34;__main__&#34;:
     Args:
         path (str): Path to the file.
         ros_path (str): Path to the revision operators file.
+        patient_values_path (str): Path to the patient values file.
 
     &#34;&#34;&#34;
     graph = read_graph(path)
-    ros = read_RO(ros_path)
+
+    # ROs
+    ros = read_JSON(ros_path)
     update_graph_with_ROs(graph, ros)
-    outputPDDL(graph, ros, &#34;problem-test&#34;, &#34;domain_test&#34;)
+    handle_alternative_nodes(graph)
+
+    # Patient values
+    patient_values = read_JSON(patient_values_path)
+
+    outputPDDL(graph, ros, patient_values, &#34;problem-test&#34;, &#34;domain_test&#34;)
     outputGraphViz(graph)</code></pre>
 </details>
 </dd>

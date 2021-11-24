@@ -53,9 +53,9 @@ INDEX=[
 "doc":""
 },
 {
-"ref":"NetworkXGraph.input_RO.read_RO",
+"ref":"NetworkXGraph.input_RO.read_JSON",
 "url":3,
-"doc":"Reads the revision operator file. The file MUST be JSON format. Args: path (str): Path to the file. Returns: json: JSON object",
+"doc":"Reads a JSON file and returns its content. Args: path (str): Path to the file. Returns: json: JSON object",
 "func":1
 },
 {
@@ -65,9 +65,21 @@ INDEX=[
 "func":1
 },
 {
+"ref":"NetworkXGraph.input_RO.add_all_new_nodes",
+"url":3,
+"doc":"Add a list of new nodes with some attributes. These nodes do not have any edges after the execution of this function. Use 'add_all_new_edges' to add the respectives edges. Args: graph (networkx graph): The graph. id_ro (str): The ID of the revision operator. trigger (list): List of triggering nodes. operation (object): The operation object.",
+"func":1
+},
+{
+"ref":"NetworkXGraph.input_RO.add_all_new_edges",
+"url":3,
+"doc":"Add all the edges from the operation object. Nodes related to these edges must be added to the graph prior to this function call. Use 'add_all_new_nodes' to add the respectives nodes before calling this function. Args: graph (networkx graph): The graph. id_ro (str): The ID of the revision operator. trigger (list): List of triggering nodes. operation (object): The operation object.",
+"func":1
+},
+{
 "ref":"NetworkXGraph.input_RO.replace_operation",
 "url":3,
-"doc":"Replace operation inserts a sequence of new nodes. The first node of the sequence is a sibling of the node to 'replace' with the same edge attributs to the predecessor. Args: graph (networkx graph): The graph. id_ro (str): The ID of the revision operator. trigger (list): List of triggering nodes. operation (str): The operation object",
+"doc":"Replace operation inserts a sequence of new nodes. This function is a 2-steps process. First, we add all the nodes to be added. Secondly, we add all the edges. This allows the RO file to have the nodes in any particular order. Args: graph (networkx graph): The graph. id_ro (str): The ID of the revision operator. trigger (list): List of triggering nodes. operation (object): The operation object",
 "func":1
 },
 {
@@ -77,7 +89,7 @@ INDEX=[
 "func":1
 },
 {
-"ref":"NetworkXGraph.input_RO.add_action",
+"ref":"NetworkXGraph.input_RO.add_operation",
 "url":3,
 "doc":"Add operation inserts a node(s) between a list of predeccessors and successors. Args: graph (networkx graph): The graph. idRO (str): The ID of the revision operator. trigger (list): List of triggering nodes. operation (str): The operation object",
 "func":1
@@ -90,7 +102,7 @@ INDEX=[
 {
 "ref":"NetworkXGraph.script.run",
 "url":4,
-"doc":"Function to run the automation pipeline. Args: path (str): Path to the file. ros_path (str): Path to the revision operators file.",
+"doc":"Function to run the automation pipeline. Args: path (str): Path to the file. ros_path (str): Path to the revision operators file. patient_values_path (str): Path to the patient values file.",
 "func":1
 },
 {
@@ -140,6 +152,12 @@ INDEX=[
 "func":1
 },
 {
+"ref":"NetworkXGraph.utils.get_number_parallel_paths",
+"url":6,
+"doc":"Finds the number of parallel paths. Args: graph (networkx graph): The graph. Returns: int: Number of parallel paths.",
+"func":1
+},
+{
 "ref":"NetworkXGraph.utils.find_parallel_path",
 "url":6,
 "doc":"Finds all parallel paths from a list of parallel nodes. Args: graph (networkx graph): The graph. p_nodes_found (list): List of parallel start and end nodes. Returns: str: PDDL representation of the parallel path.",
@@ -170,6 +188,18 @@ INDEX=[
 "func":1
 },
 {
+"ref":"NetworkXGraph.utils.match_nodes_to_disease",
+"url":6,
+"doc":"For each disease, find the revision operators that involve the disease. Format of the return object: { \"disease1\": ['ro1', 'ro2'],  . } Args: graph (networkx graph): The graph. Returns: object: Object where the keys are the diseases and the values are a list of revision operations IDs.",
+"func":1
+},
+{
+"ref":"NetworkXGraph.utils.handle_alternative_nodes",
+"url":6,
+"doc":"Modifies the alternative nodes to decision nodes where all successors have the same edges value. That way, the planner will look into all successors for an optimize solution. The patient values provided should include a value called \"default\" with the value of 0 or 1 that will be used for the alternative nodes. Args: graph (networkx graph): The graph.",
+"func":1
+},
+{
 "ref":"NetworkXGraph.write_pddl",
 "url":7,
 "doc":""
@@ -183,7 +213,7 @@ INDEX=[
 {
 "ref":"NetworkXGraph.write_pddl.write_initial_state",
 "url":7,
-"doc":"Writes all the predicates of the initial (:init) state to the file. Calls a subfunction for each predicates in the initial state Args: graph (networkx graph): The graph. file (TextIOWrapper): The PDDL file.",
+"doc":"Writes all the predicates of the initial (:init) state to the file. Calls a subfunction for each predicates in the initial state Args: graph (networkx graph): The graph. file (TextIOWrapper): The PDDL file. ros (list) : List of revision operators. patient_values (dict) : Dictonary of the patient values.",
 "func":1
 },
 {
@@ -196,6 +226,12 @@ INDEX=[
 "ref":"NetworkXGraph.write_pddl.write_total_metrics",
 "url":7,
 "doc":"Writes the total metrics predicates. Args: graph (networkx graph): The graph. file (TextIOWrapper): The PDDL file.",
+"func":1
+},
+{
+"ref":"NetworkXGraph.write_pddl.write_tentative_goal_count",
+"url":7,
+"doc":"Writes the tentative goal count predicate. Currently is hardcoded to 0. Args: graph (networkx graph): The graph. file (TextIOWrapper): The PDDL file.",
 "func":1
 },
 {
@@ -241,9 +277,27 @@ INDEX=[
 "func":1
 },
 {
+"ref":"NetworkXGraph.write_pddl.write_num_revision_Ids",
+"url":7,
+"doc":"Writes the numRevisionIDs predicate to the PDDL file. Args: graph (networkx graph): The graph. file (TextIOWrapper): The PDDL file.",
+"func":1
+},
+{
+"ref":"NetworkXGraph.write_pddl.write_patient_values",
+"url":7,
+"doc":"Writes the patient value predicate. There is one predicate per successor each decision node. Args: graph (networkx graph): The graph. file (TextIOWrapper): The PDDL file. patient_values (dict) : Dictonary of the patient values.",
+"func":1
+},
+{
+"ref":"NetworkXGraph.write_pddl.write_any_no_revision_ops",
+"url":7,
+"doc":"Writes anyRevisionOps or noRevsionOps predicates. Args: graph (networkx graph): The graph. file (TextIOWrapper): The PDDL file. ros (list) : The list of revision operator objects",
+"func":1
+},
+{
 "ref":"NetworkXGraph.write_pddl.outputPDDL",
 "url":7,
-"doc":"Ouputs the PDDL file. Args: graph (networkx graph): The graph. ros (list) : The list of revision operator objects problem_name (str): The name of the problem to be in the PDDL file. domain_name (str): The name of the domain to be in the PDDL file.",
+"doc":"Ouputs the PDDL file. Args: graph (networkx graph): The graph. ros (list) : The list of revision operator objects patient_values (dict) : Dictonary of the patient values. problem_name (str): The name of the problem to be in the PDDL file. domain_name (str): The name of the domain to be in the PDDL file.",
 "func":1
 }
 ]
