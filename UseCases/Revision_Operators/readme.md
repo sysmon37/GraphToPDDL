@@ -19,7 +19,7 @@ The global content must be an array of dictionaries
 ```
 ### Single revision operation
 A revision operation must have the followings:
-- id (str) : ID of the RO
+- id (str) : ID of the RO.
 - trigger (list of str) : List of the nodes (node IDs) triggering the RO.
 - operations (list of dict) : List of operations to execute.
 
@@ -34,7 +34,7 @@ other ROs...]
 
 #### Operations
 Every operation must have the followings attributes:
-- type (str) : The type of the operation (3 possibilities)
+- type (str) : The type of the operation (3 possibilities).
 - existingNode (str) : The ID of the node to replace. It must be a node already in the graph.
 
 ```

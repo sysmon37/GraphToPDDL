@@ -1,8 +1,8 @@
-digraph test_1 {
-newrank=true;
-ranksep = 0.25;
-node [fontname=arial, fontsize=10];
-edge [fontname=arial, fontsize=9];
+digraph {
+// newrank=true;
+// ranksep = 0.25;
+// node [fontname=arial, fontsize=10];
+// edge [fontname=arial, fontsize=9];
 
 // Contexts
 d1 [type=context];
@@ -12,6 +12,8 @@ d2 [type=context];
 t1 [type=decision, dataItem=v1]
 t2 [type=decision, dataItem=v2]
 t3 [type=decision, dataItem=v3]
+t4 [type=decision, dataItem=v3]
+
 
 // Actions
 a1 [cost=10, type=action];
@@ -32,6 +34,7 @@ d1 -> t1;
 t1 -> a1 [range=0..4];
 t1 -> a2 [range=5..10];
 {a1, a2} -> t2;
+{a1, a2} -> t4;
 t2 -> g1 [range=0..4];
 t2 -> a3 [range=5..10];
 a3 -> g1;
@@ -41,15 +44,6 @@ t3 -> a7 [range=0..4];
 t3 -> g2 [range=5..10];
 a7 -> g2;
 
-{g1, g2} -> ros [style=invis];
-ros [shape=box, width=5, style=filled, fillcolor=white, color=white, align=center, label=<
-<b>Revision operators:</b><br/>
-1. if <i>A2</i> and <i>A7</i>, then replace <i>A7</i> with <i>newAction</i> [cost=100]<br/>
-2. if <i>A2</i> and <i>A7</i>, then replace <i>A7</i> with <i>newAction2</i> [cost=50]
->]
 
-{rank=same; a1; a2; a4}
-{rank=same; d1; d2 }
-{rank=same; a3; a7 }
 }
 
