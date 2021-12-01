@@ -30,11 +30,13 @@
     find_goal_node,
     find_init_node,
     find_parallel_path,
+    match_nodes_to_disease,
     find_revId_involved_nodes,
     get_all_metrics,
     get_all_revIds,
     get_metric_name,
     get_type_nodes,
+    get_number_parallel_paths
 )
 
 
@@ -54,7 +56,7 @@ def write_objects(graph, file):
     file.write(&#34;)\n&#34;)
 
 
-def write_initial_state(graph, file, ros):
+def write_initial_state(graph, file, ros, patient_values):
     &#34;&#34;&#34;
     Writes all the predicates of the initial (:init) state to the file.
 
@@ -63,13 +65,18 @@ def write_initial_state(graph, file, ros):
     Args:
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
+        ros (list) : List of revision operators.
+        patient_values (dict) : Dictonary of the patient values.
+
     &#34;&#34;&#34;
     file.write(&#34;(:init &#34;)
     # decision branching min/max
     write_decision_branch(graph, file)
     file.write(&#34;\n&#34;)
 
-    # patient value - NOT NOW
+    # patient value
+    write_patient_values(graph, file, patient_values)
+    file.write(&#34;\n&#34;)
 
     # noPrevious nodes
     # write_not_previous_node(graph, file)
@@ -88,7 +95,16 @@ def write_initial_state(graph, file, ros):
     write_revision_flags(graph, file, ros)
     file.write(&#34;\n&#34;)
     write_all_revisions_pass(graph, file)
-    # tentativeGoalCount - ???
+
+    # numRevisionIDs
+    write_num_revision_Ids(graph, file)
+    file.write(&#34;\n&#34;)
+
+    # anyRevisionOps | noRevisionOps
+    write_any_no_revision_ops(graph, file, ros)
+    file.write(&#34;\n&#34;)
+    # tentativeGoalCount
+    write_tentative_goal_count(graph, file)
     # numgoals
     file.write(&#34;\n&#34;)
     file.write(&#34;\t(= (numGoals) {})\n&#34;.format(len(get_type_nodes(graph, &#34;goal&#34;))))
@@ -176,6 +192,13 @@ def write_predecessors_and_node_type(graph, file):
     file.write(&#34;\n&#34;)
     file.write(&#34;&#34;.join(revisionAction))
 
+    # number of parallel paths
+    n_path_found = get_number_parallel_paths(graph)
+    if parallel_node_found:
+        [file.write(&#34;&#34;.join(f&#34;\n\t(= (parallelPathCount {init_node}) 0)&#34;)) for init_node, n_paths in n_path_found.items()]
+        [file.write(&#34;&#34;.join(f&#34;\n\t(= (numParallelPaths {init_node}) {n_paths})&#34;)) for init_node, n_paths in n_path_found.items()]
+
+
 
 def write_total_metrics(graph, file):
     &#34;&#34;&#34;
@@ -189,6 +212,17 @@ def write_total_metrics(graph, file):
     for metric in metrics:
         metric_name = get_metric_name(metric)
         file.write(&#34;\t(= (total-{}) 0)\n&#34;.format(metric_name.lower()))
+
+
+def write_tentative_goal_count(graph, file):
+    &#34;&#34;&#34;
+    Writes the tentative goal count predicate. Currently is hardcoded to 0.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    &#34;&#34;&#34;
+    file.write(&#34;\t(= (tentativeGoalCount) 0)\n&#34;)
 
 
 def write_decision_branch(graph, file):
@@ -282,12 +316,18 @@ def write_metric(graph, file):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    file.write(&#34;(:metric minimize (+\n&#34;)
+    file.write(&#34;(:metric minimize&#34;)
     metrics = get_all_metrics(graph)
+    if len(metrics) &gt; 1:
+        file.write(&#34;(+\n&#34;)
+
     for metric in metrics:
         metric_name = get_metric_name(metric)
         file.write(&#34;\t(total-{})\n&#34;.format(metric_name.lower()))
-    file.write(&#34;\t)\n)\n &#34;)
+
+    file.write(&#34;)\n &#34;)
+    if len(metrics) &gt; 1:
+        file.write(&#34;)\n &#34;)
 
 
 def write_all_revisions_pass(graph, file):
@@ -339,13 +379,82 @@ def write_revision_flags(graph, file, ros):
         file.write(&#34;\n&#34;)
 
 
-def outputPDDL(graph, ros, problem_name, domain_name):
+def write_num_revision_Ids(graph, file):
+    &#34;&#34;&#34;
+    Writes the numRevisionIDs predicate to the PDDL file.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    &#34;&#34;&#34;
+    ro_diseases = match_nodes_to_disease(graph)
+    for disease, ro in ro_diseases.items():
+        file.write(&#34;\t(= (numRevisionIDs {}) {})\n&#34;.format(disease, len(ro)))
+
+
+def write_patient_values(graph, file, patient_values):
+    &#34;&#34;&#34;
+    Writes the patient value predicate. There is one predicate per successor
+    each decision node.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+        patient_values (dict) : Dictonary of the patient values.
+
+    &#34;&#34;&#34;
+    for node, attr in graph.nodes.items():
+        if attr[&#34;type&#34;] == &#34;decision&#34;:
+            disease = find_init_node(graph, node)
+            file.write(
+                &#34;\n\t;; {} = {}\n&#34;.format(
+                    attr[&#34;dataItem&#34;], patient_values[attr[&#34;dataItem&#34;]]
+                )
+            )
+            for successor in graph.successors(node):
+                file.write(
+                    &#34;\t(= (patientValue {} {} {}) {})\n&#34;.format(
+                        disease, node, successor, patient_values[attr[&#34;dataItem&#34;]]
+                    )
+                )
+
+
+def write_any_no_revision_ops(graph, file, ros):
+    &#34;&#34;&#34;
+    Writes anyRevisionOps or noRevsionOps predicates.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+        ros (list) : The list of revision operator objects
+    &#34;&#34;&#34;
+    all_triggers = [trigger for ro in ros for trigger in ro[&#34;trigger&#34;]]
+    all_triggers = list(set(all_triggers))
+    diseases = get_type_nodes(graph, &#34;context&#34;)
+    any_revision_ops = []
+
+    for trigger in all_triggers:
+        disease = find_init_node(graph, trigger)
+
+        if not disease in any_revision_ops:
+            diseases.remove(disease)
+            any_revision_ops.append(disease)
+
+    for rev_op in any_revision_ops:
+        file.write(&#34;\t(anyRevisionOps {})\n&#34;.format(rev_op))
+
+    for rev_op in diseases:
+        file.write(&#34;\t(noRevisionOps {})\n&#34;.format(rev_op))
+
+
+def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
     &#34;&#34;&#34;
     Ouputs the PDDL file.
 
     Args:
         graph (networkx graph): The graph.
         ros (list) : The list of revision operator objects
+        patient_values (dict) : Dictonary of the patient values.
         problem_name (str): The name of the problem to be in the PDDL file.
         domain_name (str): The name of the domain to be in the PDDL file.
     &#34;&#34;&#34;
@@ -359,7 +468,7 @@ def outputPDDL(graph, ros, problem_name, domain_name):
 
         # :init
         pddl.write(&#34;\n&#34;)
-        write_initial_state(graph, pddl, ros)
+        write_initial_state(graph, pddl, ros, patient_values)
 
         # :goal
         pddl.write(&#34;\n&#34;)
@@ -384,7 +493,7 @@ def outputPDDL(graph, ros, problem_name, domain_name):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="NetworkXGraph.write_pddl.outputPDDL"><code class="name flex">
-<span>def <span class="ident">outputPDDL</span></span>(<span>graph, ros, problem_name, domain_name)</span>
+<span>def <span class="ident">outputPDDL</span></span>(<span>graph, ros, patient_values, problem_name, domain_name)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Ouputs the PDDL file.</p>
@@ -393,6 +502,7 @@ def outputPDDL(graph, ros, problem_name, domain_name):
 <dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
 <dd>The graph.</dd>
 <dt>ros (list) : The list of revision operator objects</dt>
+<dt>patient_values (dict) : Dictonary of the patient values.</dt>
 <dt><strong><code>problem_name</code></strong> :&ensp;<code>str</code></dt>
 <dd>The name of the problem to be in the PDDL file.</dd>
 <dt><strong><code>domain_name</code></strong> :&ensp;<code>str</code></dt>
@@ -402,13 +512,14 @@ def outputPDDL(graph, ros, problem_name, domain_name):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def outputPDDL(graph, ros, problem_name, domain_name):
+<pre><code class="python">def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
     &#34;&#34;&#34;
     Ouputs the PDDL file.
 
     Args:
         graph (networkx graph): The graph.
         ros (list) : The list of revision operator objects
+        patient_values (dict) : Dictonary of the patient values.
         problem_name (str): The name of the problem to be in the PDDL file.
         domain_name (str): The name of the domain to be in the PDDL file.
     &#34;&#34;&#34;
@@ -422,7 +533,7 @@ def outputPDDL(graph, ros, problem_name, domain_name):
 
         # :init
         pddl.write(&#34;\n&#34;)
-        write_initial_state(graph, pddl, ros)
+        write_initial_state(graph, pddl, ros, patient_values)
 
         # :goal
         pddl.write(&#34;\n&#34;)
@@ -466,6 +577,51 @@ def outputPDDL(graph, ros, problem_name, domain_name):
     disease = get_type_nodes(graph, &#34;context&#34;)
     for d in disease:
         file.write(&#34;\t(= (allRevisionsPass {}) 0)\n&#34;.format(d))</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.write_pddl.write_any_no_revision_ops"><code class="name flex">
+<span>def <span class="ident">write_any_no_revision_ops</span></span>(<span>graph, file, ros)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Writes anyRevisionOps or noRevsionOps predicates.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+<dt><strong><code>file</code></strong> :&ensp;<code>TextIOWrapper</code></dt>
+<dd>The PDDL file.</dd>
+</dl>
+<p>ros (list) : The list of revision operator objects</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write_any_no_revision_ops(graph, file, ros):
+    &#34;&#34;&#34;
+    Writes anyRevisionOps or noRevsionOps predicates.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+        ros (list) : The list of revision operator objects
+    &#34;&#34;&#34;
+    all_triggers = [trigger for ro in ros for trigger in ro[&#34;trigger&#34;]]
+    all_triggers = list(set(all_triggers))
+    diseases = get_type_nodes(graph, &#34;context&#34;)
+    any_revision_ops = []
+
+    for trigger in all_triggers:
+        disease = find_init_node(graph, trigger)
+
+        if not disease in any_revision_ops:
+            diseases.remove(disease)
+            any_revision_ops.append(disease)
+
+    for rev_op in any_revision_ops:
+        file.write(&#34;\t(anyRevisionOps {})\n&#34;.format(rev_op))
+
+    for rev_op in diseases:
+        file.write(&#34;\t(noRevisionOps {})\n&#34;.format(rev_op))</code></pre>
 </details>
 </dd>
 <dt id="NetworkXGraph.write_pddl.write_decision_branch"><code class="name flex">
@@ -545,7 +701,7 @@ def outputPDDL(graph, ros, problem_name, domain_name):
 </details>
 </dd>
 <dt id="NetworkXGraph.write_pddl.write_initial_state"><code class="name flex">
-<span>def <span class="ident">write_initial_state</span></span>(<span>graph, file, ros)</span>
+<span>def <span class="ident">write_initial_state</span></span>(<span>graph, file, ros, patient_values)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Writes all the predicates of the initial (:init) state to the file.</p>
@@ -556,12 +712,14 @@ def outputPDDL(graph, ros, problem_name, domain_name):
 <dd>The graph.</dd>
 <dt><strong><code>file</code></strong> :&ensp;<code>TextIOWrapper</code></dt>
 <dd>The PDDL file.</dd>
-</dl></div>
+</dl>
+<p>ros (list) : List of revision operators.
+patient_values (dict) : Dictonary of the patient values.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def write_initial_state(graph, file, ros):
+<pre><code class="python">def write_initial_state(graph, file, ros, patient_values):
     &#34;&#34;&#34;
     Writes all the predicates of the initial (:init) state to the file.
 
@@ -570,13 +728,18 @@ def outputPDDL(graph, ros, problem_name, domain_name):
     Args:
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
+        ros (list) : List of revision operators.
+        patient_values (dict) : Dictonary of the patient values.
+
     &#34;&#34;&#34;
     file.write(&#34;(:init &#34;)
     # decision branching min/max
     write_decision_branch(graph, file)
     file.write(&#34;\n&#34;)
 
-    # patient value - NOT NOW
+    # patient value
+    write_patient_values(graph, file, patient_values)
+    file.write(&#34;\n&#34;)
 
     # noPrevious nodes
     # write_not_previous_node(graph, file)
@@ -595,7 +758,16 @@ def outputPDDL(graph, ros, problem_name, domain_name):
     write_revision_flags(graph, file, ros)
     file.write(&#34;\n&#34;)
     write_all_revisions_pass(graph, file)
-    # tentativeGoalCount - ???
+
+    # numRevisionIDs
+    write_num_revision_Ids(graph, file)
+    file.write(&#34;\n&#34;)
+
+    # anyRevisionOps | noRevisionOps
+    write_any_no_revision_ops(graph, file, ros)
+    file.write(&#34;\n&#34;)
+    # tentativeGoalCount
+    write_tentative_goal_count(graph, file)
     # numgoals
     file.write(&#34;\n&#34;)
     file.write(&#34;\t(= (numGoals) {})\n&#34;.format(len(get_type_nodes(graph, &#34;goal&#34;))))
@@ -634,12 +806,18 @@ def outputPDDL(graph, ros, problem_name, domain_name):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    file.write(&#34;(:metric minimize (+\n&#34;)
+    file.write(&#34;(:metric minimize&#34;)
     metrics = get_all_metrics(graph)
+    if len(metrics) &gt; 1:
+        file.write(&#34;(+\n&#34;)
+
     for metric in metrics:
         metric_name = get_metric_name(metric)
         file.write(&#34;\t(total-{})\n&#34;.format(metric_name.lower()))
-    file.write(&#34;\t)\n)\n &#34;)</code></pre>
+
+    file.write(&#34;)\n &#34;)
+    if len(metrics) &gt; 1:
+        file.write(&#34;)\n &#34;)</code></pre>
 </details>
 </dd>
 <dt id="NetworkXGraph.write_pddl.write_node_cost"><code class="name flex">
@@ -712,6 +890,35 @@ def outputPDDL(graph, ros, problem_name, domain_name):
         file.write(&#34;\t(noPrevious{} {})\n&#34;.format(to_node_type.capitalize(), node))</code></pre>
 </details>
 </dd>
+<dt id="NetworkXGraph.write_pddl.write_num_revision_Ids"><code class="name flex">
+<span>def <span class="ident">write_num_revision_Ids</span></span>(<span>graph, file)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Writes the numRevisionIDs predicate to the PDDL file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+<dt><strong><code>file</code></strong> :&ensp;<code>TextIOWrapper</code></dt>
+<dd>The PDDL file.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write_num_revision_Ids(graph, file):
+    &#34;&#34;&#34;
+    Writes the numRevisionIDs predicate to the PDDL file.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    &#34;&#34;&#34;
+    ro_diseases = match_nodes_to_disease(graph)
+    for disease, ro in ro_diseases.items():
+        file.write(&#34;\t(= (numRevisionIDs {}) {})\n&#34;.format(disease, len(ro)))</code></pre>
+</details>
+</dd>
 <dt id="NetworkXGraph.write_pddl.write_objects"><code class="name flex">
 <span>def <span class="ident">write_objects</span></span>(<span>graph, file)</span>
 </code></dt>
@@ -742,6 +949,51 @@ def outputPDDL(graph, ros, problem_name, domain_name):
     file.write(&#34;\t&#34; * 3 + &#34;{} - node\n&#34;.format(&#34; &#34;.join(nodes)))
     file.write(&#34;\t&#34; * 3 + &#34;{} - revId\n&#34;.format(&#34; &#34;.join(get_all_revIds(graph))))
     file.write(&#34;)\n&#34;)</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.write_pddl.write_patient_values"><code class="name flex">
+<span>def <span class="ident">write_patient_values</span></span>(<span>graph, file, patient_values)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Writes the patient value predicate. There is one predicate per successor
+each decision node.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+<dt><strong><code>file</code></strong> :&ensp;<code>TextIOWrapper</code></dt>
+<dd>The PDDL file.</dd>
+</dl>
+<p>patient_values (dict) : Dictonary of the patient values.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write_patient_values(graph, file, patient_values):
+    &#34;&#34;&#34;
+    Writes the patient value predicate. There is one predicate per successor
+    each decision node.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+        patient_values (dict) : Dictonary of the patient values.
+
+    &#34;&#34;&#34;
+    for node, attr in graph.nodes.items():
+        if attr[&#34;type&#34;] == &#34;decision&#34;:
+            disease = find_init_node(graph, node)
+            file.write(
+                &#34;\n\t;; {} = {}\n&#34;.format(
+                    attr[&#34;dataItem&#34;], patient_values[attr[&#34;dataItem&#34;]]
+                )
+            )
+            for successor in graph.successors(node):
+                file.write(
+                    &#34;\t(= (patientValue {} {} {}) {})\n&#34;.format(
+                        disease, node, successor, patient_values[attr[&#34;dataItem&#34;]]
+                    )
+                )</code></pre>
 </details>
 </dd>
 <dt id="NetworkXGraph.write_pddl.write_predecessors_and_node_type"><code class="name flex">
@@ -841,7 +1093,13 @@ def outputPDDL(graph, ros, problem_name, domain_name):
 
     # revisionAction
     file.write(&#34;\n&#34;)
-    file.write(&#34;&#34;.join(revisionAction))</code></pre>
+    file.write(&#34;&#34;.join(revisionAction))
+
+    # number of parallel paths
+    n_path_found = get_number_parallel_paths(graph)
+    if parallel_node_found:
+        [file.write(&#34;&#34;.join(f&#34;\n\t(= (parallelPathCount {init_node}) 0)&#34;)) for init_node, n_paths in n_path_found.items()]
+        [file.write(&#34;&#34;.join(f&#34;\n\t(= (numParallelPaths {init_node}) {n_paths})&#34;)) for init_node, n_paths in n_path_found.items()]</code></pre>
 </details>
 </dd>
 <dt id="NetworkXGraph.write_pddl.write_revision_flags"><code class="name flex">
@@ -895,6 +1153,33 @@ def outputPDDL(graph, ros, problem_name, domain_name):
         for d in disease:
             file.write(&#34;\t(= (revisionIDPass {} {}) 0)\n&#34;.format(d, revId))
         file.write(&#34;\n&#34;)</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.write_pddl.write_tentative_goal_count"><code class="name flex">
+<span>def <span class="ident">write_tentative_goal_count</span></span>(<span>graph, file)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Writes the tentative goal count predicate. Currently is hardcoded to 0.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+<dt><strong><code>file</code></strong> :&ensp;<code>TextIOWrapper</code></dt>
+<dd>The PDDL file.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write_tentative_goal_count(graph, file):
+    &#34;&#34;&#34;
+    Writes the tentative goal count predicate. Currently is hardcoded to 0.
+
+    Args:
+        graph (networkx graph): The graph.
+        file (TextIOWrapper): The PDDL file.
+    &#34;&#34;&#34;
+    file.write(&#34;\t(= (tentativeGoalCount) 0)\n&#34;)</code></pre>
 </details>
 </dd>
 <dt id="NetworkXGraph.write_pddl.write_total_metrics"><code class="name flex">
@@ -993,15 +1278,19 @@ setTimeout(() => input.focus(), 100);
 <ul class="">
 <li><code><a title="NetworkXGraph.write_pddl.outputPDDL" href="#NetworkXGraph.write_pddl.outputPDDL">outputPDDL</a></code></li>
 <li><code><a title="NetworkXGraph.write_pddl.write_all_revisions_pass" href="#NetworkXGraph.write_pddl.write_all_revisions_pass">write_all_revisions_pass</a></code></li>
+<li><code><a title="NetworkXGraph.write_pddl.write_any_no_revision_ops" href="#NetworkXGraph.write_pddl.write_any_no_revision_ops">write_any_no_revision_ops</a></code></li>
 <li><code><a title="NetworkXGraph.write_pddl.write_decision_branch" href="#NetworkXGraph.write_pddl.write_decision_branch">write_decision_branch</a></code></li>
 <li><code><a title="NetworkXGraph.write_pddl.write_goal" href="#NetworkXGraph.write_pddl.write_goal">write_goal</a></code></li>
 <li><code><a title="NetworkXGraph.write_pddl.write_initial_state" href="#NetworkXGraph.write_pddl.write_initial_state">write_initial_state</a></code></li>
 <li><code><a title="NetworkXGraph.write_pddl.write_metric" href="#NetworkXGraph.write_pddl.write_metric">write_metric</a></code></li>
 <li><code><a title="NetworkXGraph.write_pddl.write_node_cost" href="#NetworkXGraph.write_pddl.write_node_cost">write_node_cost</a></code></li>
 <li><code><a title="NetworkXGraph.write_pddl.write_not_previous_node" href="#NetworkXGraph.write_pddl.write_not_previous_node">write_not_previous_node</a></code></li>
+<li><code><a title="NetworkXGraph.write_pddl.write_num_revision_Ids" href="#NetworkXGraph.write_pddl.write_num_revision_Ids">write_num_revision_Ids</a></code></li>
 <li><code><a title="NetworkXGraph.write_pddl.write_objects" href="#NetworkXGraph.write_pddl.write_objects">write_objects</a></code></li>
+<li><code><a title="NetworkXGraph.write_pddl.write_patient_values" href="#NetworkXGraph.write_pddl.write_patient_values">write_patient_values</a></code></li>
 <li><code><a title="NetworkXGraph.write_pddl.write_predecessors_and_node_type" href="#NetworkXGraph.write_pddl.write_predecessors_and_node_type">write_predecessors_and_node_type</a></code></li>
 <li><code><a title="NetworkXGraph.write_pddl.write_revision_flags" href="#NetworkXGraph.write_pddl.write_revision_flags">write_revision_flags</a></code></li>
+<li><code><a title="NetworkXGraph.write_pddl.write_tentative_goal_count" href="#NetworkXGraph.write_pddl.write_tentative_goal_count">write_tentative_goal_count</a></code></li>
 <li><code><a title="NetworkXGraph.write_pddl.write_total_metrics" href="#NetworkXGraph.write_pddl.write_total_metrics">write_total_metrics</a></code></li>
 </ul>
 </li>

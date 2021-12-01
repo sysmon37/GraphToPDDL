@@ -8,6 +8,7 @@ from utils import (
     get_all_revIds,
     get_metric_name,
     get_type_nodes,
+    get_number_parallel_paths
 )
 
 
@@ -162,6 +163,13 @@ def write_predecessors_and_node_type(graph, file):
     # revisionAction
     file.write("\n")
     file.write("".join(revisionAction))
+
+    # number of parallel paths
+    n_path_found = get_number_parallel_paths(graph)
+    if parallel_node_found:
+        [file.write("".join(f"\n\t(= (parallelPathCount {init_node}) 0)")) for init_node, n_paths in n_path_found.items()]
+        [file.write("".join(f"\n\t(= (numParallelPaths {init_node}) {n_paths})")) for init_node, n_paths in n_path_found.items()]
+
 
 
 def write_total_metrics(graph, file):

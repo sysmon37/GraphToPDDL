@@ -1,0 +1,40 @@
+digraph test_1 {
+newrank=true;
+ranksep = 0.25;
+node [fontname=arial, fontsize=10];
+edge [fontname=arial, fontsize=9];
+
+// Contexts
+d1 [type=context];
+
+
+// Tests
+t1 [type=decision, dataItem=v1]
+
+
+// Actions
+a1 [cost=10, type=action];
+a2 [cost=10, type=action];
+a3 [cost=10, type=action];
+a4 [cost=10, type=action];
+
+// Alternative
+// d2_alt1 [type=alternative];
+// d2_alt2 [type=alternative];
+
+// Goals
+g1 [type=goal];
+
+d1 -> t1;
+t1 -> a1 [range=0..4];
+t1 -> a4 [range=5..10];
+a1 -> a2 -> a3;
+a3 -> g1;
+a4 -> g1;
+
+
+
+{rank=same; a1; a4}
+{rank=same; d1; }
+}
+

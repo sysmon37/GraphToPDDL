@@ -20,8 +20,6 @@ a2 [cost=10, type=action];
 a3 [cost=10, type=action];
 a7 [cost=10, type=action];
 a4 [cost=10, type=action];
-newAction [cost=100, type=action, idRO=ro1, trigger=a2..a7];
-newAction2 [cost=50, type=action, idRO=ro2, trigger=a2..a7];
 
 // Goals
 g1 [type=goal];
@@ -46,6 +44,6 @@ a7 -> g2;
 
 {rank=same; a1; a2; a4}
 {rank=same; d1; d2 }
-{rank=same; a3; a7; newAction; newAction2 }
+{rank=same; a3; a7; }
 }
 

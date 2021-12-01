@@ -54,7 +54,7 @@ other ROs...]
  There are 3 possibles operations:
  - [Replace](#Replace-operation)
  - [Delete](#Delete-operation)
- - Add
+ - [Add](#Add-operation)
 
 
  #### Replace operation
@@ -134,4 +134,67 @@ Any other attributes in this dictionary will be attributes of the new node (e.g.
       ]
  },
 other ROs...]
+```
+
+#### Add operation
+The add operation insert a new node between a list of predessors and successors nodes. The existing edge between a predesssor and a successor is kept, because the revision operator might not happen.
+
+
+The content of a newNode dictionary has the followings attributes:
+- id (str) : The ID of the new node.
+- type (str) : The type of the node to add. It must be a valid type (action, decision, goal, alternative or parallel).
+- predecessors (list of dict) : A list of predecessors nodes create an edge from. Each dictionary must contain an attribute 'nodeId'. The rest of the attributes will be added as attributes of the edge (e.g. range). If the predessors is not given to new node type should be 'context'.
+- successors (list of dict) : A list of successors nodes create an edge from. Each dictionary must contain an attribute 'nodeId'. The rest of the attributes will be added as attributes of the edge (e.g. range). If the succssors is not given to new node type should be 'goal'.
+- Any attributes needed to the new node can be added. For example, if thhe type of the node is an 'action', a cost attributes should be present, or if the type is a 'decision', the label 'dataItem' should be used.
+
+If the type of the new node is 'decision', each successors needs an attribute range.
+
+
+```JSON
+    ...
+        "operations": [
+            {
+                "type": "add",
+                "newNodes": [
+                    {
+                        "id": "newActionX",
+                        "cost": 50,
+                        "type": "action",
+                        "predecessors": [
+                            {
+                                "nodeId": "a1"
+                            }
+                        ],
+                        "successors": [
+                            {
+                                "nodeId": "a2"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "newDecisionX",
+                        "type": "decision",
+                        "dataItem": "v2",
+                        "predecessors": [
+                            {
+                                "nodeId": "a3"
+                            }
+                        ],
+                        "successors": [
+                            {
+                                "nodeId": "a4",
+                                "range": "0..5"
+                            },
+                            {
+                                "nodeId": "g1",
+                                "range": "6..10"
+                            }
+                        ]
+                    },
+                other new nodes...
+                ],
+            }, other operations...
+        ], other ROs...
+    ]
+
 ```

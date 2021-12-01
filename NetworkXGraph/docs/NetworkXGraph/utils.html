@@ -121,6 +121,35 @@ def get_all_parallel_nodes(graph):
 
     return parallel_nodes
 
+def get_number_parallel_paths(graph):
+    &#34;&#34;&#34;
+    Finds the number of parallel paths.
+
+    Args:
+        graph (networkx graph): The graph.
+
+    Returns:
+        int: Number of parallel paths.
+    &#34;&#34;&#34;#find_init_node
+    p_start = &#34;&#34;
+    p_end = &#34;&#34;
+    n_path_found = {}
+    for node, attributes in graph.nodes.items():
+        if find_init_node(graph, node) not in n_path_found:
+            n_path_found[find_init_node(graph, node)] = 0
+        if attributes.get(&#34;parallelStartNode&#34;) == True:
+            p_start = node
+        if attributes.get(&#34;parallelEndNode&#34;) == True:
+            p_end = node
+        if p_start != &#34;&#34; and p_end != &#34;&#34;:
+            parallel_sequence = list(
+                nwx.all_simple_paths(graph, source=p_start, target=p_end)
+            )
+            n_paths = len(parallel_sequence)
+            context = find_init_node(graph, p_start)
+            n_path_found[context] = n_paths + n_path_found.get(context, 0)
+            p_start = &#34;&#34;
+    return n_path_found
 
 def find_parallel_path(graph, p_nodes_found):
     &#34;&#34;&#34;
@@ -137,6 +166,7 @@ def find_parallel_path(graph, p_nodes_found):
     &#34;&#34;&#34;
     parallelNode = &#34;&#34;
     # TODO: numParallelPaths for each diseases
+    end_nodes = []
 
     for start_node in p_nodes_found:
         for end_node in p_nodes_found:
@@ -153,7 +183,11 @@ def find_parallel_path(graph, p_nodes_found):
                 untraversedParallelNode = &#34;&#34;
 
                 parallelNode += &#34;(parallelStartNode {})\n\t&#34;.format(start_node)
-                parallelNode += &#34;(parallelEndNode {})\n\t&#34;.format(end_node)
+                graph.nodes[start_node][&#34;parallelStartNode&#34;] = True
+                if end_node not in end_nodes:
+                    end_nodes.append(end_node)
+                    parallelNode += &#34;(parallelEndNode {})\n\t&#34;.format(end_node)
+                    graph.nodes[end_node][&#34;parallelEndNode&#34;] = True
 
                 # for path in parallel_sequence:
                 (
@@ -338,7 +372,62 @@ def find_revId_involved_nodes(graph, revId):
                     ):
                         nodes.append(child)
                         children.extend(list(graph.successors(child)))
-    return list(set(nodes))</code></pre>
+    return list(set(nodes))
+
+
+def match_nodes_to_disease(graph):
+    &#34;&#34;&#34;
+    For each disease, find the revision operators that involve the disease.
+
+    Format of the return object:
+
+        {
+            &#34;disease1&#34;: [&#39;ro1&#39;, &#39;ro2&#39;],
+            ...
+        }
+
+
+    Args:
+        graph (networkx graph): The graph.
+
+    Returns:
+        object: Object where the keys are the diseases and the values are a list of revision operations IDs.
+    &#34;&#34;&#34;
+    revIds = get_all_revIds(graph)
+    diseases = get_type_nodes(graph, &#34;context&#34;)
+
+    ro_disease = {}
+    for disease in diseases:
+        ro_disease[disease] = set()
+
+    for revId in revIds:
+        nodes = find_revId_involved_nodes(graph, revId)
+        diseases_involved = []
+        for node in nodes:
+            diseases_involved.append(find_init_node(graph, node))
+        for disease in diseases_involved:
+            ro_disease[disease].add(revId)
+    return ro_disease
+
+
+def handle_alternative_nodes(graph):
+    &#34;&#34;&#34;
+    Modifies the alternative nodes to decision nodes where all successors have the same edges value.
+    That way, the planner will look into all successors for an optimize solution.
+
+
+    The patient values provided should include a value called &#34;default&#34; with the value of 0 or 1 that will be used for the alternative nodes.
+
+    Args:
+        graph (networkx graph): The graph.
+    &#34;&#34;&#34;
+    for node, attr in graph.nodes.items():
+        if attr.get(&#34;type&#34;) == &#34;alternative&#34;:
+            graph.nodes[node][&#34;type&#34;] = &#34;decision&#34;
+            graph.nodes[node][&#34;dataItem&#34;] = &#34;default_value&#34;
+            graph.nodes[node][&#34;is_alternative&#34;] = True
+            for succ in graph.successors(node):
+                graph.edges[node, succ, 0][&#34;range&#34;] = &#34;0..1&#34;</code></pre>
 </details>
 </section>
 <section>
@@ -468,6 +557,7 @@ def find_revId_involved_nodes(graph, revId):
     &#34;&#34;&#34;
     parallelNode = &#34;&#34;
     # TODO: numParallelPaths for each diseases
+    end_nodes = []
 
     for start_node in p_nodes_found:
         for end_node in p_nodes_found:
@@ -484,7 +574,11 @@ def find_revId_involved_nodes(graph, revId):
                 untraversedParallelNode = &#34;&#34;
 
                 parallelNode += &#34;(parallelStartNode {})\n\t&#34;.format(start_node)
-                parallelNode += &#34;(parallelEndNode {})\n\t&#34;.format(end_node)
+                graph.nodes[start_node][&#34;parallelStartNode&#34;] = True
+                if end_node not in end_nodes:
+                    end_nodes.append(end_node)
+                    parallelNode += &#34;(parallelEndNode {})\n\t&#34;.format(end_node)
+                    graph.nodes[end_node][&#34;parallelEndNode&#34;] = True
 
                 # for path in parallel_sequence:
                 (
@@ -716,6 +810,56 @@ def find_revId_involved_nodes(graph, revId):
     return metric_name</code></pre>
 </details>
 </dd>
+<dt id="NetworkXGraph.utils.get_number_parallel_paths"><code class="name flex">
+<span>def <span class="ident">get_number_parallel_paths</span></span>(<span>graph)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds the number of parallel paths.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>Number of parallel paths.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_number_parallel_paths(graph):
+    &#34;&#34;&#34;
+    Finds the number of parallel paths.
+
+    Args:
+        graph (networkx graph): The graph.
+
+    Returns:
+        int: Number of parallel paths.
+    &#34;&#34;&#34;#find_init_node
+    p_start = &#34;&#34;
+    p_end = &#34;&#34;
+    n_path_found = {}
+    for node, attributes in graph.nodes.items():
+        if find_init_node(graph, node) not in n_path_found:
+            n_path_found[find_init_node(graph, node)] = 0
+        if attributes.get(&#34;parallelStartNode&#34;) == True:
+            p_start = node
+        if attributes.get(&#34;parallelEndNode&#34;) == True:
+            p_end = node
+        if p_start != &#34;&#34; and p_end != &#34;&#34;:
+            parallel_sequence = list(
+                nwx.all_simple_paths(graph, source=p_start, target=p_end)
+            )
+            n_paths = len(parallel_sequence)
+            context = find_init_node(graph, p_start)
+            n_path_found[context] = n_paths + n_path_found.get(context, 0)
+            p_start = &#34;&#34;
+    return n_path_found</code></pre>
+</details>
+</dd>
 <dt id="NetworkXGraph.utils.get_type_nodes"><code class="name flex">
 <span>def <span class="ident">get_type_nodes</span></span>(<span>graph, node_type)</span>
 </code></dt>
@@ -750,6 +894,102 @@ def find_revId_involved_nodes(graph, revId):
 
     &#34;&#34;&#34;
     return [node for node, attr in graph.nodes.items() if attr[&#34;type&#34;] == node_type]</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.utils.handle_alternative_nodes"><code class="name flex">
+<span>def <span class="ident">handle_alternative_nodes</span></span>(<span>graph)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Modifies the alternative nodes to decision nodes where all successors have the same edges value.
+That way, the planner will look into all successors for an optimize solution.</p>
+<p>The patient values provided should include a value called "default" with the value of 0 or 1 that will be used for the alternative nodes.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def handle_alternative_nodes(graph):
+    &#34;&#34;&#34;
+    Modifies the alternative nodes to decision nodes where all successors have the same edges value.
+    That way, the planner will look into all successors for an optimize solution.
+
+
+    The patient values provided should include a value called &#34;default&#34; with the value of 0 or 1 that will be used for the alternative nodes.
+
+    Args:
+        graph (networkx graph): The graph.
+    &#34;&#34;&#34;
+    for node, attr in graph.nodes.items():
+        if attr.get(&#34;type&#34;) == &#34;alternative&#34;:
+            graph.nodes[node][&#34;type&#34;] = &#34;decision&#34;
+            graph.nodes[node][&#34;dataItem&#34;] = &#34;default_value&#34;
+            graph.nodes[node][&#34;is_alternative&#34;] = True
+            for succ in graph.successors(node):
+                graph.edges[node, succ, 0][&#34;range&#34;] = &#34;0..1&#34;</code></pre>
+</details>
+</dd>
+<dt id="NetworkXGraph.utils.match_nodes_to_disease"><code class="name flex">
+<span>def <span class="ident">match_nodes_to_disease</span></span>(<span>graph)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>For each disease, find the revision operators that involve the disease.</p>
+<p>Format of the return object:</p>
+<pre><code>{
+    "disease1": ['ro1', 'ro2'],
+    ...
+}
+</code></pre>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>object</code></dt>
+<dd>Object where the keys are the diseases and the values are a list of revision operations IDs.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def match_nodes_to_disease(graph):
+    &#34;&#34;&#34;
+    For each disease, find the revision operators that involve the disease.
+
+    Format of the return object:
+
+        {
+            &#34;disease1&#34;: [&#39;ro1&#39;, &#39;ro2&#39;],
+            ...
+        }
+
+
+    Args:
+        graph (networkx graph): The graph.
+
+    Returns:
+        object: Object where the keys are the diseases and the values are a list of revision operations IDs.
+    &#34;&#34;&#34;
+    revIds = get_all_revIds(graph)
+    diseases = get_type_nodes(graph, &#34;context&#34;)
+
+    ro_disease = {}
+    for disease in diseases:
+        ro_disease[disease] = set()
+
+    for revId in revIds:
+        nodes = find_revId_involved_nodes(graph, revId)
+        diseases_involved = []
+        for node in nodes:
+            diseases_involved.append(find_init_node(graph, node))
+        for disease in diseases_involved:
+            ro_disease[disease].add(revId)
+    return ro_disease</code></pre>
 </details>
 </dd>
 <dt id="NetworkXGraph.utils.update_between_parallel_nodes"><code class="name flex">
@@ -946,7 +1186,10 @@ setTimeout(() => input.focus(), 100);
 <li><code><a title="NetworkXGraph.utils.get_all_parallel_nodes" href="#NetworkXGraph.utils.get_all_parallel_nodes">get_all_parallel_nodes</a></code></li>
 <li><code><a title="NetworkXGraph.utils.get_all_revIds" href="#NetworkXGraph.utils.get_all_revIds">get_all_revIds</a></code></li>
 <li><code><a title="NetworkXGraph.utils.get_metric_name" href="#NetworkXGraph.utils.get_metric_name">get_metric_name</a></code></li>
+<li><code><a title="NetworkXGraph.utils.get_number_parallel_paths" href="#NetworkXGraph.utils.get_number_parallel_paths">get_number_parallel_paths</a></code></li>
 <li><code><a title="NetworkXGraph.utils.get_type_nodes" href="#NetworkXGraph.utils.get_type_nodes">get_type_nodes</a></code></li>
+<li><code><a title="NetworkXGraph.utils.handle_alternative_nodes" href="#NetworkXGraph.utils.handle_alternative_nodes">handle_alternative_nodes</a></code></li>
+<li><code><a title="NetworkXGraph.utils.match_nodes_to_disease" href="#NetworkXGraph.utils.match_nodes_to_disease">match_nodes_to_disease</a></code></li>
 <li><code><a title="NetworkXGraph.utils.update_between_parallel_nodes" href="#NetworkXGraph.utils.update_between_parallel_nodes">update_between_parallel_nodes</a></code></li>
 </ul>
 </li>

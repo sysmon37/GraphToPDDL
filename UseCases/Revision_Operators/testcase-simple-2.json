@@ -1,0 +1,106 @@
+[
+    {
+        "id": "ro2",
+        "trigger": [
+            "a2"
+        ],
+        "operations": [
+            {
+                "type": "add",
+                "newNodes": [
+                    {
+                        "id": "newAction1",
+                        "cost": 50,
+                        "type": "action",
+                        "predecessors": [
+                            {
+                                "nodeId": "a1"
+                            }
+                        ],
+                        "successors": [
+                            {
+                                "nodeId": "a2"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "newAction2",
+                        "cost": 50,
+                        "type": "action",
+                        "predecessors": [
+                            {
+                                "nodeId": "a2"
+                            }
+                        ],
+                        "successors": [
+                            {
+                                "nodeId": "a3"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "add",
+                "newNodes": [
+                    {
+                        "id": "newDecision1",
+                        "type": "decision",
+                        "dataItem": "v2",
+                        "predecessors": [
+                            {
+                                "nodeId": "a3"
+                            }
+                        ],
+                        "successors": [
+                            {
+                                "nodeId": "a4",
+                                "range": "0..5"
+                            },
+                            {
+                                "nodeId": "g1",
+                                "range": "6..10"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "newGoal1",
+                        "type": "goal",
+                        "predecessors": [
+                            {
+                                "nodeId": "a3"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "newDisease1",
+                        "type": "context",
+                        "successors": [
+                            {
+                                "nodeId": "a3"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "newAction5",
+                        "type": "action",
+                        "cost": 50,
+                        "predecessors": [
+                            {
+                                "nodeId": "t1",
+                                "range": "0..8"
+                            }
+                        ],
+                        "successors": [
+                            {
+                                "nodeId": "g1"
+                            }
+                        ]
+                    }
+
+                ]
+            }
+            
+        ]
+    }
+]
