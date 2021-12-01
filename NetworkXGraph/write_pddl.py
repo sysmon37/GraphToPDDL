@@ -50,8 +50,8 @@ def write_initial_state(graph, file, ros, patient_values):
     file.write("\n")
 
     # noPrevious nodes
-    # write_not_previous_node(graph, file)
-    # file.write("\n")
+    write_not_previous_node(graph, file)
+    file.write("\n")
 
     # initialNode
     # goalNode
@@ -268,7 +268,7 @@ def write_goal(graph, file):
         file.write(
             "\t(treatmentPlanReady {} {})\n".format(find_init_node(graph, node), node)
         )
-    file.write(")\n")
+    file.write("\t)\n)\n")
 
 
 # TODO - revise this, no weights input for now
