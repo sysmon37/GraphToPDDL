@@ -23,5 +23,9 @@ RUN "./build-release"
 
 VOLUME /tmp/optic/optic/release/optic
 WORKDIR /tmp/optic/optic/release/optic
+
+RUN alias optic=/tmp/optic/optic/release/optic/optic-clp
+WORKDIR /home/optic
+
 ENTRYPOINT ["/bin/bash"]
 
