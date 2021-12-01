@@ -1,4 +1,11 @@
 > This use an old version of optic
+
+## Build Docker image
+````
+docker build --pull --rm -f "Optic-Docker\DOCKERFILE" -t optic-docker:latest "Optic-Docker"
+````
+
+
 ## Execute the container with a host folder
 ````
 docker run -v "Docker_Host_Folder/":/home/optic --rm -ti GraphToPDDL
