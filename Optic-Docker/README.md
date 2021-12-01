@@ -8,7 +8,7 @@ docker build --pull --rm -f "Optic-Docker\DOCKERFILE" -t optic-docker:latest "Op
 
 ## Execute the container with a host folder
 ````
-docker run -v "Docker_Host_Folder/":/home/optic --rm -ti GraphToPDDL
+docker run -v "Docker_Host_Folder/":/home/optic --rm -ti Optic-Docker
 ````
 Then you can place your domain and problems files into this folder.
 
