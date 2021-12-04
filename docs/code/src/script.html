@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>NetworkXGraph.test_problem_file API documentation</title>
+<title>src.script API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,36 +19,93 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>NetworkXGraph.test_problem_file</code></h1>
+<h1 class="title">Module <code>src.script</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import filecmp
-import difflib
-import pytest
+<pre><code class="python">from utils import handle_alternative_nodes
+from input_output_graph import outputGraphViz, read_graph
+from write_pddl import outputPDDL
+from input_RO import read_JSON, update_graph_with_ROs
+import argparse as ap
+import traceback
 
-# pytest test_problem_file.py
 
-&#34;&#34;&#34;
-Test Case Example
-&#34;&#34;&#34;
-def test_problem_file():
-    f1 = &#39;problem.pddl&#39; # Generated file from read_graph.py
-    f2 = &#39;test-problem.pddl&#39; # File to compare
-    result = filecmp.cmp(f1, f2)
-    # assert result == True
-    if not result:
-        text1 = open(f1).readlines()
-        text2 = open(f2).readlines()
-        buffer = &#34;&#34;
-        for line in difflib.unified_diff(text1, text2):
-            buffer += line
-        
-        # Show the content
-        pytest.fail(buffer)</code></pre>
+def run(
+    path,
+    ros_path,
+    patient_values_path,
+    og
+):
+    &#34;&#34;&#34;
+    Function to run the automation pipeline.
+
+    Args:
+        path (str): Path to the file.
+        ros_path (str): Path to the revision operators file.
+        patient_values_path (str): Path to the patient values file.
+
+    &#34;&#34;&#34;
+    graph = read_graph(path)
+
+    # ROs
+    ros = read_JSON(ros_path)
+    update_graph_with_ROs(graph, ros)
+    handle_alternative_nodes(graph)
+
+    # Patient values
+    patient_values = read_JSON(patient_values_path)
+
+    outputPDDL(graph, ros, patient_values, &#34;problem-test&#34;, &#34;domain_test&#34;)
+    outputGraphViz(graph)
+
+
+if __name__ == &#34;__main__&#34;:
+    parser = ap.ArgumentParser()
+    parser.add_argument(
+        &#34;ag&#34;, type=str, help=&#34;Path to the AG file. It must be a DOT file.&#34;
+    )
+
+    parser.add_argument(
+        &#34;--ro&#34;,
+        type=str,
+        help=&#34;Path to the revision operator file. It must be a JSON file.&#34;,
+    )
+    parser.add_argument(
+        &#34;--p&#34;,
+        type=str,
+        help=&#34;Path to the patient values file. It must be a JSON file.&#34;,
+    )
+
+    parser.add_argument(
+        &#34;--og&#34;,
+        action=&#39;store_true&#39;,
+        help=&#34;Original Graph only&#34;,
+    )
+
+    args = parser.parse_args()
+    try:
+        if not args.ag:
+            raise Exception(
+                &#34;An AG (extended or not) file is needed. Please use the flag --ag or --agx followed by the path to the file.\nUse the flag -h for more information&#34;
+            )
+
+        if args.ag and args.ag[-3:].lower() != &#34;dot&#34;:
+            raise Exception(&#34;The AG file (--ag) must be a DOT file.&#34;)
+
+        if args.ro != None and args.ro[-4:].lower() != &#34;json&#34;:
+            raise Exception(&#34;The Revision operators file (--ro) must be a JSON file.&#34;)
+
+        if args.p != None and args.p[-4:].lower() != &#34;json&#34;:
+            raise Exception(&#34;The Revision operators file (--ro) must be a JSON file.&#34;)
+
+        run(args.ag, args.ro, args.p, args.og)
+    except Exception as e:
+        print(e)
+        traceback.print_exc()</code></pre>
 </details>
 </section>
 <section>
@@ -58,29 +115,51 @@ def test_problem_file():
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="NetworkXGraph.test_problem_file.test_problem_file"><code class="name flex">
-<span>def <span class="ident">test_problem_file</span></span>(<span>)</span>
+<dt id="src.script.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>path, ros_path, patient_values_path, og)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Function to run the automation pipeline.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path to the file.</dd>
+<dt><strong><code>ros_path</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path to the revision operators file.</dd>
+<dt><strong><code>patient_values_path</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path to the patient values file.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def test_problem_file():
-    f1 = &#39;problem.pddl&#39; # Generated file from read_graph.py
-    f2 = &#39;test-problem.pddl&#39; # File to compare
-    result = filecmp.cmp(f1, f2)
-    # assert result == True
-    if not result:
-        text1 = open(f1).readlines()
-        text2 = open(f2).readlines()
-        buffer = &#34;&#34;
-        for line in difflib.unified_diff(text1, text2):
-            buffer += line
-        
-        # Show the content
-        pytest.fail(buffer)</code></pre>
+<pre><code class="python">def run(
+    path,
+    ros_path,
+    patient_values_path,
+    og
+):
+    &#34;&#34;&#34;
+    Function to run the automation pipeline.
+
+    Args:
+        path (str): Path to the file.
+        ros_path (str): Path to the revision operators file.
+        patient_values_path (str): Path to the patient values file.
+
+    &#34;&#34;&#34;
+    graph = read_graph(path)
+
+    # ROs
+    ros = read_JSON(ros_path)
+    update_graph_with_ROs(graph, ros)
+    handle_alternative_nodes(graph)
+
+    # Patient values
+    patient_values = read_JSON(patient_values_path)
+
+    outputPDDL(graph, ros, patient_values, &#34;problem-test&#34;, &#34;domain_test&#34;)
+    outputGraphViz(graph)</code></pre>
 </details>
 </dd>
 </dl>
@@ -142,12 +221,12 @@ setTimeout(() => input.focus(), 100);
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="NetworkXGraph" href="index.html">NetworkXGraph</a></code></li>
+<li><code><a title="src" href="index.html">src</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="NetworkXGraph.test_problem_file.test_problem_file" href="#NetworkXGraph.test_problem_file.test_problem_file">test_problem_file</a></code></li>
+<li><code><a title="src.script.run" href="#src.script.run">run</a></code></li>
 </ul>
 </li>
 </ul>

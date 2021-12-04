@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>NetworkXGraph.utils API documentation</title>
+<title>src.utils API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,7 +19,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>NetworkXGraph.utils</code></h1>
+<h1 class="title">Module <code>src.utils</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
@@ -437,7 +437,7 @@ def handle_alternative_nodes(graph):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="NetworkXGraph.utils.find_goal_node"><code class="name flex">
+<dt id="src.utils.find_goal_node"><code class="name flex">
 <span>def <span class="ident">find_goal_node</span></span>(<span>graph, start_node)</span>
 </code></dt>
 <dd>
@@ -479,7 +479,7 @@ def handle_alternative_nodes(graph):
     return start_node</code></pre>
 </details>
 </dd>
-<dt id="NetworkXGraph.utils.find_init_node"><code class="name flex">
+<dt id="src.utils.find_init_node"><code class="name flex">
 <span>def <span class="ident">find_init_node</span></span>(<span>graph, start_node)</span>
 </code></dt>
 <dd>
@@ -521,7 +521,7 @@ def handle_alternative_nodes(graph):
     return start_node</code></pre>
 </details>
 </dd>
-<dt id="NetworkXGraph.utils.find_parallel_path"><code class="name flex">
+<dt id="src.utils.find_parallel_path"><code class="name flex">
 <span>def <span class="ident">find_parallel_path</span></span>(<span>graph, p_nodes_found)</span>
 </code></dt>
 <dd>
@@ -598,7 +598,7 @@ def handle_alternative_nodes(graph):
     return parallelNode</code></pre>
 </details>
 </dd>
-<dt id="NetworkXGraph.utils.find_revId_involved_nodes"><code class="name flex">
+<dt id="src.utils.find_revId_involved_nodes"><code class="name flex">
 <span>def <span class="ident">find_revId_involved_nodes</span></span>(<span>graph, revId)</span>
 </code></dt>
 <dd>
@@ -652,7 +652,7 @@ def handle_alternative_nodes(graph):
     return list(set(nodes))</code></pre>
 </details>
 </dd>
-<dt id="NetworkXGraph.utils.get_all_metrics"><code class="name flex">
+<dt id="src.utils.get_all_metrics"><code class="name flex">
 <span>def <span class="ident">get_all_metrics</span></span>(<span>graph)</span>
 </code></dt>
 <dd>
@@ -696,7 +696,7 @@ def handle_alternative_nodes(graph):
     return list(set(metrics))</code></pre>
 </details>
 </dd>
-<dt id="NetworkXGraph.utils.get_all_parallel_nodes"><code class="name flex">
+<dt id="src.utils.get_all_parallel_nodes"><code class="name flex">
 <span>def <span class="ident">get_all_parallel_nodes</span></span>(<span>graph)</span>
 </code></dt>
 <dd>
@@ -736,7 +736,7 @@ def handle_alternative_nodes(graph):
     return parallel_nodes</code></pre>
 </details>
 </dd>
-<dt id="NetworkXGraph.utils.get_all_revIds"><code class="name flex">
+<dt id="src.utils.get_all_revIds"><code class="name flex">
 <span>def <span class="ident">get_all_revIds</span></span>(<span>graph)</span>
 </code></dt>
 <dd>
@@ -773,7 +773,7 @@ def handle_alternative_nodes(graph):
     return revIds</code></pre>
 </details>
 </dd>
-<dt id="NetworkXGraph.utils.get_metric_name"><code class="name flex">
+<dt id="src.utils.get_metric_name"><code class="name flex">
 <span>def <span class="ident">get_metric_name</span></span>(<span>metric)</span>
 </code></dt>
 <dd>
@@ -810,7 +810,7 @@ def handle_alternative_nodes(graph):
     return metric_name</code></pre>
 </details>
 </dd>
-<dt id="NetworkXGraph.utils.get_number_parallel_paths"><code class="name flex">
+<dt id="src.utils.get_number_parallel_paths"><code class="name flex">
 <span>def <span class="ident">get_number_parallel_paths</span></span>(<span>graph)</span>
 </code></dt>
 <dd>
@@ -860,7 +860,7 @@ def handle_alternative_nodes(graph):
     return n_path_found</code></pre>
 </details>
 </dd>
-<dt id="NetworkXGraph.utils.get_type_nodes"><code class="name flex">
+<dt id="src.utils.get_type_nodes"><code class="name flex">
 <span>def <span class="ident">get_type_nodes</span></span>(<span>graph, node_type)</span>
 </code></dt>
 <dd>
@@ -896,7 +896,7 @@ def handle_alternative_nodes(graph):
     return [node for node, attr in graph.nodes.items() if attr[&#34;type&#34;] == node_type]</code></pre>
 </details>
 </dd>
-<dt id="NetworkXGraph.utils.handle_alternative_nodes"><code class="name flex">
+<dt id="src.utils.handle_alternative_nodes"><code class="name flex">
 <span>def <span class="ident">handle_alternative_nodes</span></span>(<span>graph)</span>
 </code></dt>
 <dd>
@@ -932,7 +932,7 @@ That way, the planner will look into all successors for an optimize solution.</p
                 graph.edges[node, succ, 0][&#34;range&#34;] = &#34;0..1&#34;</code></pre>
 </details>
 </dd>
-<dt id="NetworkXGraph.utils.match_nodes_to_disease"><code class="name flex">
+<dt id="src.utils.match_nodes_to_disease"><code class="name flex">
 <span>def <span class="ident">match_nodes_to_disease</span></span>(<span>graph)</span>
 </code></dt>
 <dd>
@@ -992,7 +992,7 @@ That way, the planner will look into all successors for an optimize solution.</p
     return ro_disease</code></pre>
 </details>
 </dd>
-<dt id="NetworkXGraph.utils.update_between_parallel_nodes"><code class="name flex">
+<dt id="src.utils.update_between_parallel_nodes"><code class="name flex">
 <span>def <span class="ident">update_between_parallel_nodes</span></span>(<span>graph, start_node, end_node, parallelTypeNode, untraversedParallelNode, numParallelPaths=0)</span>
 </code></dt>
 <dd>
@@ -1173,24 +1173,24 @@ setTimeout(() => input.focus(), 100);
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="NetworkXGraph" href="index.html">NetworkXGraph</a></code></li>
+<li><code><a title="src" href="index.html">src</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="NetworkXGraph.utils.find_goal_node" href="#NetworkXGraph.utils.find_goal_node">find_goal_node</a></code></li>
-<li><code><a title="NetworkXGraph.utils.find_init_node" href="#NetworkXGraph.utils.find_init_node">find_init_node</a></code></li>
-<li><code><a title="NetworkXGraph.utils.find_parallel_path" href="#NetworkXGraph.utils.find_parallel_path">find_parallel_path</a></code></li>
-<li><code><a title="NetworkXGraph.utils.find_revId_involved_nodes" href="#NetworkXGraph.utils.find_revId_involved_nodes">find_revId_involved_nodes</a></code></li>
-<li><code><a title="NetworkXGraph.utils.get_all_metrics" href="#NetworkXGraph.utils.get_all_metrics">get_all_metrics</a></code></li>
-<li><code><a title="NetworkXGraph.utils.get_all_parallel_nodes" href="#NetworkXGraph.utils.get_all_parallel_nodes">get_all_parallel_nodes</a></code></li>
-<li><code><a title="NetworkXGraph.utils.get_all_revIds" href="#NetworkXGraph.utils.get_all_revIds">get_all_revIds</a></code></li>
-<li><code><a title="NetworkXGraph.utils.get_metric_name" href="#NetworkXGraph.utils.get_metric_name">get_metric_name</a></code></li>
-<li><code><a title="NetworkXGraph.utils.get_number_parallel_paths" href="#NetworkXGraph.utils.get_number_parallel_paths">get_number_parallel_paths</a></code></li>
-<li><code><a title="NetworkXGraph.utils.get_type_nodes" href="#NetworkXGraph.utils.get_type_nodes">get_type_nodes</a></code></li>
-<li><code><a title="NetworkXGraph.utils.handle_alternative_nodes" href="#NetworkXGraph.utils.handle_alternative_nodes">handle_alternative_nodes</a></code></li>
-<li><code><a title="NetworkXGraph.utils.match_nodes_to_disease" href="#NetworkXGraph.utils.match_nodes_to_disease">match_nodes_to_disease</a></code></li>
-<li><code><a title="NetworkXGraph.utils.update_between_parallel_nodes" href="#NetworkXGraph.utils.update_between_parallel_nodes">update_between_parallel_nodes</a></code></li>
+<li><code><a title="src.utils.find_goal_node" href="#src.utils.find_goal_node">find_goal_node</a></code></li>
+<li><code><a title="src.utils.find_init_node" href="#src.utils.find_init_node">find_init_node</a></code></li>
+<li><code><a title="src.utils.find_parallel_path" href="#src.utils.find_parallel_path">find_parallel_path</a></code></li>
+<li><code><a title="src.utils.find_revId_involved_nodes" href="#src.utils.find_revId_involved_nodes">find_revId_involved_nodes</a></code></li>
+<li><code><a title="src.utils.get_all_metrics" href="#src.utils.get_all_metrics">get_all_metrics</a></code></li>
+<li><code><a title="src.utils.get_all_parallel_nodes" href="#src.utils.get_all_parallel_nodes">get_all_parallel_nodes</a></code></li>
+<li><code><a title="src.utils.get_all_revIds" href="#src.utils.get_all_revIds">get_all_revIds</a></code></li>
+<li><code><a title="src.utils.get_metric_name" href="#src.utils.get_metric_name">get_metric_name</a></code></li>
+<li><code><a title="src.utils.get_number_parallel_paths" href="#src.utils.get_number_parallel_paths">get_number_parallel_paths</a></code></li>
+<li><code><a title="src.utils.get_type_nodes" href="#src.utils.get_type_nodes">get_type_nodes</a></code></li>
+<li><code><a title="src.utils.handle_alternative_nodes" href="#src.utils.handle_alternative_nodes">handle_alternative_nodes</a></code></li>
+<li><code><a title="src.utils.match_nodes_to_disease" href="#src.utils.match_nodes_to_disease">match_nodes_to_disease</a></code></li>
+<li><code><a title="src.utils.update_between_parallel_nodes" href="#src.utils.update_between_parallel_nodes">update_between_parallel_nodes</a></code></li>
 </ul>
 </li>
 </ul>
