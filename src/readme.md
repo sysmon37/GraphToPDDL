@@ -24,6 +24,10 @@ python script.py
 ````shell
 ./script.py AG.dot --ro RO.json --patient-values.json
 ````
+### Usage example
+````bash
+python script.py ../UseCases/AGFigures/testcase-1-rev-ext-2.dot --ro ../UseCases/Revision_Operators/testcase-1-ro-Add.json --p ../UseCases/PatientValues/patient-values-1-5.json --og
+````
 
 ### Commands
 The current implementation required an actionnable graph, a revision_operator json file and a patient_values json file.

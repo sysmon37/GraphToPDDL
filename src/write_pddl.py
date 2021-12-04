@@ -47,8 +47,9 @@ def write_initial_state(graph, file, ros, patient_values):
     file.write("\n")
 
     # patient value
-    write_patient_values(graph, file, patient_values)
-    file.write("\n")
+    if patient_values:
+        write_patient_values(graph, file, patient_values)
+        file.write("\n")
 
     # noPrevious nodes
     write_not_previous_node(graph, file)

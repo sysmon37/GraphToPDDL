@@ -23,16 +23,29 @@ def run(
     """
     graph = read_graph(path)
 
+    if og:
+        outputGraphViz(graph, "original_graph")
+
     # ROs
-    ros = read_JSON(ros_path)
-    update_graph_with_ROs(graph, ros)
-    handle_alternative_nodes(graph)
+    if ros_path:
+        ros = read_JSON(ros_path)
+        update_graph_with_ROs(graph, ros)
+        handle_alternative_nodes(graph)
+    else:
+        print("No revision operators file provided.")
 
     # Patient values
-    patient_values = read_JSON(patient_values_path)
+    if patient_values_path:
+        patient_values = read_JSON(patient_values_path)
+    else:
+        print("No patient values file provided.")
 
-    outputPDDL(graph, ros, patient_values, "problem-test", "domain_test")
-    outputGraphViz(graph)
+    if patient_values_path and patient_values:
+        outputPDDL(graph, ros, patient_values, "problem-test", "domain_test")
+        outputGraphViz(graph)
+    else:
+        outputPDDL(graph, [], False, "problem-test", "domain_test")
+        #print("Original Graph PDDL output.")
 
 
 if __name__ == "__main__":
