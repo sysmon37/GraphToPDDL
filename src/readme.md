@@ -3,10 +3,12 @@
 ## Requirements
 
 - Python 3.9.X
-- graphviz
-- networkx
+- graphviz (python librairy & graphviz package)
+- networkx (python librairy)
 
 ## Installation
+
+Graphhviz can be installed from [Graphviz](https://graphviz.org/download/)
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install requirements.
 
