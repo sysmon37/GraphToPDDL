@@ -23,5 +23,10 @@ RUN "./build-release"
 
 VOLUME /tmp/optic/optic/release/optic
 WORKDIR /tmp/optic/optic/release/optic
+
+ENV optic=/tmp/optic/optic/release/optic/optic-clp
+RUN echo "alias optic=$optic" >> ~/.bashrc
+WORKDIR /home/optic
+
 ENTRYPOINT ["/bin/bash"]
 
