@@ -1,0 +1,85 @@
+// CKD - chronic kidney disease
+// modified for the JAMIA study
+// version 3 -- changed antiplatelets to aspirin
+// version 2 -- removed the decision step for anamia and replaced it with the hemoglobin testing
+// version 1 -- consistent with the text
+
+
+digraph CKD {
+newrank=true;
+ranksep=0.25;
+
+node [shape=box, style=filled, fillcolor=deepskyblue, fontname=calibri, fontsize=10];
+edge [fontname=calibri, fontsize=9];
+
+// Start and stop
+start [label="CKD", shape=oval, style=filled, fillcolor=lightgray];
+// end [shape=oval label="CKD - End", fillcolor=red]
+
+// Actions
+a_phosphate_binders [label=<Phosphate binders<br/><i>duration: lifetime</i>>];
+// a_cvd_risk_management [label="CVD risk management"];
+a_esa [label=<ESA <br/> <i>duration: lifetime</i>>];
+a_iron_therapy [label=<Oral iron therapy <br/> <i>duration: 8 weeks</i>>];
+
+subgraph cluster0 {
+    label="HTN prevention";
+    fontname=calibri; fontsize=9; style=dotted;
+    a_ace_inhibitor [label=<ACE inhibitor <br/> <i>duration: lifetime</i>>];
+}
+
+subgraph cluster1 {
+    label="CVD prevention";
+    fontname=calibri; fontsize=9; style=dotted;
+    a_aspirin [label=<Low dose aspirin <br/> <i>duration: lifetime</i>>];
+    a_lifestyle_management [label=<Lifestyle management for CVD <br/> <i>duration: lifetime</i>>];
+}
+
+// Decisions
+d_egfr [shape=diamond, fillcolor=darkorange, label="eGFR level?"];
+// d_anemia [shape=diamond, fillcolor=darkorange, label="Anemia \n present?"];
+
+d_hemoglobin_level [shape=diamond, fillcolor=darkorange, label="Hemoglobin \n level?"];
+d_metabolic_abnormality_present [shape=diamond, fillcolor=darkorange, label="Metabolic \n abnormality \npresent?"];
+d_ferritin_level [shape=diamond, fillcolor=darkorange, label="Ferritin \n level?"];
+
+// Parallel gateways
+p1 [shape=hexagon, height=0.3, width=0.4, fixedsize=true, fillcolor=gold, label=<para>];
+p2 [shape=hexagon, height=0.3, width=0.4, fixedsize=true, fillcolor=gold, label=<para>];
+p3 [shape=hexagon, height=0.3, width=0.4, fixedsize=true, fillcolor=gold, label=<para>];
+p4 [shape=hexagon, height=0.3, width=0.4, fixedsize=true, fillcolor=gold, label=<para>];
+p_end [shape=hexagon, height=0.3, width=0.4, fixedsize=true, fillcolor=gold, label=<para>];
+
+// Arcs
+start -> d_egfr;
+// d_egfr -> d_anemia [label="< 60"];
+d_egfr -> d_hemoglobin_level [label="< 60"];
+d_egfr -> p2 [label=">= 60"];
+
+// p1 -> p2;
+// p1 -> d_anemia;
+// p1 -> d_metabolic_abnormality_present;
+
+// d_anemia -> d_metabolic_abnormality_present [label="no"];
+// d_anemia -> d_hemoglobin_level [label="yes"];
+
+d_hemoglobin_level -> p3 [label="< 100"];
+p3 -> a_esa, d_ferritin_level;
+d_hemoglobin_level -> d_ferritin_level [label = ">= 100"];
+
+d_ferritin_level -> p4 [label="< 100"];
+p4 -> a_iron_therapy, d_metabolic_abnormality_present
+d_ferritin_level -> d_metabolic_abnormality_present [label=">= 100"];
+
+d_metabolic_abnormality_present -> p1 [label="yes"];
+p1 -> a_phosphate_binders;
+p1 -> p2;
+
+d_metabolic_abnormality_present -> p2 [label="no"];
+
+p2 -> a_aspirin, a_lifestyle_management, a_ace_inhibitor;
+
+a_esa, a_iron_therapy, a_ace_inhibitor, a_lifestyle_management, a_aspirin, a_phosphate_binders -> p_end;
+
+a_esa -> a_iron_therapy [style=invis];
+}

@@ -1,0 +1,93 @@
+// HTN - hypertension 
+// modified for the JAMIA study
+// version 3 -- replaced CCB in stage 2 with diuretics
+// version 2 -- changed duration of action in step 3 litetime
+// version 1 -- consistent with the text
+digraph HTN {
+newrank=true;
+ranksep=0.15;
+node [shape=box, style=filled, fillcolor=deepskyblue, fontname=calibri, fontsize=10];
+edge [fontname=calibri, fontsize=9];
+
+// Context
+c_htn [label="HTN", shape=oval, style=filled, fillcolor=lightgray];
+
+// Actions
+a_lifestyle_management [label=<Lifestyle management for HTN<br/><i>duration: lifetime</i>>];
+
+subgraph cluster0 {
+	label="Step 1 treatment";
+	fontname=calibri;
+	fontsize=9;
+	style=dotted;
+	d_age_under_55 [shape=diamond, fillcolor=darkorange, label="Age < 55?"];
+	a_step1_acei [label=<ACE inhibitor <br/> <i>duration: 12 weeks</i>>];
+	a_step1_ccb [label=<CCB <br/> <i>duration: 12 weeks</i>>];
+	// Parallel gateways
+	p0 [shape=hexagon, height=0.3, width=0.4, fixedsize=true, fillcolor=gold, label=<para>];
+	d_bp_controlled_1 [shape=diamond, fillcolor=darkorange, label="BP controlled?"];
+}
+
+subgraph cluster1 {
+	label="Step 2 treatment";
+	fontname=calibri;
+	fontsize=9;
+	style=dotted;
+	a_step2_acei [label=<ACE inhibitor <br/> <i>duration: 12 weeks</i>>];
+	a_step2_diuretics [label=<Diuretic <br/> <i>duration: 12 weeks</i>>];
+	// Parallel gateways
+	p1 [shape=hexagon, height=0.3, width=0.4, fixedsize=true, fillcolor=gold, label=<para>];
+	p2 [shape=hexagon, height=0.3, width=0.4, fixedsize=true, fillcolor=gold, label=<para>];
+	d_bp_controlled_2 [shape=diamond, fillcolor=darkorange, label="BP controlled?"];
+
+}
+
+subgraph cluster2 {
+	label="Step 3 treatment";
+	fontname=arial;
+	fontsize=10;
+	style=dotted;
+	a_step3_acei [label=<ACE inhibitor <br/> <i>duration: lifetimne</i>>];
+	a_step3_ccb [label=<CCB <br/> <i>duration: lifetime</i>>];
+	a_step3_diuretric [label=<Diuretic<br/><i>duration: lifetime</i>>];
+	// Parallel gateways
+	p3 [shape=hexagon, height=0.3, width=0.4, fixedsize=true, fillcolor=gold, label=<para>];
+	// p4 [shape=circle, label="", width=0.2, fillcolor=black];
+	d_bp_controlled_3 [shape=diamond, fillcolor=darkorange, label="BP controlled?"];
+	a_specialist_consult [label=<Specialist consult<br/><i>duration: 1 h</i>>];
+
+}
+
+// Parallel gateways
+p_end [shape=hexagon, height=0.3, width=0.4, fixedsize=true, fillcolor=gold, label=<para>];
+
+
+// Decisions
+
+
+// Arcs
+c_htn -> p0 -> d_age_under_55;
+p0 -> a_lifestyle_management -> p_end;
+
+d_age_under_55 -> a_step1_acei [label="yes"];
+d_age_under_55 -> a_step1_ccb [label="no"];
+
+a_step1_acei -> d_bp_controlled_1;
+a_step1_ccb -> d_bp_controlled_1;
+d_bp_controlled_1 -> p_end [label="yes"];
+d_bp_controlled_1 -> p1 [label="no"];
+p1 -> a_step2_acei;
+p1 -> a_step2_diuretics
+a_step2_acei -> p2;
+a_step2_diuretics -> p2;
+p2 -> d_bp_controlled_2;
+d_bp_controlled_2 -> p_end [label="yes"];
+d_bp_controlled_2 -> p3 [label="no"];
+p3 -> d_bp_controlled_3;
+p3 -> a_step3_acei, a_step3_ccb, a_step3_diuretric -> p_end;
+// p4 -> d_bp_controlled_3;
+d_bp_controlled_3 -> p_end [label="yes"];
+d_bp_controlled_3 -> a_specialist_consult [label="no"];
+a_specialist_consult -> p_end;
+a_step3_acei, a_step3_ccb, a_step3_diuretric -> d_bp_controlled_3  [style=invis];
+}
