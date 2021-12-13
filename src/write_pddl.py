@@ -8,7 +8,7 @@ from utils import (
     get_all_revIds,
     get_metric_name,
     get_type_nodes,
-    get_number_parallel_paths
+    get_number_parallel_paths,
 )
 
 
@@ -167,9 +167,14 @@ def write_predecessors_and_node_type(graph, file):
     # number of parallel paths
     n_path_found = get_number_parallel_paths(graph)
     if parallel_node_found:
-        [file.write("".join(f"\n\t(= (parallelPathCount {init_node}) 0)")) for init_node, n_paths in n_path_found.items()]
-        [file.write("".join(f"\n\t(= (numParallelPaths {init_node}) {n_paths})")) for init_node, n_paths in n_path_found.items()]
-
+        [
+            file.write("".join(f"\n\t(= (parallelPathCount {init_node}) 0)"))
+            for init_node, n_paths in n_path_found.items()
+        ]
+        [
+            file.write("".join(f"\n\t(= (numParallelPaths {init_node}) {n_paths})"))
+            for init_node, n_paths in n_path_found.items()
+        ]
 
 
 def write_total_metrics(graph, file):
@@ -430,7 +435,7 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
         problem_name (str): The name of the problem to be in the PDDL file.
         domain_name (str): The name of the domain to be in the PDDL file.
     """
-    with open("problem.pddl", "w") as pddl:
+    with open("{}.pddl".format(problem_name), "w") as pddl:
         # define
         pddl.write(("(define (problem {})\n").format(problem_name))
         pddl.write(("\t(:domain  {})\n").format(domain_name))
