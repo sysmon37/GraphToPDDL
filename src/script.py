@@ -6,7 +6,7 @@ import argparse as ap
 import traceback
 
 
-def run(path, ros_path, patient_values_path, og, problem_name, domain_name):
+def run(path, ros_path, patient_values_path, no_ro, problem_name, domain_name):
     """
     Function to run the automation pipeline.
 
@@ -19,9 +19,12 @@ def run(path, ros_path, patient_values_path, og, problem_name, domain_name):
     graph = read_graph(path)
 
     # ROs
-    ros = read_JSON(ros_path)
-    update_graph_with_ROs(graph, ros)
-    handle_alternative_nodes(graph)
+    if no_ro:
+        ros = []
+    else:
+        ros = read_JSON(ros_path)
+        update_graph_with_ROs(graph, ros)
+        handle_alternative_nodes(graph)
 
     # Patient values
     patient_values = read_JSON(patient_values_path)
@@ -61,9 +64,10 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--og",
+        "--no-ro",
         action="store_true",
-        help="Original Graph only",
+        default=False,
+        help="If true, does not apply any revision operators. It will output the original graph with the corresponding PDDL.",
     )
 
     args = parser.parse_args()
@@ -81,8 +85,7 @@ if __name__ == "__main__":
 
         if args.p != None and args.p[-4:].lower() != "json":
             raise Exception("The Revision operators file (--ro) must be a JSON file.")
-        print(args)
-        run(args.ag, args.ro, args.p, args.og, args.p_name, args.d_name)
+        run(args.ag, args.ro, args.p, args.no_ro, args.p_name, args.d_name)
     except Exception as e:
         print(e)
         traceback.print_exc()
