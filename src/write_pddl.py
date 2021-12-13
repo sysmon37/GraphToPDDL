@@ -9,6 +9,7 @@ from CONSTANTS import (
     RANGE_ATTR,
     TRIGGER,
     TYPE_ATTR,
+    DEFAULT_PATIENT_VALUE,
 )
 from utils import (
     find_goal_node,
@@ -62,6 +63,7 @@ def write_initial_state(graph, file, ros, patient_values):
 
     # patient value
     if patient_values:
+        patient_values[DEFAULT_PATIENT_VALUE] = 0
         write_patient_values(graph, file, patient_values)
         file.write("\n")
 

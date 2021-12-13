@@ -26,7 +26,6 @@ def run(path, ros_path, patient_values_path, no_ro, problem_name, domain_name):
     elif ros_path:
         ros = read_JSON(ros_path)
         update_graph_with_ROs(graph, ros)
-        handle_alternative_nodes(graph)
     else:
         print("No revision operators file provided.")
 
@@ -34,9 +33,10 @@ def run(path, ros_path, patient_values_path, no_ro, problem_name, domain_name):
     if patient_values_path:
         patient_values = read_JSON(patient_values_path)
     else:
-        patient_values = False
+        patient_values = {}
         print("No patient values file provided.")
 
+    handle_alternative_nodes(graph)
     outputPDDL(graph, ros, patient_values, problem_name, domain_name)
     outputGraphViz(graph, problem_name)
 

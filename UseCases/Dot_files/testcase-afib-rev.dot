@@ -11,7 +11,7 @@ d1 [type=context];
 cha2sds2 [type=decision, dataItem=v1];
 
 // Alternatives
-altx12 [type=decision,, dataItem=v2];
+altx12 [type=alternative, dataItem=v2];
 
 // Actions
 asp [type=action, cost=100, burdenCost=10, nonAdherenceCost=100];

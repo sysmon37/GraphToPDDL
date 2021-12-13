@@ -42,3 +42,6 @@ FONTCOLOR = "fontcolor"
 WIDTH = "width"
 HEIGHT = "height"
 FIXEDSIZE = "fixedsize"
+
+# Patient values
+DEFAULT_PATIENT_VALUE = "default_value"
