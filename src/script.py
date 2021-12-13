@@ -30,7 +30,7 @@ def run(path, ros_path, patient_values_path, no_ro, problem_name, domain_name):
     patient_values = read_JSON(patient_values_path)
 
     outputPDDL(graph, ros, patient_values, problem_name, domain_name)
-    outputGraphViz(graph)
+    outputGraphViz(graph, problem_name)
 
 
 if __name__ == "__main__":

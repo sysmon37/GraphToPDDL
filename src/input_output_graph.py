@@ -1,5 +1,6 @@
 import networkx as nwx
 import DotGraphCreator as dgc
+from CONSTANTS import ACTION_NODE, IS_ORIGINAL_ATTR, TYPE_ATTR
 
 # reads in a graph from a Dot file.
 # removing useless nodes
@@ -21,8 +22,8 @@ def read_graph(path):
 
     for _, node in graph.nodes.items():
         # used for actionNode predicate
-        if node["type"] == "action":
-            node["is_original"] = True
+        if node[TYPE_ATTR] == ACTION_NODE:
+            node[IS_ORIGINAL_ATTR] = True
     return graph
 
 

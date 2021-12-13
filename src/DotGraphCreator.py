@@ -1,4 +1,24 @@
-from graphviz import Digraph  # We only need Digraph
+# We only need Digraph
+from graphviz import Digraph
+
+from CONSTANTS import (
+    ACTION_NODE,
+    ALTERNATIVE_NODE,
+    CONTEXT_NODE,
+    DATA_ITEM_ATTR,
+    DECISION_NODE,
+    GOAL_NODE,
+    IS_ALTERNATIVE,
+    PARALLEL_NODE,
+    RANGE_ATTR,
+    TYPE_ATTR,
+    FILLCOLOR,
+    FIXEDSIZE,
+    FONTCOLOR,
+    HEIGHT,
+    SHAPE,
+    WIDTH,
+)
 
 
 class DotGraphCreator:
@@ -11,35 +31,35 @@ class DotGraphCreator:
     """
 
     __FORMAT = {
-        "context": {"shape": "oval", "fillcolor": "grey", "fontcolor": "black"},
-        "action": {"shape": "box", "fillcolor": "deepskyblue", "fontcolor": "black"},
-        "decision": {
-            "shape": "diamond",
-            "fillcolor": "darkorange",
-            "fontcolor": "black",
+        CONTEXT_NODE: {SHAPE: "oval", FILLCOLOR: "grey", FONTCOLOR: "black"},
+        ACTION_NODE: {SHAPE: "box", FILLCOLOR: "deepskyblue", FONTCOLOR: "black"},
+        DECISION_NODE: {
+            SHAPE: "diamond",
+            FILLCOLOR: "darkorange",
+            FONTCOLOR: "black",
         },
-        "goal": {
-            "shape": "circle",
-            "fillcolor": "forestgreen",
-            "fontcolor": "white",
-            "width": 0.1,
+        GOAL_NODE: {
+            SHAPE: "circle",
+            FILLCOLOR: "forestgreen",
+            FONTCOLOR: "white",
+            WIDTH: 0.1,
             "fontsize": 8,
         },
-        "parallel": {
-            "shape": "hexagon",
-            "fillcolor": "gold",
-            "fontcolor": "black",
-            "height": 0.3,
-            "width": 0.3,
-            "fixedsize": True,
+        PARALLEL_NODE: {
+            SHAPE: "hexagon",
+            FILLCOLOR: "gold",
+            FONTCOLOR: "black",
+            HEIGHT: 0.3,
+            WIDTH: 0.3,
+            FIXEDSIZE: True,
         },
-        "alternative": {
-            "shape": "trapezium",
-            "height": 0.3,
-            "width": 0.9,
-            "fixedsize": True,
-            "fillcolor": "orange",
-            "fontcolor": "black",
+        ALTERNATIVE_NODE: {
+            SHAPE: "trapezium",
+            HEIGHT: 0.3,
+            WIDTH: 0.9,
+            FIXEDSIZE: True,
+            FILLCOLOR: "orange",
+            FONTCOLOR: "black",
         },
     }
 
@@ -57,7 +77,7 @@ class DotGraphCreator:
         """
         extra_label = (
             f"<br/>[cost={node_props['cost']}]"
-            if node_props["type"] == "action"
+            if node_props[TYPE_ATTR] == ACTION_NODE
             else ""
         )
         return f"<<b>{id}</b>{extra_label}>"
@@ -75,9 +95,9 @@ class DotGraphCreator:
             The edge label.
         """
         return (
-            f"{in_node_props['dataItem']}={edge_props['range']}"
-            if in_node_props["type"] == "decision"
-            and not in_node_props.get("is_alternative", False)
+            f"{in_node_props[DATA_ITEM_ATTR]}={edge_props[RANGE_ATTR]}"
+            if in_node_props[TYPE_ATTR] == DECISION_NODE
+            and not in_node_props.get(IS_ALTERNATIVE, False)
             else ""
         )
 
@@ -96,18 +116,18 @@ class DotGraphCreator:
         for n in nx_graph.nodes:
             node_props = nx_graph.nodes[n]
             node_type = (
-                "alternative"
-                if node_props.get("is_alternative")
-                else node_props["type"]
+                ALTERNATIVE_NODE
+                if node_props.get(IS_ALTERNATIVE)
+                else node_props[TYPE_ATTR]
             )
             node_format = cls.__FORMAT[node_type]
             dot_graph.node(
                 n,
                 label=cls.__create_node_label(n, node_props),
                 style="filled",
-                shape=node_format["shape"],
-                fillcolor=node_format["fillcolor"],
-                fontcolor=node_format["fontcolor"],
+                shape=node_format[SHAPE],
+                fillcolor=node_format[FILLCOLOR],
+                fontcolor=node_format[FONTCOLOR],
             )
 
             for e in nx_graph.out_edges(n):

@@ -1,5 +1,23 @@
 import networkx as nwx
 
+from CONSTANTS import (
+    ACTION_NODE,
+    ALTERNATIVE_NODE,
+    CONTEXT_NODE,
+    DATA_ITEM_ATTR,
+    DECISION_NODE,
+    ID_RO,
+    IS_ALTERNATIVE,
+    IS_IN_PARALLEL,
+    IS_ORIGINAL_ATTR,
+    PARALLEL_NODE,
+    PARALLEL_START_ATTR,
+    PARLLEL_END_ATTR,
+    RANGE_ATTR,
+    TRIGGER,
+    TYPE_ATTR,
+)
+
 
 def get_type_nodes(graph, node_type):
     """
@@ -13,7 +31,7 @@ def get_type_nodes(graph, node_type):
         list: List of node of the given type.
 
     """
-    return [node for node, attr in graph.nodes.items() if attr["type"] == node_type]
+    return [node for node, attr in graph.nodes.items() if attr[TYPE_ATTR] == node_type]
 
 
 def find_goal_node(graph, start_node):
@@ -88,10 +106,11 @@ def get_all_parallel_nodes(graph):
     parallel_nodes = []
     for node, attributes in graph.nodes.items():
 
-        if attributes.get("is_in_parallel") == True:
+        if attributes.get(IS_IN_PARALLEL) == True:
             parallel_nodes.append(f"{node}")
 
     return parallel_nodes
+
 
 def get_number_parallel_paths(graph):
     """
@@ -102,16 +121,16 @@ def get_number_parallel_paths(graph):
 
     Returns:
         int: Number of parallel paths.
-    """#find_init_node
+    """  # find_init_node
     p_start = ""
     p_end = ""
     n_path_found = {}
     for node, attributes in graph.nodes.items():
         if find_init_node(graph, node) not in n_path_found:
             n_path_found[find_init_node(graph, node)] = 0
-        if attributes.get("parallelStartNode") == True:
+        if attributes.get(PARALLEL_START_ATTR) == True:
             p_start = node
-        if attributes.get("parallelEndNode") == True:
+        if attributes.get(PARLLEL_END_ATTR) == True:
             p_end = node
         if p_start != "" and p_end != "":
             parallel_sequence = list(
@@ -122,6 +141,7 @@ def get_number_parallel_paths(graph):
             n_path_found[context] = n_paths + n_path_found.get(context, 0)
             p_start = ""
     return n_path_found
+
 
 def find_parallel_path(graph, p_nodes_found):
     """
@@ -155,11 +175,11 @@ def find_parallel_path(graph, p_nodes_found):
                 untraversedParallelNode = ""
 
                 parallelNode += "(parallelStartNode {})\n\t".format(start_node)
-                graph.nodes[start_node]["parallelStartNode"] = True
+                graph.nodes[start_node][PARALLEL_START_ATTR] = True
                 if end_node not in end_nodes:
                     end_nodes.append(end_node)
                     parallelNode += "(parallelEndNode {})\n\t".format(end_node)
-                    graph.nodes[end_node]["parallelEndNode"] = True
+                    graph.nodes[end_node][PARLLEL_END_ATTR] = True
 
                 # for path in parallel_sequence:
                 (
@@ -251,11 +271,11 @@ def update_between_parallel_nodes(
             numParallelPaths + 1,
         )
 
-    if graph.nodes[start_node]["type"] != "parallel":
-        graph.nodes[start_node]["is_in_parallel"] = True
+    if graph.nodes[start_node][TYPE_ATTR] != PARALLEL_NODE:
+        graph.nodes[start_node][IS_IN_PARALLEL] = True
 
         parallelTypeNode += "(parallel{}Node {})\n\t".format(
-            graph.nodes[start_node]["type"].capitalize(), start_node
+            graph.nodes[start_node][TYPE_ATTR].capitalize(), start_node
         )
         untraversedParallelNode += "(untraversedParallelNode p{})\n\t".format(
             start_node
@@ -286,7 +306,7 @@ def get_all_metrics(graph):
         list: List of metrics.
 
     """
-    action_nodes = get_type_nodes(graph, "action")
+    action_nodes = get_type_nodes(graph, ACTION_NODE)
     metrics = []
     for node in action_nodes:
         node_metrics = [
@@ -308,7 +328,7 @@ def get_all_revIds(graph):
     """
     revIds = []
     for _, attr in graph.nodes.items():
-        idRO = attr.get("idRO", False)
+        idRO = attr.get(ID_RO, False)
         if idRO and idRO not in revIds:
             revIds.append(idRO)
     return revIds
@@ -327,9 +347,9 @@ def find_revId_involved_nodes(graph, revId):
     """
     nodes = []
     for node, attr in graph.nodes.items():
-        node_revId = attr.get("idRO", False)
+        node_revId = attr.get(ID_RO, False)
         if node_revId and node_revId == revId:
-            nodes.extend(attr.get("trigger"))
+            nodes.extend(attr.get(TRIGGER))
             parent_nodes = list(graph.predecessors(node))
             # Loop over all the parents of the existing node
             for parent_node in parent_nodes:
@@ -339,8 +359,8 @@ def find_revId_involved_nodes(graph, revId):
                     child_attr = graph.nodes[child]
 
                     # need to check the revision flags when the added nodes are not just action nodes
-                    if child_attr.get("idRO", None) != revId and not child_attr.get(
-                        "is_original", True
+                    if child_attr.get(ID_RO, None) != revId and not child_attr.get(
+                        IS_ORIGINAL_ATTR, True
                     ):
                         nodes.append(child)
                         children.extend(list(graph.successors(child)))
@@ -366,7 +386,7 @@ def match_nodes_to_disease(graph):
         object: Object where the keys are the diseases and the values are a list of revision operations IDs.
     """
     revIds = get_all_revIds(graph)
-    diseases = get_type_nodes(graph, "context")
+    diseases = get_type_nodes(graph, CONTEXT_NODE)
 
     ro_disease = {}
     for disease in diseases:
@@ -394,9 +414,9 @@ def handle_alternative_nodes(graph):
         graph (networkx graph): The graph.
     """
     for node, attr in graph.nodes.items():
-        if attr.get("type") == "alternative":
-            graph.nodes[node]["type"] = "decision"
-            graph.nodes[node]["dataItem"] = "default_value"
-            graph.nodes[node]["is_alternative"] = True
+        if attr.get(TYPE_ATTR) == ALTERNATIVE_NODE:
+            graph.nodes[node][TYPE_ATTR] = DECISION_NODE
+            graph.nodes[node][DATA_ITEM_ATTR] = "default_value"
+            graph.nodes[node][IS_ALTERNATIVE] = True
             for succ in graph.successors(node):
-                graph.edges[node, succ, 0]["range"] = "0..1"
+                graph.edges[node, succ, 0][RANGE_ATTR] = "0..1"

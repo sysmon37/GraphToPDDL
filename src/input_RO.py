@@ -1,6 +1,24 @@
 import json
 from operator import itemgetter
 
+from CONSTANTS import (
+    ACTION_NODE,
+    DECISION_NODE,
+    DELETE_OPERATION,
+    EDGE_TO_SUCCESSORS,
+    EDGE_TO_SUCCESSORS_ATTR,
+    EXISTRING_NDOE,
+    IS_ORIGINAL_ATTR,
+    NEW_NODES,
+    OPERATIONS,
+    PREDECESSORS,
+    RANGE_ATTR,
+    REPLACE_OPERATION,
+    SUCCESSORS,
+    TRIGGER,
+    TYPE_ATTR,
+)
+
 
 def read_JSON(path):
     """
@@ -26,13 +44,13 @@ def update_graph_with_ROs(graph, ros):
         ros (list): List of JSON like object.
     """
     for ro in ros:
-        id, trigger, operations = itemgetter("id", "trigger", "operations")(ro)
-        operations = ro["operations"]
+        id, trigger, operations = itemgetter("id", TRIGGER, OPERATIONS)(ro)
+        operations = ro[OPERATIONS]
         for op in operations:
-            type = op["type"]
-            if type == "replace":
+            type = op[TYPE_ATTR]
+            if type == REPLACE_OPERATION:
                 replace_operation(graph, id, trigger, op)
-            elif type == "delete":
+            elif type == DELETE_OPERATION:
                 delete_operation(graph, op)
             else:
                 add_operation(graph, id, trigger, op)
@@ -51,25 +69,25 @@ def add_all_new_nodes(graph, id_ro, trigger, operation):
         operation (object): The operation object.
     """
     edge_to_successors = []
-    for node in operation["newNodes"]:
+    for node in operation[NEW_NODES]:
         # taking node id and the rest of its attributes
         node_copy = {**node}
         new_node_id = node_copy["id"]
-        node_type = node_copy["type"]
+        node_type = node_copy[TYPE_ATTR]
 
         # if the current node needs to connect to the successors of the 'existing node'
-        if node_copy.get("edgeToSuccessors", False):
+        if node_copy.get(EDGE_TO_SUCCESSORS, False):
             edge_to_successors.append(
-                {"node": new_node_id, **node_copy.get("edgeToSuccessorsAttr", {})}
+                {"node": new_node_id, **node_copy.get(EDGE_TO_SUCCESSORS_ATTR, {})}
             )
 
-        if node_type == "action":
-            node_copy["is_original"] = False
+        if node_type == ACTION_NODE:
+            node_copy[IS_ORIGINAL_ATTR] = False
 
         node_copy.pop("id", None)
-        node_copy.pop("type", None)
-        node_copy.pop("predecessors", None)
-        node_copy.pop("edgeToSuccessors", None)
+        node_copy.pop(TYPE_ATTR, None)
+        node_copy.pop(PREDECESSORS, None)
+        node_copy.pop(EDGE_TO_SUCCESSORS, None)
 
         # adding it to the graph
         # Currently assuming the added nodes are all actionNode
@@ -94,14 +112,14 @@ def add_all_new_edges(graph, operation, edge_to_successors):
         trigger (list): List of triggering nodes.
         operation (object): The operation object.
     """
-    existing_node = operation["existingNode"]
+    existing_node = operation[EXISTRING_NDOE]
 
-    for node in operation["newNodes"]:
+    for node in operation[NEW_NODES]:
         node_copy = {**node}
         new_node_id = node_copy["id"]
 
         predecessor_list = node_copy.get(
-            "predecessors", list(graph.predecessors(existing_node))
+            PREDECESSORS, list(graph.predecessors(existing_node))
         )
 
         for pred in predecessor_list:
@@ -152,7 +170,7 @@ def delete_operation(graph, operation):
         graph (networkx graph): The graph.
         operation (str): The operation object
     """
-    node_to_delete = operation["existingNode"]
+    node_to_delete = operation[EXISTRING_NDOE]
     predecessors = graph.predecessors(node_to_delete)
     successors = graph.successors(node_to_delete)
 
@@ -176,31 +194,29 @@ def add_operation(graph, idRO, trigger, operation):
         operation (str): The operation object
     """
 
-    addedNodes = operation["newNodes"]
+    addedNodes = operation[NEW_NODES]
 
     # for predecessor in predecessors:
     #     for successor in successors:
     for node in addedNodes:
         # taking node id and the rest of its attributes
-        node_copy = {**node} # cost ...
+        node_copy = {**node}  # cost ...
         new_node_id = node_copy["id"]
 
-        node_type = node_copy["type"]
+        node_type = node_copy[TYPE_ATTR]
         del node_copy["id"]
-        del node_copy["type"]
-        
+        del node_copy[TYPE_ATTR]
+
         # Predecessors and successors are lists of dictionaries
-        predecessors_list = node_copy.get("predecessors", None)
-        successors_list = node_copy.get("successors", None)
-        node_copy.pop("predecessors", None)
-        node_copy.pop("successors", None)
+        predecessors_list = node_copy.get(PREDECESSORS, None)
+        successors_list = node_copy.get(SUCCESSORS, None)
+        node_copy.pop(PREDECESSORS, None)
+        node_copy.pop(SUCCESSORS, None)
 
         # disease/goal case
         if not predecessors_list:
-            # print("No predecessors")
             predecessors_list = ["disease"]
         if not successors_list:
-            # print("No successors")
             successors_list = ["goal"]
 
         for predecessor in predecessors_list:
@@ -229,12 +245,12 @@ def add_operation(graph, idRO, trigger, operation):
 
                 # Get range of predecessor and successor
                 if not predecessor == "disease":
-                    predecessor_range = pred.get("range", None)
-                    pred.pop("range", None)
+                    predecessor_range = pred.get(RANGE_ATTR, None)
+                    pred.pop(RANGE_ATTR, None)
                 if not successor == "goal":
-                    successor_range = succ.get("range", None)
-                    succ.pop("range", None)
-                
+                    successor_range = succ.get(RANGE_ATTR, None)
+                    succ.pop(RANGE_ATTR, None)
+
                 # Case where the Predecessor node and successor node are adjecent
                 # if graph.has_edge(predecessor_node, successor_node) :
                 # Adding the edge between the new node and the predecessor with the edge data
@@ -242,11 +258,16 @@ def add_operation(graph, idRO, trigger, operation):
                 if not graph.has_edge(predecessor_node, new_node_id):
                     if not predecessor == "disease":
 
-                        if graph.has_edge(predecessor_node, successor_node) and not predecessor_range : # if the range is not specified from the predecessor
+                        if (
+                            graph.has_edge(predecessor_node, successor_node)
+                            and not predecessor_range
+                        ):  # if the range is not specified from the predecessor
                             graph.add_edge(
                                 predecessor_node,
                                 new_node_id,
-                                **graph.get_edge_data(predecessor_node, successor_node)[0]
+                                **graph.get_edge_data(predecessor_node, successor_node)[
+                                    0
+                                ]
                             )
                         else:
                             graph.add_edge(
@@ -255,41 +276,18 @@ def add_operation(graph, idRO, trigger, operation):
                                 range=predecessor_range,
                                 **pred
                             )
-                
-                # else:
-               
-                #     graph.add_edge(
-                #         predecessor_node,
-                #         new_node_id,
-                #         range=predecessor_range,
-                #         **pred
-                #     )
-
-                    # UPDATE: We keep the edge between the predecessor and the successor
-                    # We need to remove the edges between the predecessor and the successor
-                    # graph.remove_edge(predecessor, successor) 
-
-                # Case where the predecessor node is not adjacent to the successor node
-                # else: # Probably not needed since we will not add a "new edge", Will need to test with a bigger problem
-                #     tmpSuccessors = list(graph.successors(predecessor_node))
-
-                #     for tmpSuccessor in tmpSuccessors:
-                #         # What range data do we want to copy/overlap?
-                #         # Using the first edge data for now
-                #         if graph.get_edge_data(predecessor_node, tmpSuccessor):
-                #             if not successor == "disease":
-                #                 # print(new_node_id)
-                #                 tmpData = graph.get_edge_data(predecessor_node, tmpSuccessor)[0]
-                #                 # We only want one edge between the predecessor and the new node
-                #                 if not graph.has_edge(predecessor_node, new_node_id):
-                #                     graph.add_edge(predecessor_node, new_node_id, **tmpData)
 
                 # We only want one edge between the new node and the successor
                 if not graph.has_edge(new_node_id, successor_node):
                     if not successor == "goal":
-                        if node_type == "decision":
-                        #     for ranges in node_range:
-                        #         if ranges.get("successors", None) == successor_node:
-                            graph.add_edge(new_node_id, successor_node,range=successor_range,**succ)
+                        if node_type == DECISION_NODE:
+                            #     for ranges in node_range:
+                            #         if ranges.get(SUCCESSORS, None) == successor_node:
+                            graph.add_edge(
+                                new_node_id,
+                                successor_node,
+                                range=successor_range,
+                                **succ
+                            )
                         else:
-                            graph.add_edge(new_node_id, successor_node,**succ)
+                            graph.add_edge(new_node_id, successor_node, **succ)
