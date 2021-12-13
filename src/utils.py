@@ -277,7 +277,7 @@ def update_between_parallel_nodes(
         parallelTypeNode += "(parallel{}Node {})\n\t".format(
             graph.nodes[start_node][TYPE_ATTR].capitalize(), start_node
         )
-        untraversedParallelNode += "(untraversedParallelNode p{})\n\t".format(
+        untraversedParallelNode += "(untraversedParallelNode {})\n\t".format(
             start_node
         )
 

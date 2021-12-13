@@ -3,10 +3,12 @@
 ## Requirements
 
 - Python 3.9.X
-- graphviz
-- networkx
+- graphviz (python librairy & graphviz package)
+- networkx (python librairy)
 
 ## Installation
+
+Graphhviz can be installed from [Graphviz](https://graphviz.org/download/)
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install requirements.
 
@@ -21,6 +23,10 @@ python script.py
 ````
 ````shell
 ./script.py AG.dot --ro RO.json --patient-values.json
+````
+### Usage example
+````bash
+python script.py ../UseCases/AGFigures/testcase-1-rev-ext-2.dot --ro ../UseCases/Revision_Operators/testcase-1-ro-Add.json --p ../UseCases/PatientValues/patient-values-1-5.json --og
 ````
 
 ### Commands
