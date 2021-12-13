@@ -11,7 +11,7 @@ d1 [type=context];
 cha2sds2 [type=decision, dataItem=v1];
 
 // Alternatives
-altx12 [type=alternative];
+altx12 [type=decision,, dataItem=v2];
 
 // Actions
 asp [type=action, cost=100, burdenCost=10, nonAdherenceCost=100];
@@ -25,8 +25,8 @@ cha2sds2 -> asp [range=0..0.99];
 cha2sds2 -> altx12 [range=1..10];
 
 d1 -> cha2sds2
-altx12 -> warf;
-altx12 -> dabi;
+altx12 -> warf[range=0..5];
+altx12 -> dabi[range=0..5];
 warf -> g1
 dabi-> g1
 asp -> g1
