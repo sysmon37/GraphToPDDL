@@ -12,38 +12,9 @@
                 "newNodes": [
                     {
                         "id": "newAction",
-                        "cost": 100
-                    },
-                    {
-                        "id": "hidden",
-                        "cost": 100
-                    },
-                    {
-                        "id": "Hello",
-                        "cost": 100
-                    }
-                ]
-            },
-            {
-                "type": "delete",
-                "existingNode": "hidden"
-            }
-        ]
-    },
-    {
-        "id": "ro2",
-        "trigger": [
-            "a2",
-            "a7"
-        ],
-        "operations": [
-            {
-                "type": "replace",
-                "existingNode": "a7",
-                "newNodes": [
-                    {
-                        "id": "newAction2",
-                        "cost": 50
+                        "cost": 100,
+                        "type": "action",
+                        "edgeToSuccessors": true
                     }
                 ]
             }
