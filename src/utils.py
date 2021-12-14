@@ -281,9 +281,7 @@ def update_between_parallel_nodes(
         parallelTypeNode += "(parallel{}Node {})\n\t".format(
             graph.nodes[start_node][TYPE_ATTR].capitalize(), start_node
         )
-        untraversedParallelNode += "(untraversedParallelNode {})\n\t".format(
-            start_node
-        )
+        untraversedParallelNode += "(untraversedParallelNode {})\n\t".format(start_node)
 
     _, node = first_path
     return update_between_parallel_nodes(
@@ -361,11 +359,10 @@ def find_revId_involved_nodes(graph, revId):
                 while len(children) > 0:
                     child = children.pop()
                     child_attr = graph.nodes[child]
-
+                    child_id_ro = child_attr.get(ID_RO, None)
                     # need to check the revision flags when the added nodes are not just action nodes
-                    if child_attr.get(ID_RO, None) != revId and not child_attr.get(
-                        IS_ORIGINAL_ATTR, True
-                    ):
+                    if child_id_ro and child_id_ro != revId:
+                        print(revId, child)
                         nodes.append(child)
                         children.extend(list(graph.successors(child)))
     return list(set(nodes))
