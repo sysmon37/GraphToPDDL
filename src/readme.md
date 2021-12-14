@@ -20,7 +20,7 @@
     - [source](https://github.com/networkx/networkx)
 - pydot dependency for NetworkX 
     - [library](https://pypi.org/project/pydot/)
-    - [source]((https://github.com/pydot/pydot))
+    - [source](https://github.com/pydot/pydot)
 - pdoc
     - [library](https://pypi.org/project/pdoc/)
     - [source](https://github.com/mitmproxy/pdoc/)
