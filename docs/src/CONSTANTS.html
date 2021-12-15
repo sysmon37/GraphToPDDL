@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>src.CONSTANTS API documentation</title>
-<meta name="description" content="File containing the constant used …" />
+<meta name="description" content="File containing the constants used in this project …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,46 +22,46 @@
 <h1 class="title">Module <code>src.CONSTANTS</code></h1>
 </header>
 <section id="section-intro">
-<p>File containing the constant used.</p>
+<p>File containing the constants used in this project.</p>
 <h1 id="node-types">Node types</h1>
-<p>CONTEXT_NODE = "context"
-GOAL_NODE = "goal"
-ACTION_NODE = "action"
-DECISION_NODE = "decision"
-PARALLEL_NODE = "parallel"
-ALTERNATIVE_NODE = "alternative"</p>
+<p>CONTEXT_NODE = "context"</p>
+<p>GOAL_NODE = "goal"</p>
+<p>ACTION_NODE = "action"</p>
+<p>DECISION_NODE = "decision"</p>
+<p>PARALLEL_NODE = "parallel"</p>
+<p>ALTERNATIVE_NODE = "alternative"</p>
 <h1 id="node-attributes">Node attributes</h1>
-<p>ID_ATTR = "id"
-IS_ORIGINAL_ATTR = "is_original"
-TYPE_ATTR = "type"
-DATA_ITEM_ATTR = "dataItem"
-IS_IN_PARALLEL = "is_in_parallel"
-IS_ALTERNATIVE = "is_alternative"
-TRIGGER = "trigger"
-PARALLEL_START_ATTR = "parallelStartNode"
-PARLLEL_END_ATTR = "parallelEndNode"</p>
+<p>ID_ATTR = "id"</p>
+<p>IS_ORIGINAL_ATTR = "is_original"</p>
+<p>TYPE_ATTR = "type"</p>
+<p>DATA_ITEM_ATTR = "dataItem"</p>
+<p>IS_IN_PARALLEL = "is_in_parallel"</p>
+<p>IS_ALTERNATIVE = "is_alternative"</p>
+<p>TRIGGER = "trigger"</p>
+<p>PARALLEL_START_ATTR = "parallelStartNode"</p>
+<p>PARLLEL_END_ATTR = "parallelEndNode"</p>
 <h1 id="edge-attributes">Edge attributes</h1>
 <p>RANGE_ATTR = "range"</p>
 <h1 id="ro-operations">RO operations</h1>
-<p>ADD_OPERATION = "add"
-DELETE_OPERATION = "delete"
-REPLACE_OPERATION = "replace"</p>
+<p>ADD_OPERATION = "add"</p>
+<p>DELETE_OPERATION = "delete"</p>
+<p>REPLACE_OPERATION = "replace"</p>
 <h1 id="ro-operations-attributes">RO operations attributes</h1>
-<p>ID_RO = "idRO"
-OPERATIONS = "operations"
-NEW_NODES = "newNodes"
-EXISTRING_NDOE = "existingNode"
-PREDECESSORS = "predecessor"
-EDGE_TO_SUCCESSORS = "edgeToSuccessors"
-EDGE_TO_SUCCESSORS_ATTR = "edgeToSuccessorsAttr"
-SUCCESSORS = "successors"</p>
+<p>ID_RO = "idRO"</p>
+<p>OPERATIONS = "operations"</p>
+<p>NEW_NODES = "newNodes"</p>
+<p>EXISTRING_NDOE = "existingNode"</p>
+<p>PREDECESSORS = "predecessor"</p>
+<p>EDGE_TO_SUCCESSORS = "edgeToSuccessors"</p>
+<p>EDGE_TO_SUCCESSORS_ATTR = "edgeToSuccessorsAttr"</p>
+<p>SUCCESSORS = "successors"</p>
 <h1 id="graph-attributes">Graph attributes</h1>
-<p>SHAPE = "shape"
-FILLCOLOR = "fillcolor"
-FONTCOLOR = "fontcolor"
-WIDTH = "width"
-HEIGHT = "height"
-FIXEDSIZE = "fixedsize"</p>
+<p>SHAPE = "shape"</p>
+<p>FILLCOLOR = "fillcolor"</p>
+<p>FONTCOLOR = "fontcolor"</p>
+<p>WIDTH = "width"</p>
+<p>HEIGHT = "height"</p>
+<p>FIXEDSIZE = "fixedsize"</p>
 <h1 id="patient-values">Patient values</h1>
 <p>DEFAULT_PATIENT_VALUE = "default_value"</p>
 <details class="source">
@@ -69,57 +69,104 @@ FIXEDSIZE = "fixedsize"</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
-File containing the constant used.
+File containing the constants used in this project.
 
 # Node types
 CONTEXT_NODE = &#34;context&#34;
+
 GOAL_NODE = &#34;goal&#34;
+
 ACTION_NODE = &#34;action&#34;
+
+
 DECISION_NODE = &#34;decision&#34;
+
 PARALLEL_NODE = &#34;parallel&#34;
+
 ALTERNATIVE_NODE = &#34;alternative&#34;
 
+
+
 # Node attributes
+
 ID_ATTR = &#34;id&#34;
+
 IS_ORIGINAL_ATTR = &#34;is_original&#34;
+
 TYPE_ATTR = &#34;type&#34;
+
 DATA_ITEM_ATTR = &#34;dataItem&#34;
+
 IS_IN_PARALLEL = &#34;is_in_parallel&#34;
+
 IS_ALTERNATIVE = &#34;is_alternative&#34;
+
 TRIGGER = &#34;trigger&#34;
+
 PARALLEL_START_ATTR = &#34;parallelStartNode&#34;
+
 PARLLEL_END_ATTR = &#34;parallelEndNode&#34;
 
+
+
 # Edge attributes
+
 RANGE_ATTR = &#34;range&#34;
 
+
+
 # RO operations
+
 ADD_OPERATION = &#34;add&#34;
+
 DELETE_OPERATION = &#34;delete&#34;
+
 REPLACE_OPERATION = &#34;replace&#34;
 
+
+
 # RO operations attributes
+
 ID_RO = &#34;idRO&#34;
+
 OPERATIONS = &#34;operations&#34;
+
 NEW_NODES = &#34;newNodes&#34;
+
 EXISTRING_NDOE = &#34;existingNode&#34;
+
 PREDECESSORS = &#34;predecessor&#34;
+
 EDGE_TO_SUCCESSORS = &#34;edgeToSuccessors&#34;
+
 EDGE_TO_SUCCESSORS_ATTR = &#34;edgeToSuccessorsAttr&#34;
+
 SUCCESSORS = &#34;successors&#34;
 
+
+
 # Graph attributes
+
 SHAPE = &#34;shape&#34;
+
 FILLCOLOR = &#34;fillcolor&#34;
+
 FONTCOLOR = &#34;fontcolor&#34;
+
 WIDTH = &#34;width&#34;
+
 HEIGHT = &#34;height&#34;
+
 FIXEDSIZE = &#34;fixedsize&#34;
 
+
+
 # Patient values
+
 DEFAULT_PATIENT_VALUE = &#34;default_value&#34;
 
 &#34;&#34;&#34;
+
 
 # Node types
 CONTEXT_NODE = &#34;context&#34;
