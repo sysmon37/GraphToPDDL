@@ -1,3 +1,5 @@
+# Node types
+CONTEXT_NODE = "context"
 """
 File containing the constant used.
 
@@ -48,11 +50,8 @@ FIXEDSIZE = "fixedsize"
 
 # Patient values
 DEFAULT_PATIENT_VALUE = "default_value"
-
 """
 
-# Node types
-CONTEXT_NODE = "context"
 GOAL_NODE = "goal"
 ACTION_NODE = "action"
 DECISION_NODE = "decision"
