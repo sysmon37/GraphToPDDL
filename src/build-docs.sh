@@ -1,1 +1,1 @@
-pdoc --html --output-dir ../docs/code --force --template-dir ../docs/templates .
+pdoc --html --output-dir ../docs --force --template-dir ../docs/templates .

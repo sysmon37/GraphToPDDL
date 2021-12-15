@@ -26,7 +26,27 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from graphviz import Digraph  # We only need Digraph
+<pre><code class="python"># We only need Digraph
+from graphviz import Digraph
+
+from src.CONSTANTS import (
+    ACTION_NODE,
+    ALTERNATIVE_NODE,
+    CONTEXT_NODE,
+    DATA_ITEM_ATTR,
+    DECISION_NODE,
+    GOAL_NODE,
+    IS_ALTERNATIVE,
+    PARALLEL_NODE,
+    RANGE_ATTR,
+    TYPE_ATTR,
+    FILLCOLOR,
+    FIXEDSIZE,
+    FONTCOLOR,
+    HEIGHT,
+    SHAPE,
+    WIDTH,
+)
 
 
 class DotGraphCreator:
@@ -39,35 +59,35 @@ class DotGraphCreator:
     &#34;&#34;&#34;
 
     __FORMAT = {
-        &#34;context&#34;: {&#34;shape&#34;: &#34;oval&#34;, &#34;fillcolor&#34;: &#34;grey&#34;, &#34;fontcolor&#34;: &#34;black&#34;},
-        &#34;action&#34;: {&#34;shape&#34;: &#34;box&#34;, &#34;fillcolor&#34;: &#34;deepskyblue&#34;, &#34;fontcolor&#34;: &#34;black&#34;},
-        &#34;decision&#34;: {
-            &#34;shape&#34;: &#34;diamond&#34;,
-            &#34;fillcolor&#34;: &#34;darkorange&#34;,
-            &#34;fontcolor&#34;: &#34;black&#34;,
+        CONTEXT_NODE: {SHAPE: &#34;oval&#34;, FILLCOLOR: &#34;grey&#34;, FONTCOLOR: &#34;black&#34;},
+        ACTION_NODE: {SHAPE: &#34;box&#34;, FILLCOLOR: &#34;deepskyblue&#34;, FONTCOLOR: &#34;black&#34;},
+        DECISION_NODE: {
+            SHAPE: &#34;diamond&#34;,
+            FILLCOLOR: &#34;darkorange&#34;,
+            FONTCOLOR: &#34;black&#34;,
         },
-        &#34;goal&#34;: {
-            &#34;shape&#34;: &#34;circle&#34;,
-            &#34;fillcolor&#34;: &#34;forestgreen&#34;,
-            &#34;fontcolor&#34;: &#34;white&#34;,
-            &#34;width&#34;: 0.1,
+        GOAL_NODE: {
+            SHAPE: &#34;circle&#34;,
+            FILLCOLOR: &#34;forestgreen&#34;,
+            FONTCOLOR: &#34;white&#34;,
+            WIDTH: 0.1,
             &#34;fontsize&#34;: 8,
         },
-        &#34;parallel&#34;: {
-            &#34;shape&#34;: &#34;hexagon&#34;,
-            &#34;fillcolor&#34;: &#34;gold&#34;,
-            &#34;fontcolor&#34;: &#34;black&#34;,
-            &#34;height&#34;: 0.3,
-            &#34;width&#34;: 0.3,
-            &#34;fixedsize&#34;: True,
+        PARALLEL_NODE: {
+            SHAPE: &#34;hexagon&#34;,
+            FILLCOLOR: &#34;gold&#34;,
+            FONTCOLOR: &#34;black&#34;,
+            HEIGHT: 0.3,
+            WIDTH: 0.3,
+            FIXEDSIZE: True,
         },
-        &#34;alternative&#34;: {
-            &#34;shape&#34;: &#34;trapezium&#34;,
-            &#34;height&#34;: 0.3,
-            &#34;width&#34;: 0.9,
-            &#34;fixedsize&#34;: True,
-            &#34;fillcolor&#34;: &#34;orange&#34;,
-            &#34;fontcolor&#34;: &#34;black&#34;,
+        ALTERNATIVE_NODE: {
+            SHAPE: &#34;trapezium&#34;,
+            HEIGHT: 0.3,
+            WIDTH: 0.9,
+            FIXEDSIZE: True,
+            FILLCOLOR: &#34;orange&#34;,
+            FONTCOLOR: &#34;black&#34;,
         },
     }
 
@@ -85,7 +105,7 @@ class DotGraphCreator:
         &#34;&#34;&#34;
         extra_label = (
             f&#34;&lt;br/&gt;[cost={node_props[&#39;cost&#39;]}]&#34;
-            if node_props[&#34;type&#34;] == &#34;action&#34;
+            if node_props[TYPE_ATTR] == ACTION_NODE
             else &#34;&#34;
         )
         return f&#34;&lt;&lt;b&gt;{id}&lt;/b&gt;{extra_label}&gt;&#34;
@@ -103,9 +123,9 @@ class DotGraphCreator:
             The edge label.
         &#34;&#34;&#34;
         return (
-            f&#34;{in_node_props[&#39;dataItem&#39;]}={edge_props[&#39;range&#39;]}&#34;
-            if in_node_props[&#34;type&#34;] == &#34;decision&#34;
-            and not in_node_props.get(&#34;is_alternative&#34;, False)
+            f&#34;{in_node_props[DATA_ITEM_ATTR]}={edge_props[RANGE_ATTR]}&#34;
+            if in_node_props[TYPE_ATTR] == DECISION_NODE
+            and not in_node_props.get(IS_ALTERNATIVE, False)
             else &#34;&#34;
         )
 
@@ -124,18 +144,18 @@ class DotGraphCreator:
         for n in nx_graph.nodes:
             node_props = nx_graph.nodes[n]
             node_type = (
-                &#34;alternative&#34;
-                if node_props.get(&#34;is_alternative&#34;)
-                else node_props[&#34;type&#34;]
+                ALTERNATIVE_NODE
+                if node_props.get(IS_ALTERNATIVE)
+                else node_props[TYPE_ATTR]
             )
             node_format = cls.__FORMAT[node_type]
             dot_graph.node(
                 n,
                 label=cls.__create_node_label(n, node_props),
                 style=&#34;filled&#34;,
-                shape=node_format[&#34;shape&#34;],
-                fillcolor=node_format[&#34;fillcolor&#34;],
-                fontcolor=node_format[&#34;fontcolor&#34;],
+                shape=node_format[SHAPE],
+                fillcolor=node_format[FILLCOLOR],
+                fontcolor=node_format[FONTCOLOR],
             )
 
             for e in nx_graph.out_edges(n):
@@ -181,35 +201,35 @@ class DotGraphCreator:
     &#34;&#34;&#34;
 
     __FORMAT = {
-        &#34;context&#34;: {&#34;shape&#34;: &#34;oval&#34;, &#34;fillcolor&#34;: &#34;grey&#34;, &#34;fontcolor&#34;: &#34;black&#34;},
-        &#34;action&#34;: {&#34;shape&#34;: &#34;box&#34;, &#34;fillcolor&#34;: &#34;deepskyblue&#34;, &#34;fontcolor&#34;: &#34;black&#34;},
-        &#34;decision&#34;: {
-            &#34;shape&#34;: &#34;diamond&#34;,
-            &#34;fillcolor&#34;: &#34;darkorange&#34;,
-            &#34;fontcolor&#34;: &#34;black&#34;,
+        CONTEXT_NODE: {SHAPE: &#34;oval&#34;, FILLCOLOR: &#34;grey&#34;, FONTCOLOR: &#34;black&#34;},
+        ACTION_NODE: {SHAPE: &#34;box&#34;, FILLCOLOR: &#34;deepskyblue&#34;, FONTCOLOR: &#34;black&#34;},
+        DECISION_NODE: {
+            SHAPE: &#34;diamond&#34;,
+            FILLCOLOR: &#34;darkorange&#34;,
+            FONTCOLOR: &#34;black&#34;,
         },
-        &#34;goal&#34;: {
-            &#34;shape&#34;: &#34;circle&#34;,
-            &#34;fillcolor&#34;: &#34;forestgreen&#34;,
-            &#34;fontcolor&#34;: &#34;white&#34;,
-            &#34;width&#34;: 0.1,
+        GOAL_NODE: {
+            SHAPE: &#34;circle&#34;,
+            FILLCOLOR: &#34;forestgreen&#34;,
+            FONTCOLOR: &#34;white&#34;,
+            WIDTH: 0.1,
             &#34;fontsize&#34;: 8,
         },
-        &#34;parallel&#34;: {
-            &#34;shape&#34;: &#34;hexagon&#34;,
-            &#34;fillcolor&#34;: &#34;gold&#34;,
-            &#34;fontcolor&#34;: &#34;black&#34;,
-            &#34;height&#34;: 0.3,
-            &#34;width&#34;: 0.3,
-            &#34;fixedsize&#34;: True,
+        PARALLEL_NODE: {
+            SHAPE: &#34;hexagon&#34;,
+            FILLCOLOR: &#34;gold&#34;,
+            FONTCOLOR: &#34;black&#34;,
+            HEIGHT: 0.3,
+            WIDTH: 0.3,
+            FIXEDSIZE: True,
         },
-        &#34;alternative&#34;: {
-            &#34;shape&#34;: &#34;trapezium&#34;,
-            &#34;height&#34;: 0.3,
-            &#34;width&#34;: 0.9,
-            &#34;fixedsize&#34;: True,
-            &#34;fillcolor&#34;: &#34;orange&#34;,
-            &#34;fontcolor&#34;: &#34;black&#34;,
+        ALTERNATIVE_NODE: {
+            SHAPE: &#34;trapezium&#34;,
+            HEIGHT: 0.3,
+            WIDTH: 0.9,
+            FIXEDSIZE: True,
+            FILLCOLOR: &#34;orange&#34;,
+            FONTCOLOR: &#34;black&#34;,
         },
     }
 
@@ -227,7 +247,7 @@ class DotGraphCreator:
         &#34;&#34;&#34;
         extra_label = (
             f&#34;&lt;br/&gt;[cost={node_props[&#39;cost&#39;]}]&#34;
-            if node_props[&#34;type&#34;] == &#34;action&#34;
+            if node_props[TYPE_ATTR] == ACTION_NODE
             else &#34;&#34;
         )
         return f&#34;&lt;&lt;b&gt;{id}&lt;/b&gt;{extra_label}&gt;&#34;
@@ -245,9 +265,9 @@ class DotGraphCreator:
             The edge label.
         &#34;&#34;&#34;
         return (
-            f&#34;{in_node_props[&#39;dataItem&#39;]}={edge_props[&#39;range&#39;]}&#34;
-            if in_node_props[&#34;type&#34;] == &#34;decision&#34;
-            and not in_node_props.get(&#34;is_alternative&#34;, False)
+            f&#34;{in_node_props[DATA_ITEM_ATTR]}={edge_props[RANGE_ATTR]}&#34;
+            if in_node_props[TYPE_ATTR] == DECISION_NODE
+            and not in_node_props.get(IS_ALTERNATIVE, False)
             else &#34;&#34;
         )
 
@@ -266,18 +286,18 @@ class DotGraphCreator:
         for n in nx_graph.nodes:
             node_props = nx_graph.nodes[n]
             node_type = (
-                &#34;alternative&#34;
-                if node_props.get(&#34;is_alternative&#34;)
-                else node_props[&#34;type&#34;]
+                ALTERNATIVE_NODE
+                if node_props.get(IS_ALTERNATIVE)
+                else node_props[TYPE_ATTR]
             )
             node_format = cls.__FORMAT[node_type]
             dot_graph.node(
                 n,
                 label=cls.__create_node_label(n, node_props),
                 style=&#34;filled&#34;,
-                shape=node_format[&#34;shape&#34;],
-                fillcolor=node_format[&#34;fillcolor&#34;],
-                fontcolor=node_format[&#34;fontcolor&#34;],
+                shape=node_format[SHAPE],
+                fillcolor=node_format[FILLCOLOR],
+                fontcolor=node_format[FONTCOLOR],
             )
 
             for e in nx_graph.out_edges(n):
@@ -320,18 +340,18 @@ def create_dot_graph(cls, nx_graph):
     for n in nx_graph.nodes:
         node_props = nx_graph.nodes[n]
         node_type = (
-            &#34;alternative&#34;
-            if node_props.get(&#34;is_alternative&#34;)
-            else node_props[&#34;type&#34;]
+            ALTERNATIVE_NODE
+            if node_props.get(IS_ALTERNATIVE)
+            else node_props[TYPE_ATTR]
         )
         node_format = cls.__FORMAT[node_type]
         dot_graph.node(
             n,
             label=cls.__create_node_label(n, node_props),
             style=&#34;filled&#34;,
-            shape=node_format[&#34;shape&#34;],
-            fillcolor=node_format[&#34;fillcolor&#34;],
-            fontcolor=node_format[&#34;fontcolor&#34;],
+            shape=node_format[SHAPE],
+            fillcolor=node_format[FILLCOLOR],
+            fontcolor=node_format[FONTCOLOR],
         )
 
         for e in nx_graph.out_edges(n):

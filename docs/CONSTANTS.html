@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>src API documentation</title>
+<title>src.CONSTANTS API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,44 +19,63 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Package <code>src</code></h1>
+<h1 class="title">Module <code>src.CONSTANTS</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python"># This Python __init__ file enable this module</code></pre>
+<pre><code class="python"># Node types
+CONTEXT_NODE = &#34;context&#34;
+GOAL_NODE = &#34;goal&#34;
+ACTION_NODE = &#34;action&#34;
+DECISION_NODE = &#34;decision&#34;
+PARALLEL_NODE = &#34;parallel&#34;
+ALTERNATIVE_NODE = &#34;alternative&#34;
+
+# Node attributes
+ID_ATTR = &#34;id&#34;
+IS_ORIGINAL_ATTR = &#34;is_original&#34;
+TYPE_ATTR = &#34;type&#34;
+DATA_ITEM_ATTR = &#34;dataItem&#34;
+IS_IN_PARALLEL = &#34;is_in_parallel&#34;
+IS_ALTERNATIVE = &#34;is_alternative&#34;
+TRIGGER = &#34;trigger&#34;
+PARALLEL_START_ATTR = &#34;parallelStartNode&#34;
+PARLLEL_END_ATTR = &#34;parallelEndNode&#34;
+
+# Edge attributes
+RANGE_ATTR = &#34;range&#34;
+
+# RO operations
+ADD_OPERATION = &#34;add&#34;
+DELETE_OPERATION = &#34;delete&#34;
+REPLACE_OPERATION = &#34;replace&#34;
+
+# RO operations attributes
+ID_RO = &#34;idRO&#34;
+OPERATIONS = &#34;operations&#34;
+NEW_NODES = &#34;newNodes&#34;
+EXISTRING_NDOE = &#34;existingNode&#34;
+PREDECESSORS = &#34;predecessors&#34;
+EDGE_TO_SUCCESSORS = &#34;edgeToSuccessors&#34;
+EDGE_TO_SUCCESSORS_ATTR = &#34;edgeToSuccessorsAttr&#34;
+SUCCESSORS = &#34;successors&#34;
+
+# Graph attributes
+SHAPE = &#34;shape&#34;
+FILLCOLOR = &#34;fillcolor&#34;
+FONTCOLOR = &#34;fontcolor&#34;
+WIDTH = &#34;width&#34;
+HEIGHT = &#34;height&#34;
+FIXEDSIZE = &#34;fixedsize&#34;
+
+# Patient values
+DEFAULT_PATIENT_VALUE = &#34;default_value&#34;</code></pre>
 </details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
-<dl>
-<dt><code class="name"><a title="src.DotGraphCreator" href="DotGraphCreator.html">src.DotGraphCreator</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.input_RO" href="input_RO.html">src.input_RO</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.input_output_graph" href="input_output_graph.html">src.input_output_graph</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.script" href="script.html">src.script</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.utils" href="utils.html">src.utils</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.write_pddl" href="write_pddl.html">src.write_pddl</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
 </section>
 <section>
 </section>
@@ -117,14 +136,9 @@ setTimeout(() => input.focus(), 100);
 <ul></ul>
 </div>
 <ul id="index">
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3>Super-module</h3>
 <ul>
-<li><code><a title="src.DotGraphCreator" href="DotGraphCreator.html">src.DotGraphCreator</a></code></li>
-<li><code><a title="src.input_RO" href="input_RO.html">src.input_RO</a></code></li>
-<li><code><a title="src.input_output_graph" href="input_output_graph.html">src.input_output_graph</a></code></li>
-<li><code><a title="src.script" href="script.html">src.script</a></code></li>
-<li><code><a title="src.utils" href="utils.html">src.utils</a></code></li>
-<li><code><a title="src.write_pddl" href="write_pddl.html">src.write_pddl</a></code></li>
+<li><code><a title="src" href="index.html">src</a></code></li>
 </ul>
 </li>
 </ul>
