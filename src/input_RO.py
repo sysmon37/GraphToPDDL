@@ -224,6 +224,7 @@ def add_operation(graph, idRO, trigger, operation):
                 # adding it to the graph
                 # Currently assuming the added nodes are all actionNode
 
+                #print(predecessor)
                 graph.add_node(
                     new_node_id,
                     type=node_type,
@@ -250,6 +251,7 @@ def add_operation(graph, idRO, trigger, operation):
                 if not successor == "goal":
                     successor_range = succ.get(RANGE_ATTR, None)
                     succ.pop(RANGE_ATTR, None)
+             
 
                 # Case where the Predecessor node and successor node are adjecent
                 # if graph.has_edge(predecessor_node, successor_node) :

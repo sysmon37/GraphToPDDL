@@ -26,7 +26,20 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from utils import (
+<pre><code class="python">from src.CONSTANTS import (
+    DATA_ITEM_ATTR,
+    DECISION_NODE,
+    GOAL_NODE,
+    CONTEXT_NODE,
+    ID_RO,
+    IS_ORIGINAL_ATTR,
+    PARALLEL_NODE,
+    RANGE_ATTR,
+    TRIGGER,
+    TYPE_ATTR,
+    DEFAULT_PATIENT_VALUE,
+)
+from src.utils import (
     find_goal_node,
     find_init_node,
     find_parallel_path,
@@ -36,7 +49,7 @@
     get_all_revIds,
     get_metric_name,
     get_type_nodes,
-    get_number_parallel_paths
+    get_number_parallel_paths,
 )
 
 
@@ -48,8 +61,10 @@ def write_objects(graph, file):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    disease = get_type_nodes(graph, &#34;context&#34;)
-    nodes = [node for node in graph.nodes if graph.nodes[node][&#34;type&#34;] != &#34;context&#34;]
+    disease = get_type_nodes(graph, CONTEXT_NODE)
+    nodes = [
+        node for node in graph.nodes if graph.nodes[node][TYPE_ATTR] != CONTEXT_NODE
+    ]
     file.write(&#34;(:objects {} - disease\n&#34;.format(&#34; &#34;.join(disease)))
     file.write(&#34;\t&#34; * 3 + &#34;{} - node\n&#34;.format(&#34; &#34;.join(nodes)))
     file.write(&#34;\t&#34; * 3 + &#34;{} - revId\n&#34;.format(&#34; &#34;.join(get_all_revIds(graph))))
@@ -75,8 +90,10 @@ def write_initial_state(graph, file, ros, patient_values):
     file.write(&#34;\n&#34;)
 
     # patient value
-    write_patient_values(graph, file, patient_values)
-    file.write(&#34;\n&#34;)
+    if patient_values:
+        patient_values[DEFAULT_PATIENT_VALUE] = 0
+        write_patient_values(graph, file, patient_values)
+        file.write(&#34;\n&#34;)
 
     # noPrevious nodes
     write_not_previous_node(graph, file)
@@ -107,7 +124,7 @@ def write_initial_state(graph, file, ros, patient_values):
     write_tentative_goal_count(graph, file)
     # numgoals
     file.write(&#34;\n&#34;)
-    file.write(&#34;\t(= (numGoals) {})\n&#34;.format(len(get_type_nodes(graph, &#34;goal&#34;))))
+    file.write(&#34;\t(= (numGoals) {})\n&#34;.format(len(get_type_nodes(graph, GOAL_NODE))))
 
     # nodeCost - ask with afib example for different costs
     file.write(&#34;\n&#34;)
@@ -136,7 +153,7 @@ def write_predecessors_and_node_type(graph, file):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    init_nodes = get_type_nodes(graph, &#34;context&#34;)
+    init_nodes = get_type_nodes(graph, CONTEXT_NODE)
 
     nodes = []
     predecessor = []
@@ -145,12 +162,12 @@ def write_predecessors_and_node_type(graph, file):
     revisionAction = []
 
     for name, attributes in graph.nodes.items():
-        node_type = attributes[&#34;type&#34;]
+        node_type = attributes[TYPE_ATTR]
 
-        if node_type not in [&#34;context&#34;, &#34;goal&#34;, &#34;parallel&#34;]:
+        if node_type not in [CONTEXT_NODE, GOAL_NODE, PARALLEL_NODE]:
             nodes.append(&#34;\t({}Node {})\n&#34;.format(node_type, name))
         else:
-            if node_type == &#34;context&#34;:
+            if node_type == CONTEXT_NODE:
                 file.write(
                     &#34;\t(initialNode {} {})\n&#34;.format(
                         name, list(graph.out_edges(name))[0][1]
@@ -161,7 +178,7 @@ def write_predecessors_and_node_type(graph, file):
                 )
 
             # Parallel node found
-            if node_type == &#34;parallel&#34;:
+            if node_type == PARALLEL_NODE:
                 parallel_node_found.append(name)
 
         for pred in graph.predecessors(name):
@@ -169,11 +186,11 @@ def write_predecessors_and_node_type(graph, file):
                 predecessor.append(&#34;\t(predecessorNode {} {})\n&#34;.format(pred, name))
 
         # originalAction - added is_original to action nodes
-        if attributes.get(&#34;is_original&#34;) == True:
+        if attributes.get(IS_ORIGINAL_ATTR) == True:
             original_node.append(&#34;\t(originalAction {})\n&#34;.format(name))
 
         # revisionAction
-        if attributes.get(&#34;is_original&#34;) == False:
+        if attributes.get(IS_ORIGINAL_ATTR) == False:
             revisionAction.append(&#34;\t(revisionAction {})\n&#34;.format(name))
 
     # Parallel nodes processing
@@ -195,9 +212,14 @@ def write_predecessors_and_node_type(graph, file):
     # number of parallel paths
     n_path_found = get_number_parallel_paths(graph)
     if parallel_node_found:
-        [file.write(&#34;&#34;.join(f&#34;\n\t(= (parallelPathCount {init_node}) 0)&#34;)) for init_node, n_paths in n_path_found.items()]
-        [file.write(&#34;&#34;.join(f&#34;\n\t(= (numParallelPaths {init_node}) {n_paths})&#34;)) for init_node, n_paths in n_path_found.items()]
-
+        [
+            file.write(&#34;&#34;.join(f&#34;\n\t(= (parallelPathCount {init_node}) 0)&#34;))
+            for init_node, n_paths in n_path_found.items()
+        ]
+        [
+            file.write(&#34;&#34;.join(f&#34;\n\t(= (numParallelPaths {init_node}) {n_paths})&#34;))
+            for init_node, n_paths in n_path_found.items()
+        ]
 
 
 def write_total_metrics(graph, file):
@@ -233,10 +255,10 @@ def write_decision_branch(graph, file):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    decision_nodes = get_type_nodes(graph, &#34;decision&#34;)
+    decision_nodes = get_type_nodes(graph, DECISION_NODE)
     for node in decision_nodes:
         for _, out_edge in graph.out_edges(node):
-            lower, upper = graph[node][out_edge][0][&#34;range&#34;].split(&#34;..&#34;)
+            lower, upper = graph[node][out_edge][0][RANGE_ATTR].split(&#34;..&#34;)
             file.write(
                 &#34;\t(= (decisionBranchMin {} {} {}) {})\n&#34;.format(
                     find_init_node(graph, node), node, out_edge, lower
@@ -257,7 +279,7 @@ def write_node_cost(graph, file):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    init_nodes = get_type_nodes(graph, &#34;context&#34;)
+    init_nodes = get_type_nodes(graph, CONTEXT_NODE)
     metrics = get_all_metrics(graph)
     for metric in metrics:
         for node, attr in graph.nodes.items():
@@ -280,10 +302,10 @@ def write_not_previous_node(graph, file):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    init_nodes = get_type_nodes(graph, &#34;context&#34;)
+    init_nodes = get_type_nodes(graph, CONTEXT_NODE)
     for node in init_nodes:
         to_node = list(graph.out_edges(node))[0][1]
-        to_node_type = graph.nodes[to_node][&#34;type&#34;]
+        to_node_type = graph.nodes[to_node][TYPE_ATTR]
         file.write(&#34;\t(noPrevious{} {})\n&#34;.format(to_node_type.capitalize(), node))
 
 
@@ -295,7 +317,9 @@ def write_goal(graph, file):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    goal_nodes = [node for node in graph.nodes if graph.nodes[node][&#34;type&#34;] == &#34;goal&#34;]
+    goal_nodes = [
+        node for node in graph.nodes if graph.nodes[node][TYPE_ATTR] == GOAL_NODE
+    ]
     file.write(&#34;(:goal &#34;)
     if len(goal_nodes) &gt; 1:
         file.write(&#34;(and&#34;)
@@ -338,7 +362,7 @@ def write_all_revisions_pass(graph, file):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    disease = get_type_nodes(graph, &#34;context&#34;)
+    disease = get_type_nodes(graph, CONTEXT_NODE)
     for d in disease:
         file.write(&#34;\t(= (allRevisionsPass {}) 0)\n&#34;.format(d))
 
@@ -352,12 +376,12 @@ def write_revision_flags(graph, file, ros):
         file (TextIOWrapper): The PDDL file.
         ros (list) : The list of revision operator objects
     &#34;&#34;&#34;
-    disease = get_type_nodes(graph, &#34;context&#34;)
+    disease = get_type_nodes(graph, CONTEXT_NODE)
     for ro in ros:
         revId = ro[&#34;id&#34;]
         nodes_to_flag = find_revId_involved_nodes(graph, revId)
         for node, attr in graph.nodes.items():
-            if attr.get(&#34;type&#34;) == &#34;context&#34;:
+            if attr.get(TYPE_ATTR) == CONTEXT_NODE:
                 continue
             file.write(
                 &#34;\t(= (revisionFlag {} {}) {})\n&#34;.format(
@@ -366,7 +390,7 @@ def write_revision_flags(graph, file, ros):
             )
         file.write(&#34;\n&#34;)
         file.write(
-            &#34;\t(= (revisionSequenceNumNodes {}) {})\n&#34;.format(revId, len(ro[&#34;trigger&#34;]))
+            &#34;\t(= (revisionSequenceNumNodes {}) {})\n&#34;.format(revId, len(ro[TRIGGER]))
         )
         file.write(
             &#34;\t(= (numNodesToReplace {}) {})\n&#34;.format(
@@ -404,17 +428,17 @@ def write_patient_values(graph, file, patient_values):
 
     &#34;&#34;&#34;
     for node, attr in graph.nodes.items():
-        if attr[&#34;type&#34;] == &#34;decision&#34;:
+        if attr[TYPE_ATTR] == DECISION_NODE:
             disease = find_init_node(graph, node)
             file.write(
                 &#34;\n\t;; {} = {}\n&#34;.format(
-                    attr[&#34;dataItem&#34;], patient_values[attr[&#34;dataItem&#34;]]
+                    attr[DATA_ITEM_ATTR], patient_values[attr[DATA_ITEM_ATTR]]
                 )
             )
             for successor in graph.successors(node):
                 file.write(
                     &#34;\t(= (patientValue {} {} {}) {})\n&#34;.format(
-                        disease, node, successor, patient_values[attr[&#34;dataItem&#34;]]
+                        disease, node, successor, patient_values[attr[DATA_ITEM_ATTR]]
                     )
                 )
 
@@ -428,9 +452,9 @@ def write_any_no_revision_ops(graph, file, ros):
         file (TextIOWrapper): The PDDL file.
         ros (list) : The list of revision operator objects
     &#34;&#34;&#34;
-    all_triggers = [trigger for ro in ros for trigger in ro[&#34;trigger&#34;]]
+    all_triggers = [trigger for ro in ros for trigger in ro[TRIGGER]]
     all_triggers = list(set(all_triggers))
-    diseases = get_type_nodes(graph, &#34;context&#34;)
+    diseases = get_type_nodes(graph, CONTEXT_NODE)
     any_revision_ops = []
 
     for trigger in all_triggers:
@@ -447,7 +471,7 @@ def write_any_no_revision_ops(graph, file, ros):
         file.write(&#34;\t(noRevisionOps {})\n&#34;.format(rev_op))
 
 
-def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
+def outputPDDL(graph, ros, patient_values, problem_name, domain_name, output_dir):
     &#34;&#34;&#34;
     Ouputs the PDDL file.
 
@@ -458,7 +482,9 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
         problem_name (str): The name of the problem to be in the PDDL file.
         domain_name (str): The name of the domain to be in the PDDL file.
     &#34;&#34;&#34;
-    with open(&#34;problem.pddl&#34;, &#34;w&#34;) as pddl:
+    with open(
+        &#34;{}{}{}.pddl&#34;.format(output_dir, &#34;/&#34; if output_dir else &#34;&#34;, problem_name), &#34;w&#34;
+    ) as pddl:
         # define
         pddl.write((&#34;(define (problem {})\n&#34;).format(problem_name))
         pddl.write((&#34;\t(:domain  {})\n&#34;).format(domain_name))
@@ -478,11 +504,7 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
         pddl.write(&#34;\n&#34;)
         write_metric(graph, pddl)
         pddl.write(&#34;)&#34;)
-        pddl.close()
-
-        # Debugging
-        # for node in graph.nodes:
-        #     print(node+ &#34;==&#34;+str(graph.nodes[node]))</code></pre>
+        pddl.close()</code></pre>
 </details>
 </section>
 <section>
@@ -493,7 +515,7 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="src.write_pddl.outputPDDL"><code class="name flex">
-<span>def <span class="ident">outputPDDL</span></span>(<span>graph, ros, patient_values, problem_name, domain_name)</span>
+<span>def <span class="ident">outputPDDL</span></span>(<span>graph, ros, patient_values, problem_name, domain_name, output_dir)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Ouputs the PDDL file.</p>
@@ -512,7 +534,7 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
+<pre><code class="python">def outputPDDL(graph, ros, patient_values, problem_name, domain_name, output_dir):
     &#34;&#34;&#34;
     Ouputs the PDDL file.
 
@@ -523,7 +545,9 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
         problem_name (str): The name of the problem to be in the PDDL file.
         domain_name (str): The name of the domain to be in the PDDL file.
     &#34;&#34;&#34;
-    with open(&#34;problem.pddl&#34;, &#34;w&#34;) as pddl:
+    with open(
+        &#34;{}{}{}.pddl&#34;.format(output_dir, &#34;/&#34; if output_dir else &#34;&#34;, problem_name), &#34;w&#34;
+    ) as pddl:
         # define
         pddl.write((&#34;(define (problem {})\n&#34;).format(problem_name))
         pddl.write((&#34;\t(:domain  {})\n&#34;).format(domain_name))
@@ -543,11 +567,7 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
         pddl.write(&#34;\n&#34;)
         write_metric(graph, pddl)
         pddl.write(&#34;)&#34;)
-        pddl.close()
-
-        # Debugging
-        # for node in graph.nodes:
-        #     print(node+ &#34;==&#34;+str(graph.nodes[node]))</code></pre>
+        pddl.close()</code></pre>
 </details>
 </dd>
 <dt id="src.write_pddl.write_all_revisions_pass"><code class="name flex">
@@ -574,7 +594,7 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    disease = get_type_nodes(graph, &#34;context&#34;)
+    disease = get_type_nodes(graph, CONTEXT_NODE)
     for d in disease:
         file.write(&#34;\t(= (allRevisionsPass {}) 0)\n&#34;.format(d))</code></pre>
 </details>
@@ -605,9 +625,9 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
         file (TextIOWrapper): The PDDL file.
         ros (list) : The list of revision operator objects
     &#34;&#34;&#34;
-    all_triggers = [trigger for ro in ros for trigger in ro[&#34;trigger&#34;]]
+    all_triggers = [trigger for ro in ros for trigger in ro[TRIGGER]]
     all_triggers = list(set(all_triggers))
-    diseases = get_type_nodes(graph, &#34;context&#34;)
+    diseases = get_type_nodes(graph, CONTEXT_NODE)
     any_revision_ops = []
 
     for trigger in all_triggers:
@@ -648,10 +668,10 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    decision_nodes = get_type_nodes(graph, &#34;decision&#34;)
+    decision_nodes = get_type_nodes(graph, DECISION_NODE)
     for node in decision_nodes:
         for _, out_edge in graph.out_edges(node):
-            lower, upper = graph[node][out_edge][0][&#34;range&#34;].split(&#34;..&#34;)
+            lower, upper = graph[node][out_edge][0][RANGE_ATTR].split(&#34;..&#34;)
             file.write(
                 &#34;\t(= (decisionBranchMin {} {} {}) {})\n&#34;.format(
                     find_init_node(graph, node), node, out_edge, lower
@@ -688,7 +708,9 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    goal_nodes = [node for node in graph.nodes if graph.nodes[node][&#34;type&#34;] == &#34;goal&#34;]
+    goal_nodes = [
+        node for node in graph.nodes if graph.nodes[node][TYPE_ATTR] == GOAL_NODE
+    ]
     file.write(&#34;(:goal &#34;)
     if len(goal_nodes) &gt; 1:
         file.write(&#34;(and&#34;)
@@ -738,8 +760,10 @@ patient_values (dict) : Dictonary of the patient values.</p></div>
     file.write(&#34;\n&#34;)
 
     # patient value
-    write_patient_values(graph, file, patient_values)
-    file.write(&#34;\n&#34;)
+    if patient_values:
+        patient_values[DEFAULT_PATIENT_VALUE] = 0
+        write_patient_values(graph, file, patient_values)
+        file.write(&#34;\n&#34;)
 
     # noPrevious nodes
     write_not_previous_node(graph, file)
@@ -770,7 +794,7 @@ patient_values (dict) : Dictonary of the patient values.</p></div>
     write_tentative_goal_count(graph, file)
     # numgoals
     file.write(&#34;\n&#34;)
-    file.write(&#34;\t(= (numGoals) {})\n&#34;.format(len(get_type_nodes(graph, &#34;goal&#34;))))
+    file.write(&#34;\t(= (numGoals) {})\n&#34;.format(len(get_type_nodes(graph, GOAL_NODE))))
 
     # nodeCost - ask with afib example for different costs
     file.write(&#34;\n&#34;)
@@ -844,7 +868,7 @@ patient_values (dict) : Dictonary of the patient values.</p></div>
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    init_nodes = get_type_nodes(graph, &#34;context&#34;)
+    init_nodes = get_type_nodes(graph, CONTEXT_NODE)
     metrics = get_all_metrics(graph)
     for metric in metrics:
         for node, attr in graph.nodes.items():
@@ -883,10 +907,10 @@ patient_values (dict) : Dictonary of the patient values.</p></div>
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    init_nodes = get_type_nodes(graph, &#34;context&#34;)
+    init_nodes = get_type_nodes(graph, CONTEXT_NODE)
     for node in init_nodes:
         to_node = list(graph.out_edges(node))[0][1]
-        to_node_type = graph.nodes[to_node][&#34;type&#34;]
+        to_node_type = graph.nodes[to_node][TYPE_ATTR]
         file.write(&#34;\t(noPrevious{} {})\n&#34;.format(to_node_type.capitalize(), node))</code></pre>
 </details>
 </dd>
@@ -943,8 +967,10 @@ patient_values (dict) : Dictonary of the patient values.</p></div>
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    disease = get_type_nodes(graph, &#34;context&#34;)
-    nodes = [node for node in graph.nodes if graph.nodes[node][&#34;type&#34;] != &#34;context&#34;]
+    disease = get_type_nodes(graph, CONTEXT_NODE)
+    nodes = [
+        node for node in graph.nodes if graph.nodes[node][TYPE_ATTR] != CONTEXT_NODE
+    ]
     file.write(&#34;(:objects {} - disease\n&#34;.format(&#34; &#34;.join(disease)))
     file.write(&#34;\t&#34; * 3 + &#34;{} - node\n&#34;.format(&#34; &#34;.join(nodes)))
     file.write(&#34;\t&#34; * 3 + &#34;{} - revId\n&#34;.format(&#34; &#34;.join(get_all_revIds(graph))))
@@ -981,17 +1007,17 @@ each decision node.</p>
 
     &#34;&#34;&#34;
     for node, attr in graph.nodes.items():
-        if attr[&#34;type&#34;] == &#34;decision&#34;:
+        if attr[TYPE_ATTR] == DECISION_NODE:
             disease = find_init_node(graph, node)
             file.write(
                 &#34;\n\t;; {} = {}\n&#34;.format(
-                    attr[&#34;dataItem&#34;], patient_values[attr[&#34;dataItem&#34;]]
+                    attr[DATA_ITEM_ATTR], patient_values[attr[DATA_ITEM_ATTR]]
                 )
             )
             for successor in graph.successors(node):
                 file.write(
                     &#34;\t(= (patientValue {} {} {}) {})\n&#34;.format(
-                        disease, node, successor, patient_values[attr[&#34;dataItem&#34;]]
+                        disease, node, successor, patient_values[attr[DATA_ITEM_ATTR]]
                     )
                 )</code></pre>
 </details>
@@ -1039,7 +1065,7 @@ each decision node.</p>
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     &#34;&#34;&#34;
-    init_nodes = get_type_nodes(graph, &#34;context&#34;)
+    init_nodes = get_type_nodes(graph, CONTEXT_NODE)
 
     nodes = []
     predecessor = []
@@ -1048,12 +1074,12 @@ each decision node.</p>
     revisionAction = []
 
     for name, attributes in graph.nodes.items():
-        node_type = attributes[&#34;type&#34;]
+        node_type = attributes[TYPE_ATTR]
 
-        if node_type not in [&#34;context&#34;, &#34;goal&#34;, &#34;parallel&#34;]:
+        if node_type not in [CONTEXT_NODE, GOAL_NODE, PARALLEL_NODE]:
             nodes.append(&#34;\t({}Node {})\n&#34;.format(node_type, name))
         else:
-            if node_type == &#34;context&#34;:
+            if node_type == CONTEXT_NODE:
                 file.write(
                     &#34;\t(initialNode {} {})\n&#34;.format(
                         name, list(graph.out_edges(name))[0][1]
@@ -1064,7 +1090,7 @@ each decision node.</p>
                 )
 
             # Parallel node found
-            if node_type == &#34;parallel&#34;:
+            if node_type == PARALLEL_NODE:
                 parallel_node_found.append(name)
 
         for pred in graph.predecessors(name):
@@ -1072,11 +1098,11 @@ each decision node.</p>
                 predecessor.append(&#34;\t(predecessorNode {} {})\n&#34;.format(pred, name))
 
         # originalAction - added is_original to action nodes
-        if attributes.get(&#34;is_original&#34;) == True:
+        if attributes.get(IS_ORIGINAL_ATTR) == True:
             original_node.append(&#34;\t(originalAction {})\n&#34;.format(name))
 
         # revisionAction
-        if attributes.get(&#34;is_original&#34;) == False:
+        if attributes.get(IS_ORIGINAL_ATTR) == False:
             revisionAction.append(&#34;\t(revisionAction {})\n&#34;.format(name))
 
     # Parallel nodes processing
@@ -1098,8 +1124,14 @@ each decision node.</p>
     # number of parallel paths
     n_path_found = get_number_parallel_paths(graph)
     if parallel_node_found:
-        [file.write(&#34;&#34;.join(f&#34;\n\t(= (parallelPathCount {init_node}) 0)&#34;)) for init_node, n_paths in n_path_found.items()]
-        [file.write(&#34;&#34;.join(f&#34;\n\t(= (numParallelPaths {init_node}) {n_paths})&#34;)) for init_node, n_paths in n_path_found.items()]</code></pre>
+        [
+            file.write(&#34;&#34;.join(f&#34;\n\t(= (parallelPathCount {init_node}) 0)&#34;))
+            for init_node, n_paths in n_path_found.items()
+        ]
+        [
+            file.write(&#34;&#34;.join(f&#34;\n\t(= (numParallelPaths {init_node}) {n_paths})&#34;))
+            for init_node, n_paths in n_path_found.items()
+        ]</code></pre>
 </details>
 </dd>
 <dt id="src.write_pddl.write_revision_flags"><code class="name flex">
@@ -1128,12 +1160,12 @@ each decision node.</p>
         file (TextIOWrapper): The PDDL file.
         ros (list) : The list of revision operator objects
     &#34;&#34;&#34;
-    disease = get_type_nodes(graph, &#34;context&#34;)
+    disease = get_type_nodes(graph, CONTEXT_NODE)
     for ro in ros:
         revId = ro[&#34;id&#34;]
         nodes_to_flag = find_revId_involved_nodes(graph, revId)
         for node, attr in graph.nodes.items():
-            if attr.get(&#34;type&#34;) == &#34;context&#34;:
+            if attr.get(TYPE_ATTR) == CONTEXT_NODE:
                 continue
             file.write(
                 &#34;\t(= (revisionFlag {} {}) {})\n&#34;.format(
@@ -1142,7 +1174,7 @@ each decision node.</p>
             )
         file.write(&#34;\n&#34;)
         file.write(
-            &#34;\t(= (revisionSequenceNumNodes {}) {})\n&#34;.format(revId, len(ro[&#34;trigger&#34;]))
+            &#34;\t(= (revisionSequenceNumNodes {}) {})\n&#34;.format(revId, len(ro[TRIGGER]))
         )
         file.write(
             &#34;\t(= (numNodesToReplace {}) {})\n&#34;.format(
