@@ -1,5 +1,0 @@
-graphviz
-pydot
-networkx
-pdoc
-argparse

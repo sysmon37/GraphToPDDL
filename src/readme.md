@@ -1,10 +1,29 @@
-# NetworkX Overview
+# GraphToPDDL - MitPlan (Generation of PDDL Based on CPGs)
+
+## Sections
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Documentation](#documentation)
+- [Execute GraphToPDDL](#execute-graphtopddl)
+- [Structure Overview](#structure-overview)
+- [Python GraphToPDDL environment](#python-graphtopddl-environment)
+
 
 ## Requirements
 
 - Python 3.9.X
-- graphviz (python librairy & graphviz package)
-- networkx (python librairy)
+- Graphviz (python api library & graphviz package)
+    - [api](https://pypi.org/project/graphviz/)
+    - [Graphviz](https://graphviz.org/download/)
+- NetworkX (python library)
+    - [library](https://pypi.org/project/networkx/)
+    - [source](https://github.com/networkx/networkx)
+- pydot dependency for NetworkX 
+    - [library](https://pypi.org/project/pydot/)
+    - [source](https://github.com/pydot/pydot)
+- pdoc
+    - [library](https://pypi.org/project/pdoc/)
+    - [source](https://github.com/mitmproxy/pdoc/)
 
 ## Installation
 
@@ -16,33 +35,60 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install require
 pip install -r requirements.txt
 ```
 
+## Documentation
+
+- [graphviz python api](https://graphviz.readthedocs.io/en/stable/manual.html)
+    - [Source](https://github.com/xflr6/graphviz)
+- [NetworkX](https://networkx.org/documentation/stable/reference/index.html)
+- [pydot](https://github.com/pydot/pydot)
+- [pdoc](https://pdoc.dev/docs/pdoc.html)
+- [GraphToPDDL](../docs/readme.md)
+
+### Build the documentation
+
+Build the documentation using the included script.
+````bash
+./build-docs.sh
+````
+The documentation can be found at [index.html](/docs/code/src/index.html)
+
+
 ## Execute GraphToPDDL
+*Possible Arguments*
+- DOT_FILE: path of the dot file
+- REVISION_OPERATORS: path of the revision operators json file
+- PATIENT_VALUES: path of the patient values json file
+- problem_name: name of the problem
+- domaine_name: name of the domain
 
 ````bash
-python script.py
+py script.py DOT_FILE --ro REVISION_OPERATORS --p PATIENT_VALUES --p-name problem_name --d-name domain_name
 ````
-````shell
-./script.py AG.dot --ro RO.json --patient-values.json
-````
+
 ### Usage example
 ````bash
-python script.py ../UseCases/AGFigures/testcase-1-rev-ext-2.dot --ro ../UseCases/Revision_Operators/testcase-1-ro-Add.json --p ../UseCases/PatientValues/patient-values-1-5.json --og
+py script.py ../UseCases/Dot_files/testcase-1-rev.dot --ro ../UseCases/Revision_Operators/testcase-1-ro.json --p ../UseCases/PatientValues/patient-values-1-5.json --p-name problem1 --d-name domain1
 ````
 
-### Commands
-The current implementation required an actionnable graph, a revision_operator json file and a patient_values json file.
+### Arguments
+The current implementation required an actionnable graph, a revision operators json file and a patient values json file.
 
 #### Actionnable Graph
+More info: [Actionable graph](../UseCases/Dot_files/readme.md)
 
 #### Revision Operators
 More info: [Revision operators](../UseCases/Revision_Operators/readme.md)
 
 #### Patient Values
+More info: [Patient values](../UseCases/PatientValues/readme.md)
+
+#### Docker Container for Optic
+More info: [Build Docker image](../Optic-Docker/README.md)
 
 ## Structure Overview
 
-│   create_RO.py    <br />
-│   └─── Revision Operators creator    <br />
+│   CONSTANT.py    <br />
+│   └─── All the various constants used   <br />
 │   DotGraphCreator.py    <br />
 │   └─── Graphical output class    <br />
 │   input_output_graph.py    <br />
@@ -50,9 +96,9 @@ More info: [Revision operators](../UseCases/Revision_Operators/readme.md)
 │   input_RO.py    <br />
 │   └─── Revision Operators reader functions    <br />
 │   problem.pddl    <br />
-│   └─── PDDL output of the problem    <br />
+│   └─── PDDL output of the problem (When generated)    <br />
 │   problem.png    <br />
-│   └─── Graphical output of the problem    <br />
+│   └─── Graphical output of the problem (When generated)   <br />
 │   readme.md    <br />
 │   └─── This file    <br />
 │   script.py    <br />
@@ -67,7 +113,29 @@ More info: [Revision operators](../UseCases/Revision_Operators/readme.md)
 │   └─── Modules used by the automation    <br />
 │   write_pddl.py    <br />
 │   └─── Functions used to create and write a PDDL output    <br />
+│   build-docs.sh    <br />
+│   └─── Script to build code documentation    <br />
 │   __init__.py    <br />
 │   └─── Module    <br />
 
 
+## Python GraphToPDDL environment
+### Creating Python environment
+````
+python -m venv .graphToPDDL
+````
+
+### Activating the Python graphToPDDL environment
+````
+.\.graphToPDDL\Scripts\activate
+````
+
+### Installing requirements
+````
+py -m pip install -r requirements.txt
+````
+
+### Deactivating the Python graphToPDDL environment
+````
+deactivate
+````
