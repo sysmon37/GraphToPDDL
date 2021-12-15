@@ -1,7 +1,7 @@
 import json
 from operator import itemgetter
 
-from CONSTANTS import (
+from src.CONSTANTS import (
     ACTION_NODE,
     DECISION_NODE,
     DELETE_OPERATION,

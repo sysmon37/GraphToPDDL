@@ -1,7 +1,7 @@
 # We only need Digraph
 from graphviz import Digraph
 
-from CONSTANTS import (
+from src.CONSTANTS import (
     ACTION_NODE,
     ALTERNATIVE_NODE,
     CONTEXT_NODE,

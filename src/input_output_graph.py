@@ -1,6 +1,6 @@
 import networkx as nwx
-import DotGraphCreator as dgc
-from CONSTANTS import ACTION_NODE, IS_ORIGINAL_ATTR, TYPE_ATTR
+import src.DotGraphCreator as dgc
+from src.CONSTANTS import ACTION_NODE, IS_ORIGINAL_ATTR, TYPE_ATTR
 
 # reads in a graph from a Dot file.
 # removing useless nodes

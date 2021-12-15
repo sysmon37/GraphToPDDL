@@ -1,4 +1,4 @@
-from CONSTANTS import (
+from src.CONSTANTS import (
     DATA_ITEM_ATTR,
     DECISION_NODE,
     GOAL_NODE,
@@ -11,7 +11,7 @@ from CONSTANTS import (
     TYPE_ATTR,
     DEFAULT_PATIENT_VALUE,
 )
-from utils import (
+from src.utils import (
     find_goal_node,
     find_init_node,
     find_parallel_path,
