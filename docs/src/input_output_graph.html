@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>src API documentation</title>
+<title>src.input_output_graph API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,56 +19,134 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Package <code>src</code></h1>
+<h1 class="title">Module <code>src.input_output_graph</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python"># This Python __init__ file enable this module</code></pre>
+<pre><code class="python">import networkx as nwx
+import src.DotGraphCreator as dgc
+from src.CONSTANTS import ACTION_NODE, IS_ORIGINAL_ATTR, TYPE_ATTR
+
+# reads in a graph from a Dot file.
+# removing useless nodes
+def read_graph(path):
+    &#34;&#34;&#34;
+    Reads in the graph. Also pre-processes the nodes by adding is_original to the action nodes.
+
+    Args:
+        path (str): Path to the file.
+
+    &#34;&#34;&#34;
+    graph = nwx.drawing.nx_pydot.read_dot(path)
+
+    # bit of preprocessing clean up, this will need to be reviewed
+    if graph.has_node(&#34;,&#34;):
+        graph.remove_node(&#34;,&#34;)
+    if graph.has_node(&#34;ros&#34;):
+        graph.remove_node(&#34;ros&#34;)
+
+    for _, node in graph.nodes.items():
+        # used for actionNode predicate
+        if node[TYPE_ATTR] == ACTION_NODE:
+            node[IS_ORIGINAL_ATTR] = True
+    return graph
+
+
+# outputs a graph to a pdf
+def outputGraphViz(graph, filename, output_dir):
+    &#34;&#34;&#34;
+    Ouputs the graph to a PNG file
+
+    Args:
+        graph (networkx graph): The graph.
+
+    &#34;&#34;&#34;
+    graph_view = dgc.DotGraphCreator.create_dot_graph(graph)
+    graph_view.render(
+        directory=&#34;{}{}&#34;.format(output_dir, &#34;/&#34; if output_dir else &#34;&#34;),
+        filename=filename,
+        format=&#34;png&#34;,
+    )</code></pre>
 </details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt><code class="name"><a title="src.CONSTANTS" href="CONSTANTS.html">src.CONSTANTS</a></code></dt>
+<dt id="src.input_output_graph.outputGraphViz"><code class="name flex">
+<span>def <span class="ident">outputGraphViz</span></span>(<span>graph, filename, output_dir)</span>
+</code></dt>
 <dd>
-<div class="desc"><p>File containing the constant used …</p></div>
+<div class="desc"><p>Ouputs the graph to a PNG file</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;<code>networkx graph</code></dt>
+<dd>The graph.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def outputGraphViz(graph, filename, output_dir):
+    &#34;&#34;&#34;
+    Ouputs the graph to a PNG file
+
+    Args:
+        graph (networkx graph): The graph.
+
+    &#34;&#34;&#34;
+    graph_view = dgc.DotGraphCreator.create_dot_graph(graph)
+    graph_view.render(
+        directory=&#34;{}{}&#34;.format(output_dir, &#34;/&#34; if output_dir else &#34;&#34;),
+        filename=filename,
+        format=&#34;png&#34;,
+    )</code></pre>
+</details>
 </dd>
-<dt><code class="name"><a title="src.DotGraphCreator" href="DotGraphCreator.html">src.DotGraphCreator</a></code></dt>
+<dt id="src.input_output_graph.read_graph"><code class="name flex">
+<span>def <span class="ident">read_graph</span></span>(<span>path)</span>
+</code></dt>
 <dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.input_RO" href="input_RO.html">src.input_RO</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.input_output_graph" href="input_output_graph.html">src.input_output_graph</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.script" href="script.html">src.script</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.test_problem_file" href="test_problem_file.html">src.test_problem_file</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.utils" href="utils.html">src.utils</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="src.write_pddl" href="write_pddl.html">src.write_pddl</a></code></dt>
-<dd>
-<div class="desc"></div>
+<div class="desc"><p>Reads in the graph. Also pre-processes the nodes by adding is_original to the action nodes.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path to the file.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def read_graph(path):
+    &#34;&#34;&#34;
+    Reads in the graph. Also pre-processes the nodes by adding is_original to the action nodes.
+
+    Args:
+        path (str): Path to the file.
+
+    &#34;&#34;&#34;
+    graph = nwx.drawing.nx_pydot.read_dot(path)
+
+    # bit of preprocessing clean up, this will need to be reviewed
+    if graph.has_node(&#34;,&#34;):
+        graph.remove_node(&#34;,&#34;)
+    if graph.has_node(&#34;ros&#34;):
+        graph.remove_node(&#34;ros&#34;)
+
+    for _, node in graph.nodes.items():
+        # used for actionNode predicate
+        if node[TYPE_ATTR] == ACTION_NODE:
+            node[IS_ORIGINAL_ATTR] = True
+    return graph</code></pre>
+</details>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
 </section>
 <section>
 </section>
@@ -125,16 +203,15 @@ setTimeout(() => input.focus(), 100);
 <ul></ul>
 </div>
 <ul id="index">
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3>Super-module</h3>
 <ul>
-<li><code><a title="src.CONSTANTS" href="CONSTANTS.html">src.CONSTANTS</a></code></li>
-<li><code><a title="src.DotGraphCreator" href="DotGraphCreator.html">src.DotGraphCreator</a></code></li>
-<li><code><a title="src.input_RO" href="input_RO.html">src.input_RO</a></code></li>
-<li><code><a title="src.input_output_graph" href="input_output_graph.html">src.input_output_graph</a></code></li>
-<li><code><a title="src.script" href="script.html">src.script</a></code></li>
-<li><code><a title="src.test_problem_file" href="test_problem_file.html">src.test_problem_file</a></code></li>
-<li><code><a title="src.utils" href="utils.html">src.utils</a></code></li>
-<li><code><a title="src.write_pddl" href="write_pddl.html">src.write_pddl</a></code></li>
+<li><code><a title="src" href="index.html">src</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="src.input_output_graph.outputGraphViz" href="#src.input_output_graph.outputGraphViz">outputGraphViz</a></code></li>
+<li><code><a title="src.input_output_graph.read_graph" href="#src.input_output_graph.read_graph">read_graph</a></code></li>
 </ul>
 </li>
 </ul>
