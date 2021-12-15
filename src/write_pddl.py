@@ -443,7 +443,7 @@ def write_any_no_revision_ops(graph, file, ros):
         file.write("\t(noRevisionOps {})\n".format(rev_op))
 
 
-def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
+def outputPDDL(graph, ros, patient_values, problem_name, domain_name, output_dir):
     """
     Ouputs the PDDL file.
 
@@ -454,7 +454,9 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
         problem_name (str): The name of the problem to be in the PDDL file.
         domain_name (str): The name of the domain to be in the PDDL file.
     """
-    with open("{}.pddl".format(problem_name), "w") as pddl:
+    with open(
+        "{}{}{}.pddl".format(output_dir, "/" if output_dir else "", problem_name), "w"
+    ) as pddl:
         # define
         pddl.write(("(define (problem {})\n").format(problem_name))
         pddl.write(("\t(:domain  {})\n").format(domain_name))
@@ -475,7 +477,3 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name):
         write_metric(graph, pddl)
         pddl.write(")")
         pddl.close()
-
-        # Debugging
-        # for node in graph.nodes:
-        #     print(node+ "=="+str(graph.nodes[node]))

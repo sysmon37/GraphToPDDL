@@ -28,7 +28,7 @@ def read_graph(path):
 
 
 # outputs a graph to a pdf
-def outputGraphViz(graph, filename="problem"):
+def outputGraphViz(graph, filename, output_dir):
     """
     Ouputs the graph to a PNG file
 
@@ -37,4 +37,8 @@ def outputGraphViz(graph, filename="problem"):
 
     """
     graph_view = dgc.DotGraphCreator.create_dot_graph(graph)
-    graph_view.render(filename=filename, format="png")
+    graph_view.render(
+        directory="{}{}".format(output_dir, "/" if output_dir else ""),
+        filename=filename,
+        format="png",
+    )

@@ -6,7 +6,9 @@ import argparse as ap
 import traceback
 
 
-def run(path, ros_path, patient_values_path, no_ro, problem_name, domain_name):
+def run(
+    path, ros_path, patient_values_path, no_ro, problem_name, domain_name, output_dir
+):
     """
     Function to run the automation pipeline.
 
@@ -37,8 +39,8 @@ def run(path, ros_path, patient_values_path, no_ro, problem_name, domain_name):
         print("No patient values file provided.")
 
     handle_alternative_nodes(graph)
-    outputPDDL(graph, ros, patient_values, problem_name, domain_name)
-    outputGraphViz(graph, problem_name)
+    outputPDDL(graph, ros, patient_values, problem_name, domain_name, output_dir)
+    outputGraphViz(graph, problem_name, output_dir)
 
 
 if __name__ == "__main__":
@@ -78,6 +80,13 @@ if __name__ == "__main__":
         help="If true, does not apply any revision operators. It will output the original graph with the corresponding PDDL.",
     )
 
+    parser.add_argument(
+        "--dir",
+        type=str,
+        default="",
+        help="Path to the directory where to create the problem and graph view files. Default value is the current directory",
+    )
+
     args = parser.parse_args()
     try:
         if not args.ag:
@@ -93,7 +102,7 @@ if __name__ == "__main__":
 
         if args.p != None and args.p[-4:].lower() != "json":
             raise Exception("The Revision operators file (--ro) must be a JSON file.")
-        run(args.ag, args.ro, args.p, args.no_ro, args.p_name, args.d_name)
+        run(args.ag, args.ro, args.p, args.no_ro, args.p_name, args.d_name, args.dir)
     except Exception as e:
         print(e)
         traceback.print_exc()
