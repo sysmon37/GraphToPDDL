@@ -29,7 +29,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--d-name",
         type=str,
-        default="domain",
+        default="default_domain",
         help="Domain name.",
     )
 
