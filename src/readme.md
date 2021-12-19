@@ -54,7 +54,7 @@ The documentation can be found at [index.html](/docs/code/src/index.html)
 
 
 ## Execute GraphToPDDL
-[See](readme.md)
+More info: [See](../readme.md)
 
 ### Arguments
 The current implementation required an actionnable graph, a revision operators json file and a patient values json file.
