@@ -54,21 +54,7 @@ The documentation can be found at [index.html](/docs/code/src/index.html)
 
 
 ## Execute GraphToPDDL
-*Possible Arguments*
-- DOT_FILE: path of the dot file
-- REVISION_OPERATORS: path of the revision operators json file
-- PATIENT_VALUES: path of the patient values json file
-- problem_name: name of the problem
-- domaine_name: name of the domain
-
-````bash
-py script.py DOT_FILE --ro REVISION_OPERATORS --p PATIENT_VALUES --p-name problem_name --d-name domain_name
-````
-
-### Usage example
-````bash
-py script.py ../UseCases/Dot_files/testcase-1-rev.dot --ro ../UseCases/Revision_Operators/testcase-1-ro.json --p ../UseCases/PatientValues/patient-values-1-5.json --p-name problem1 --d-name domain1
-````
+[See](readme.md)
 
 ### Arguments
 The current implementation required an actionnable graph, a revision operators json file and a patient values json file.
