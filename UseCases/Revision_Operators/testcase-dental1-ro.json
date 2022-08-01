@@ -23,8 +23,7 @@
                         "endTimeCost": 0,
                         "burdenCost": 0,
                         "nonAdherenceCost": 0,
-                        "type": "action",
-                        "edgeToSuccessors": true
+                        "type": "action"
                     },
                     {
                         "id": "newNoOpAction",
@@ -34,8 +33,7 @@
                         "endTimeCost": 0,
                         "burdenCost": 0,
                         "nonAdherenceCost": 0,
-                        "type": "action",
-                        "edgeToSuccessors": true
+                        "type": "action"
                     },
                     {
                         "id": "newDOACLifetime",
@@ -45,8 +43,7 @@
                         "endTimeCost": 0,
                         "burdenCost": 0,
                         "nonAdherenceCost": 0,
-                        "type": "action",
-                        "edgeToSuccessors": true
+                        "type": "action"
                     }
                 ]
             }

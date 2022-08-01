@@ -14,6 +14,7 @@ from src.CONSTANTS import (
     PREDECESSORS,
     RANGE_ATTR,
     REPLACE_OPERATION,
+    SEQUENCE, THEN, OR,
     SUCCESSORS,
     TRIGGER,
     TYPE_ATTR,
@@ -188,38 +189,34 @@ def add_all_new_edges(graph, operation, edge_to_successors):
     #the label of the equivalent node in the AG is the same. Now we use a matching
     #process to reconcile the term in the RO with the node label in the AG.
     #existing_node = operation[EXISTRING_NDOE]
-    existing_node = find_match(graph, operation)
-    print(existing_node)
+    existing_node_id = find_match(graph, operation)
+    print(existing_node_id)
 
+    new_node_ids = [n["id"] for n in operation[NEW_NODES]]
 
-    for node in operation[NEW_NODES]:
-        node_copy = {**node}
-        new_node_id = node_copy["id"]
+    if operation[SEQUENCE] == THEN:
+        # Add edges that connect nodes
+        for i in range(len(new_node_ids) - 1):
+            start_id = new_node_ids[i]
+            end_id = new_node_ids[i + 1]
+            graph.add_edge(start_id, end_id)
+        start_node_ids, end_node_ids = [new_node_ids[0]], [new_node_ids[-1]]
+    else:
+        start_node_ids, end_node_ids  = new_node_ids, new_node_ids
+        
+    for pred_id in graph.predecessors(existing_node_id):
+        edge_data = graph.get_edge_data(pred_id, existing_node_id)
+        edge_data = edge_data[0] if edge_data else {}
+        for node_id in start_node_ids:
+            if not graph.has_edge(pred_id, node_id):
+                graph.add_edge(pred_id, node_id,  **edge_data)
 
-        predecessor_list = node_copy.get(
-            PREDECESSORS, list(graph.predecessors(existing_node))
-        )
-
-        for pred in predecessor_list:
-            if isinstance(pred, str):
-                pred = {"nodeId": pred}
-            pred_node = pred["nodeId"]
-            pred.pop("nodeId", None)
-            # copying the edge data if any but only to the first new node
-            edge_data = graph.get_edge_data(pred_node, existing_node)
-            edge_data = edge_data[0] if edge_data else {}
-            if not graph.has_edge(pred_node, new_node_id):
-                graph.add_edge(pred_node, new_node_id, **pred, **edge_data)
-
-            current_existing_nodes_successors = list(graph.successors(existing_node))
-
-    for edge in edge_to_successors:
-        node = edge["node"]
-        edge.pop("node", None)
-        for succ in current_existing_nodes_successors:
-            if not graph.has_edge(node, succ):
-                # need one last edge from the last added node to the same node 'Existing_node' is pointing too
-                graph.add_edge(node, succ, **edge)
+    for succ_id in graph.successors(existing_node_id):
+        edge_data = graph.get_edge_data(existing_node_id, succ_id)
+        edge_data = edge_data[0] if edge_data else {}
+        for node_id in end_node_ids:
+            if not graph.has_edge(node_id, succ_id):
+                graph.add_edge(node_id, succ_id, **edge_data)
 
 
 def replace_operation(graph, id_ro, trigger, operation):

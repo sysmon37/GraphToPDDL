@@ -138,6 +138,9 @@ EDGE_TO_SUCCESSORS_ATTR = "edgeToSuccessorsAttr"
 SUCCESSORS = "successors"
 
 SEQUENCE = "sequence"
+THEN = "then"
+OR = "or"
+
 OFFSET = "offset"
 
 # Graph attributes

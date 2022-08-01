@@ -80,8 +80,8 @@ class DotGraphCreator:
         #     if node_props[TYPE_ATTR] == ACTION_NODE
         #     else ""
         # )
-        EXCLUDED_KEYS = ["dataItem", "type", "is_original", "idRO", "trigger"]
-        extra_label = "<br/>".join([f"{k} = {v}" for (k, v) in node_props.items() if k not in EXCLUDED_KEYS])
+        EXCLUDED_PROPS = ["dataItem", "type", "is_original", "idRO", "trigger"]
+        extra_label = "<br/>".join([f"{k} = {v}" for (k, v) in node_props.items() if k not in EXCLUDED_PROPS])
         return f"<<b>{id}</b><br/>{extra_label}>"
  
     @classmethod
