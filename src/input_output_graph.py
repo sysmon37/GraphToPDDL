@@ -20,6 +20,9 @@ def read_graph(path):
     if graph.has_node("ros"):
         graph.remove_node("ros")
 
+    for n in [n for n in graph.nodes.items() if len(n[1]) == 0]:
+        graph.remove_node(n[0])    
+
     for _, node in graph.nodes.items():
         # used for actionNode predicate
         if node[TYPE_ATTR] == ACTION_NODE:

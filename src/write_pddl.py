@@ -313,17 +313,20 @@ def write_metric(graph, file):
         file (TextIOWrapper): The PDDL file.
     """
     file.write("(:metric minimize")
-    metrics = get_all_metrics(graph)
-    if len(metrics) > 1:
-        file.write("(+\n")
 
-    for metric in metrics:
-        metric_name = get_metric_name(metric)
-        file.write("\t(total-{})\n".format(metric_name.lower()))
+    #metrics = get_all_metrics(graph)
+    #if len(metrics) > 1:
+    #    file.write("(+\n")
 
+    #for metric in metrics:
+    #    metric_name = get_metric_name(metric)
+    #    file.write("\t(total-{})\n".format(metric_name.lower()))
+
+    file.write("\t(total-cost)\n")
     file.write(")\n ")
-    if len(metrics) > 1:
-        file.write(")\n ")
+
+    #if len(metrics) > 1:
+    #    file.write(")\n ")
 
 
 def write_all_revisions_pass(graph, file):

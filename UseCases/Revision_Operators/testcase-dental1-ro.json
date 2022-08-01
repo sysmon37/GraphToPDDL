@@ -1,0 +1,55 @@
+[
+    {
+        "id": "ro5",
+        "trigger": [
+            "doacLifetime",
+            "dentalSurgery"
+        ],
+        "triggercondition": [
+            "overlap"
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "doacLifetime",
+                "sequence": "then",
+                "offset": 84,
+                "newNodes": [
+                    {
+                        "id": "newDOACInitial",
+                        "cost": 100,
+                        "durationCost": 24,
+                        "startTimeCost": 0,
+                        "endTimeCost": 0,
+                        "burdenCost": 0,
+                        "nonAdherenceCost": 0,
+                        "type": "action",
+                        "edgeToSuccessors": true
+                    },
+                    {
+                        "id": "newNoOpAction",
+                        "cost": 100,
+                        "durationCost": -1,
+                        "startTimeCost": 0,
+                        "endTimeCost": 0,
+                        "burdenCost": 0,
+                        "nonAdherenceCost": 0,
+                        "type": "action",
+                        "edgeToSuccessors": true
+                    },
+                    {
+                        "id": "newDOACLifetime",
+                        "cost": 100,
+                        "durationCost": 0.01,
+                        "startTimeCost": 0,
+                        "endTimeCost": 0,
+                        "burdenCost": 0,
+                        "nonAdherenceCost": 0,
+                        "type": "action",
+                        "edgeToSuccessors": true
+                    }
+                ]
+            }
+        ]
+    }
+]

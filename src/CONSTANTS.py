@@ -117,6 +117,8 @@ TRIGGER = "trigger"
 PARALLEL_START_ATTR = "parallelStartNode"
 PARLLEL_END_ATTR = "parallelEndNode"
 
+TRIGGERCONDITION = "triggercondition"
+
 # Edge attributes
 RANGE_ATTR = "range"
 
@@ -134,6 +136,9 @@ PREDECESSORS = "predecessors"
 EDGE_TO_SUCCESSORS = "edgeToSuccessors"
 EDGE_TO_SUCCESSORS_ATTR = "edgeToSuccessorsAttr"
 SUCCESSORS = "successors"
+
+SEQUENCE = "sequence"
+OFFSET = "offset"
 
 # Graph attributes
 SHAPE = "shape"

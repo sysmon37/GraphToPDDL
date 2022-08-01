@@ -1,0 +1,30 @@
+[
+    {
+        "id": "ro1",
+        "trigger": [
+            {
+              "triggerNodes": [
+                  "a2",
+                  "a7"
+              ],
+              "triggerConditions": [
+                  "overlap"
+              ]
+            }
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "a7",
+                "newNodes": [
+                    {
+                        "id": "newAction",
+                        "cost": 100,
+                        "type": "action",
+                        "edgeToSuccessors": true
+                    }
+                ]
+            }
+        ]
+    }
+]

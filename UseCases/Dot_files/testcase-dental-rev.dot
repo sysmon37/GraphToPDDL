@@ -1,0 +1,45 @@
+digraph {
+// newrank=true;
+// ranksep = 0.25;
+// node [fontname=arial, fontsize=10];
+// edge [fontname=arial, fontsize=9];
+
+// Contexts
+d1 [type=context];
+d2 [type=context];
+
+// Tests
+eGFRLevel [type=decision, durationCost=0.01, startTimeCost=0, endTimeCost=0, burdenCost=0, nonAdherenceCost=0, dataItem=v1]
+haemoglobinLevel [type=decision, durationCost=0.01, startTimeCost=0, endTimeCost=0, burdenCost=0, nonAdherenceCost=0, dataItem=v2]
+
+
+// Actions
+dentalNoOp [cost=10, durationCost=120, startTimeCost=0, endTimeCost=0, burdenCost=0, nonAdherenceCost=0, type=action];
+dentalSurgery [cost=10, durationCost=24, startTimeCost=120, endTimeCost=0, burdenCost=0, nonAdherenceCost=0, type=action];
+aceInhibitor [cost=10, durationCost=24, startTimeCost=0, endTimeCost=0, burdenCost=0, nonAdherenceCost=0, type=action];
+lifestyleManage [cost=10, durationCost=0.01, startTimeCost=0, endTimeCost=0, burdenCost=0, nonAdherenceCost=0, type=action];
+esaLifetime [cost=10, durationCost=0.01, startTimeCost=0, endTimeCost=0, burdenCost=0, nonAdherenceCost=0, type=action];
+doacLifetime [cost=10, durationCost=0.01, startTimeCost=0, endTimeCost=0, burdenCost=0, nonAdherenceCost=0, type=action];
+
+
+// Goals
+g1 [type=goal];
+g2 [type=goal];
+
+
+d1 -> dentalNoOp;
+dentalNoOp -> dentalSurgery;
+dentalSurgery -> g1;
+
+d2 -> eGFRLevel;
+eGFRLevel -> aceInhibitor [range=0..59];
+eGFRLevel -> lifestyleManage [range=60..1000];
+lifestyleManage -> g2;
+aceInhibitor -> haemoglobinLevel;
+haemoglobinLevel -> esaLifetime [range=0..99];
+haemoglobinLevel -> doacLifetime [range=100..1000];
+esaLifetime -> g2;
+doacLifetime -> g2;
+
+
+}

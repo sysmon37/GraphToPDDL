@@ -17,7 +17,12 @@ from src.CONSTANTS import (
     SUCCESSORS,
     TRIGGER,
     TYPE_ATTR,
+    TRIGGERCONDITION,
+    OFFSET
 )
+
+from src.matching import match_terms
+from src.utils import get_type_nodes
 
 
 def read_JSON(path):
@@ -38,13 +43,30 @@ def read_JSON(path):
 
 def update_graph_with_ROs(graph, ros):
     """
-    Excutes the operations (replace, delete, add) of every revision operators.
+    Executes the operations (replace, delete, add) of every revision operators.
     Args:
         graph (networkx graph): The graph.
         ros (list): List of JSON like object.
     """
     for ro in ros:
-        id, trigger, operations = itemgetter("id", TRIGGER, OPERATIONS)(ro)
+        id, trigger, triggercondition, operations = itemgetter("id", TRIGGER, TRIGGERCONDITION, OPERATIONS)(ro)
+
+        #If no triggering conditions are specified then continue with RO as is.
+        #If a triggering condition is specified then check if the condition is met.
+        #If the condition is met, proceed with RO. Otherwise do not apply the RO.
+
+        for condition in triggercondition:
+            if condition == "":
+                break
+            else:
+                for op in operations:
+                    if check_trigger_condition(trigger, graph, op):
+                        break
+                    else:
+                        return
+        #print(condition)
+
+
         operations = ro[OPERATIONS]
         for op in operations:
             type = op[TYPE_ATTR]
@@ -54,6 +76,55 @@ def update_graph_with_ROs(graph, ros):
                 delete_operation(graph, op)
             else:
                 add_operation(graph, id, trigger, op)
+
+
+
+def check_trigger_condition(trigger, graph, operation):
+    #Check if triggering condition is met.
+
+    v0 = trigger[0]
+    v1 = trigger[1]
+
+    node0 = graph.nodes[v0]
+    node1 = graph.nodes[v1]
+
+    if (node0['startTimeCost'] <= node1['startTimeCost']) and (node0['endTimeCost'] <= node1['endTimeCost']):
+        print('overlap!')
+
+        #Typically we need to modify action node durations when an overlap exists.
+        for node in operation[NEW_NODES]:
+            if node['durationCost'] == -1:
+                node['durationCost'] = operation[OFFSET]
+                print(node['durationCost'])
+
+    return 1
+
+
+
+def find_match(graph, operation):
+    #Reconcile the term used in the RO with node labels in the AG. These may be
+    #equivalent terms as specified by an ontology but they may not be exactly
+    #the same term/label. For now, we assume that an applicable RO always refers
+    #to nodes such that an equivalent node exists in the AG.
+    ro_existing_node = operation[EXISTRING_NDOE]
+    print("RO node:")
+    print(ro_existing_node)
+
+    matched = False
+    graphnodeslist = list(graph.nodes)
+
+    for v in graphnodeslist:
+        if v == ro_existing_node or match_terms(v, ro_existing_node):
+            print("matched!")
+            matched = True
+            break
+
+    if matched:
+        existing_node = v
+        return existing_node
+    else:
+        print("No match found")
+
 
 
 def add_all_new_nodes(graph, id_ro, trigger, operation):
@@ -112,7 +183,14 @@ def add_all_new_edges(graph, operation, edge_to_successors):
         trigger (list): List of triggering nodes.
         operation (object): The operation object.
     """
-    existing_node = operation[EXISTRING_NDOE]
+
+    #Previously, we simply retrieved the node as specified in the RO, assuming that
+    #the label of the equivalent node in the AG is the same. Now we use a matching
+    #process to reconcile the term in the RO with the node label in the AG.
+    #existing_node = operation[EXISTRING_NDOE]
+    existing_node = find_match(graph, operation)
+    print(existing_node)
+
 
     for node in operation[NEW_NODES]:
         node_copy = {**node}
@@ -170,7 +248,13 @@ def delete_operation(graph, operation):
         graph (networkx graph): The graph.
         operation (str): The operation object
     """
-    node_to_delete = operation[EXISTRING_NDOE]
+
+    #Find a match in the AG for the existing node to delete specified in the RO
+    #node_to_delete = operation[EXISTRING_NDOE]
+    node_to_delete = find_match(graph, operation)
+    print(node_to_delete)
+
+
     predecessors = graph.predecessors(node_to_delete)
     successors = graph.successors(node_to_delete)
 
@@ -251,7 +335,7 @@ def add_operation(graph, idRO, trigger, operation):
                 if not successor == "goal":
                     successor_range = succ.get(RANGE_ATTR, None)
                     succ.pop(RANGE_ATTR, None)
-             
+
 
                 # Case where the Predecessor node and successor node are adjecent
                 # if graph.has_edge(predecessor_node, successor_node) :

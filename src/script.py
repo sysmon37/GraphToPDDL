@@ -1,5 +1,6 @@
 from src.utils import handle_alternative_nodes
 from src.input_output_graph import outputGraphViz, read_graph
+from src.input_output_graph import read_graph
 from src.write_pddl import outputPDDL
 from src.input_RO import read_JSON, update_graph_with_ROs
 import argparse as ap

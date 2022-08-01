@@ -1,0 +1,26 @@
+[
+    {
+        "id": "ro1",
+        "trigger": [
+            "a2",
+            "a7"
+        ],
+        "triggercondition": [
+            ""
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "aseven",
+                "newNodes": [
+                    {
+                        "id": "newAction",
+                        "cost": 100,
+                        "type": "action",
+                        "edgeToSuccessors": true
+                    }
+                ]
+            }
+        ]
+    }
+]
