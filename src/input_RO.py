@@ -19,7 +19,16 @@ from src.CONSTANTS import (
     TRIGGER,
     TYPE_ATTR,
     TRIGGERCONDITION,
-    OFFSET
+    OFFSET,
+    OFFSET_NODE,
+    START_TIME_REF,
+    START_TIME_WHICH,
+    START_TIME_CHANGE,
+    END_TIME_REF,
+    END_TIME_WHICH,
+    END_TIME_CHANGE,
+    START,
+    END
 )
 
 from src.matching import match_terms
@@ -89,13 +98,70 @@ def check_trigger_condition(trigger, graph, operation):
     node0 = graph.nodes[v0]
     node1 = graph.nodes[v1]
 
-    if (node0['startTimeCost'] <= node1['startTimeCost']) and (node0['endTimeCost'] <= node1['endTimeCost']):
+    node0_start = int(node0['startTimeCost']);
+    node0_end = int(node0['endTimeCost']);
+    node1_start = int(node1['startTimeCost']);
+    node1_end = int(node1['endTimeCost']);
+
+    if(((node0_start <= node1_start) and (node0_end >= node1_start)) or
+        ((node0_start <= node1_end) and (node0_end >= node1_end)) or
+        ((node1_start <= node0_start) and (node1_end >= node0_start)) or
+        ((node1_start <= node0_end) and (node1_end >= node0_end))):
+
         print('overlap!')
 
         #Typically we need to modify action node durations when an overlap exists.
         for node in operation[NEW_NODES]:
-            if node['durationCost'] == -1:
-                node['durationCost'] = operation[OFFSET]
+            if node['durationCost'] == "":
+
+                #Compute start and end times.
+                sreftime = 0
+                ereftime = 0
+                stime = 0
+                etime = 0
+                echange = int(node[END_TIME_CHANGE])
+                schange = int(node[START_TIME_CHANGE])
+
+                #Compute start time
+                if node[START_TIME_REF] == EXISTRING_NDOE and node[START_TIME_WHICH] == START:
+                    sreftime = node0_start
+                elif node[START_TIME_REF] == EXISTRING_NDOE and node[START_TIME_WHICH] == END:
+                    sreftime = node0_end
+                elif node[START_TIME_REF] == OFFSET_NODE and node[START_TIME_WHICH] == START:
+                    sreftime = node1_start
+                elif node[START_TIME_REF] == OFFSET_NODE and node[START_TIME_WHICH] == END:
+                    sreftime = node1_end
+                else:
+                    #Error: there must be some ref specified.
+                    sreftime = 0
+                    print('ERROR')
+
+                stime = sreftime + schange
+
+                #Compute end time
+                if node[END_TIME_REF] == EXISTRING_NDOE and node[END_TIME_WHICH] == START:
+                    ereftime = node0_start
+                elif node[END_TIME_REF] == EXISTRING_NDOE and node[END_TIME_WHICH] == END:
+                    ereftime = node0_end
+                elif node[END_TIME_REF] == OFFSET_NODE and node[END_TIME_WHICH] == START:
+                    ereftime = node1_start
+                elif node[END_TIME_REF] == OFFSET_NODE and node[END_TIME_WHICH] == END:
+                    ereftime = node1_end
+                else:
+                    #Error: there must be some ref specified.
+                    ereftime = 0
+                    print('ERROR')
+
+                etime = ereftime + echange
+
+                #print(ereftime)
+                #print(echange)
+                #print(etime)
+
+                #Compute duration.
+                #node['durationCost'] = operation[OFFSET]
+                node['durationCost'] = str(etime - stime)
+
                 print(node['durationCost'])
 
     return 1
@@ -203,7 +269,7 @@ def add_all_new_edges(graph, operation, edge_to_successors):
         start_node_ids, end_node_ids = [new_node_ids[0]], [new_node_ids[-1]]
     else:
         start_node_ids, end_node_ids  = new_node_ids, new_node_ids
-        
+
     for pred_id in graph.predecessors(existing_node_id):
         edge_data = graph.get_edge_data(pred_id, existing_node_id)
         edge_data = edge_data[0] if edge_data else {}

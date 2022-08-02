@@ -153,3 +153,14 @@ FIXEDSIZE = "fixedsize"
 
 # Patient values
 DEFAULT_PATIENT_VALUE = "default_value"
+
+# Extra 
+OFFSET_NODE = "offsetNode"
+START_TIME_REF = "startTimeRef"
+START_TIME_WHICH = "startTimeWhich"
+START_TIME_CHANGE = "startTimeChange"
+END_TIME_REF = "endTimeRef"
+END_TIME_WHICH = "endTimeWhich"
+END_TIME_CHANGE = "endTimeChange"
+START = "start"
+END = "end"

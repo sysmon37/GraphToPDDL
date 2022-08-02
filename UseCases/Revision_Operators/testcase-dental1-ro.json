@@ -12,38 +12,61 @@
             {
                 "type": "replace",
                 "existingNode": "doacLifetime",
+                "offsetNode": "dentalSurgery",
+                "offset": "",
                 "sequence": "then",
-                "offset": 84,
                 "newNodes": [
                     {
                         "id": "newDOACInitial",
                         "cost": 100,
-                        "durationCost": 24,
+                        "durationCost": "",
                         "startTimeCost": 0,
                         "endTimeCost": 0,
                         "burdenCost": 0,
                         "nonAdherenceCost": 0,
-                        "type": "action"
+                        "type": "action",
+                        "edgeToSuccessors": true,
+                        "startTimeRef": "existingNode",
+                        "startTimeWhich": "start",
+                        "startTimeChange": 0,
+                        "endTimeRef": "offsetNode",
+                        "endTimeWhich": "start",
+                        "endTimeChange": -72
+
                     },
                     {
                         "id": "newNoOpAction",
                         "cost": 100,
-                        "durationCost": -1,
+                        "durationCost": "",
                         "startTimeCost": 0,
                         "endTimeCost": 0,
                         "burdenCost": 0,
                         "nonAdherenceCost": 0,
-                        "type": "action"
+                        "type": "action",
+                        "edgeToSuccessors": true,
+                        "startTimeRef": "offsetNode",
+                        "startTimeWhich": "start",
+                        "startTimeChange": -72,
+                        "endTimeRef": "offsetNode",
+                        "endTimeWhich": "end",
+                        "endTimeChange": 12
                     },
                     {
                         "id": "newDOACLifetime",
                         "cost": 100,
-                        "durationCost": 0.01,
+                        "durationCost": 0,
                         "startTimeCost": 0,
                         "endTimeCost": 0,
                         "burdenCost": 0,
                         "nonAdherenceCost": 0,
-                        "type": "action"
+                        "type": "action",
+                        "edgeToSuccessors": true,
+                        "startTimeRef": "",
+                        "startTimeWhich": "",
+                        "startTimeChange": 0,
+                        "endTimeRef": "",
+                        "endTimeWhich": "",
+                        "endTimeChange": 0
                     }
                 ]
             }

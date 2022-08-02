@@ -18,8 +18,9 @@ set6 = {'cvd', 'cvs disease' 'cardiovascular disease', 'cardiovascular system di
 #For testing purposes
 set7 = {'a7', 'asept', 'aseven', '7a'}
 
+SYNONYM_SETS = [set1, set2, set3, set4, set5, set6]
 
-def match_terms(clinical_term1, clinical_term2):
+def match_terms(term1, term2):
     """
     Determines if input terms clinical_term1 and clinical_term2 are equivalent by
     checking if they are both contained in the same hierarchy of terms,
@@ -27,22 +28,10 @@ def match_terms(clinical_term1, clinical_term2):
     Args:
         clinical_term: string describing the clinical action.
     """
-    if clinical_term1 in set1 and clinical_term2 in set1:
-        return 1
-    elif clinical_term1 in set2 and clinical_term2 in set2:
-        return 1
-    elif clinical_term1 in set3 and clinical_term2 in set3:
-        return 1
-    elif clinical_term1 in set4 and clinical_term2 in set4:
-        return 1
-    elif clinical_term1 in set5 and clinical_term2 in set5:
-        return 1
-    elif clinical_term1 in set6 and clinical_term2 in set6:
-        return 1
-    elif clinical_term1 in set7 and clinical_term2 in set7:
-        return 1
-    else:
-        return 0
 
+    for s in SYNONYM_SETS:
+        if term1 in s and term2 in s:
+            return True
+    return False
 
 #print(match_terms('doac', 'dabigatran'))
