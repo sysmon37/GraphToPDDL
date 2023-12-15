@@ -45,4 +45,5 @@ def run(
     outputPDDL(graph, ros, patient_values, problem_name, domain_name, output_dir)
     outputGraphViz(graph, problem_name, output_dir)
 
-    processLayer3(graph)
+    # We temporarily block processing layer 3
+    # processLayer3(graph)

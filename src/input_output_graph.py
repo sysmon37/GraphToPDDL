@@ -45,4 +45,5 @@ def outputGraphViz(graph, filename, output_dir):
         directory="{}{}".format(output_dir, "/" if output_dir else ""),
         filename=filename,
         format="png",
+        cleanup=True
     )

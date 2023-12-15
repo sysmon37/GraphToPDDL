@@ -15,7 +15,7 @@ t3 [type=decision, dataItem=v3]
 
 
 // Actions
-a1 [cost=10, type=action];
+a1 [cost=10, burdenCost=0, nonAdherenceCost=0,type=action];
 a2 [cost=10, type=action];
 a3 [cost=10, type=action];
 a7 [cost=10, type=action];

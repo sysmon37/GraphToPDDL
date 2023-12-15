@@ -135,3 +135,7 @@ dmypy.json
 
 # macOS files and folders
 **/__MACOSX/
+
+# test and temp folders
+./test
+./temp
