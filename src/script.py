@@ -3,6 +3,8 @@ from src.input_output_graph import outputGraphViz, read_graph
 from src.input_output_graph import read_graph
 from src.write_pddl import outputPDDL
 from src.input_RO import read_JSON, update_graph_with_ROs
+from src.layer3 import processLayer3
+
 import argparse as ap
 import traceback
 
@@ -42,3 +44,5 @@ def run(
     handle_alternative_nodes(graph)
     outputPDDL(graph, ros, patient_values, problem_name, domain_name, output_dir)
     outputGraphViz(graph, problem_name, output_dir)
+
+    processLayer3(graph)

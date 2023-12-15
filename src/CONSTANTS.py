@@ -127,6 +127,7 @@ ADD_OPERATION = "add"
 DELETE_OPERATION = "delete"
 REPLACE_OPERATION = "replace"
 
+
 # RO operations attributes
 ID_RO = "idRO"
 OPERATIONS = "operations"
@@ -138,10 +139,16 @@ EDGE_TO_SUCCESSORS_ATTR = "edgeToSuccessorsAttr"
 SUCCESSORS = "successors"
 
 SEQUENCE = "sequence"
-THEN = "then"
-OR = "or"
-
 OFFSET = "offset"
+OFFSET_NODE = "offsetNode"
+START_TIME_REF = "startTimeRef"
+START_TIME_WHICH = "startTimeWhich"
+START_TIME_CHANGE = "startTimeChange"
+END_TIME_REF = "endTimeRef"
+END_TIME_WHICH = "endTimeWhich"
+END_TIME_CHANGE = "endTimeChange"
+START = "start"
+END = "end"
 
 # Graph attributes
 SHAPE = "shape"
@@ -153,14 +160,3 @@ FIXEDSIZE = "fixedsize"
 
 # Patient values
 DEFAULT_PATIENT_VALUE = "default_value"
-
-# Extra 
-OFFSET_NODE = "offsetNode"
-START_TIME_REF = "startTimeRef"
-START_TIME_WHICH = "startTimeWhich"
-START_TIME_CHANGE = "startTimeChange"
-END_TIME_REF = "endTimeRef"
-END_TIME_WHICH = "endTimeWhich"
-END_TIME_CHANGE = "endTimeChange"
-START = "start"
-END = "end"

@@ -132,3 +132,6 @@ dmypy.json
 .graphView/
 *.pdf
 *.gv
+
+# macOS files and folders
+**/__MACOSX/
