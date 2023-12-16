@@ -8,9 +8,27 @@ from src.layer3 import processLayer3
 import argparse as ap
 import traceback
 
+def read_graph_and_ros(path, ros_path):
+    """
+    Reads graph and ROs and applies ROs to the graph. Returns the revised graph.
+    """
 
-def run(
-    path, ros_path, patient_values_path, no_ro, problem_name, domain_name, output_dir
+    graph = read_graph(path)
+
+    # ROs
+    ros = []
+    if ros_path:
+        ros = read_JSON(ros_path)
+        update_graph_with_ROs(graph, ros)
+    else:
+        print("No revision operators provided.")
+
+    return graph, ros
+
+
+# Run conversion to PDDL
+def run_to_pddl(
+    path, ros_path, patient_values_path, problem_name, domain_name, output_dir
 ):
     """
     Function to run the automation pipeline.
@@ -21,18 +39,7 @@ def run(
         patient_values_path (str): Path to the patient values file.
 
     """
-    graph = read_graph(path)
-
-    # ROs
-    ros = []
-    if no_ro:
-        print("Revision operators will not be applied.")
-
-    elif ros_path:
-        ros = read_JSON(ros_path)
-        update_graph_with_ROs(graph, ros)
-    else:
-        print("No revision operators file provided.")
+    graph, ros = read_graph_and_ros(path, ros_path)
 
     # Patient values
     if patient_values_path:
@@ -45,5 +52,8 @@ def run(
     outputPDDL(graph, ros, patient_values, problem_name, domain_name, output_dir)
     outputGraphViz(graph, problem_name, output_dir)
 
-    # We temporarily block processing layer 3
-    # processLayer3(graph)
+
+def run_to_plan_diff(path, ros_path, base_path, opt_path):
+
+    graph, _ = read_graph_and_ros(path, ros_path)
+    processLayer3(graph, base_path, opt_path)

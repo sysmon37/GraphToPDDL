@@ -1,0 +1,10 @@
+;;;; Solution Found
+; States evaluated: 1678
+; Cost: 130.000
+; Time 0.56
+0.000: (makefirstdecision d1 t1 a4)  [0.000]
+0.000: (checkrevisions d1 a4 g1)  [0.001]
+0.001: (takefirstaction d1 a4 g1)  [0.000]
+0.001: (finalgoalreached d1 g1)  [0.000]
+
+
