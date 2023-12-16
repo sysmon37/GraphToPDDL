@@ -17,7 +17,7 @@ from src.CONSTANTS import (
     SUCCESSORS,
     TRIGGER,
     TYPE_ATTR,
-    TRIGGERCONDITION,
+    TRIGGER_CONDITION,
     OFFSET,
     OFFSET_NODE,
     START_TIME_REF,
@@ -58,13 +58,15 @@ def update_graph_with_ROs(graph, ros):
         ros (list): List of JSON like object.
     """
     for ro in ros:
-        id, trigger, triggercondition, operations = itemgetter("id", TRIGGER, TRIGGERCONDITION, OPERATIONS)(ro)
+        id, trigger, operations = itemgetter("id", TRIGGER, OPERATIONS)(ro)
+        # This is to make the code work with old examples before introducing trigger condition
+        trigger_condition = ro.get(TRIGGER_CONDITION, "")
 
         #If no triggering conditions are specified then continue with RO as is.
         #If a triggering condition is specified then check if the condition is met.
         #If the condition is met, proceed with RO. Otherwise do not apply the RO.
 
-        for condition in triggercondition:
+        for condition in trigger_condition:
             if condition == "":
                 break
             else:

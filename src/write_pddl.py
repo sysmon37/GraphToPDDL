@@ -10,6 +10,9 @@ from src.CONSTANTS import (
     TRIGGER,
     TYPE_ATTR,
     DEFAULT_PATIENT_VALUE,
+    METRIC_COST,
+    METRIC_BURDEN,
+    METRIC_NON_ADHERENCE
 )
 from src.utils import (
     find_goal_node,
@@ -203,7 +206,7 @@ def write_total_metrics(graph, file):
         file (TextIOWrapper): The PDDL file.
     """
     metrics = get_all_metrics(graph)
-    for metric in metrics:
+    for metric in add_default_metrics(metrics):
         metric_name = get_metric_name(metric)
         file.write("\t(= (total-{}) 0)\n".format(metric_name.lower()))
 
@@ -243,6 +246,9 @@ def write_decision_branch(graph, file):
             )
 
 
+def add_default_metrics(metrics):
+    return metrics + [m for m in [METRIC_COST, METRIC_BURDEN, METRIC_NON_ADHERENCE] if m not in metrics]
+
 def write_node_cost(graph, file):
     """
     Writes node costs predicates.
@@ -253,7 +259,8 @@ def write_node_cost(graph, file):
     """
     init_nodes = get_type_nodes(graph, CONTEXT_NODE)
     metrics = get_all_metrics(graph)
-    for metric in metrics:
+    # We add default metrics to make the code work with old examples where only cost is specified
+    for metric in add_default_metrics(metrics):
         for node, attr in graph.nodes.items():
             if node not in init_nodes:
                 metric_name = get_metric_name(metric)
