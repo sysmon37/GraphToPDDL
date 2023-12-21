@@ -13,6 +13,7 @@ def read_graph(path):
 
     """
     graph = nwx.drawing.nx_pydot.read_dot(path)
+    #graph = nwx.drawing.nx_agraph.read_dot(path)
 
     # bit of preprocessing clean up, this will need to be reviewed
     if graph.has_node(","):
@@ -21,7 +22,7 @@ def read_graph(path):
         graph.remove_node("ros")
 
     for n in [n for n in graph.nodes.items() if len(n[1]) == 0]:
-        graph.remove_node(n[0])    
+        graph.remove_node(n[0])
 
     for _, node in graph.nodes.items():
         # used for actionNode predicate
@@ -44,4 +45,5 @@ def outputGraphViz(graph, filename, output_dir):
         directory="{}{}".format(output_dir, "/" if output_dir else ""),
         filename=filename,
         format="png",
+        cleanup=True
     )

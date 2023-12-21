@@ -1,100 +1,5 @@
 """
 File containing the constants used in this project.
-
-# Node types
-CONTEXT_NODE = "context"
-
-GOAL_NODE = "goal"
-
-ACTION_NODE = "action"
-
-
-DECISION_NODE = "decision"
-
-PARALLEL_NODE = "parallel"
-
-ALTERNATIVE_NODE = "alternative"
-
-
-
-# Node attributes
-
-ID_ATTR = "id"
-
-IS_ORIGINAL_ATTR = "is_original"
-
-TYPE_ATTR = "type"
-
-DATA_ITEM_ATTR = "dataItem"
-
-IS_IN_PARALLEL = "is_in_parallel"
-
-IS_ALTERNATIVE = "is_alternative"
-
-TRIGGER = "trigger"
-
-PARALLEL_START_ATTR = "parallelStartNode"
-
-PARLLEL_END_ATTR = "parallelEndNode"
-
-
-
-# Edge attributes
-
-RANGE_ATTR = "range"
-
-
-
-# RO operations
-
-ADD_OPERATION = "add"
-
-DELETE_OPERATION = "delete"
-
-REPLACE_OPERATION = "replace"
-
-
-
-# RO operations attributes
-
-ID_RO = "idRO"
-
-OPERATIONS = "operations"
-
-NEW_NODES = "newNodes"
-
-EXISTRING_NDOE = "existingNode"
-
-PREDECESSORS = "predecessor"
-
-EDGE_TO_SUCCESSORS = "edgeToSuccessors"
-
-EDGE_TO_SUCCESSORS_ATTR = "edgeToSuccessorsAttr"
-
-SUCCESSORS = "successors"
-
-
-
-# Graph attributes
-
-SHAPE = "shape"
-
-FILLCOLOR = "fillcolor"
-
-FONTCOLOR = "fontcolor"
-
-WIDTH = "width"
-
-HEIGHT = "height"
-
-FIXEDSIZE = "fixedsize"
-
-
-
-# Patient values
-
-DEFAULT_PATIENT_VALUE = "default_value"
-
 """
 
 
@@ -117,7 +22,7 @@ TRIGGER = "trigger"
 PARALLEL_START_ATTR = "parallelStartNode"
 PARLLEL_END_ATTR = "parallelEndNode"
 
-TRIGGERCONDITION = "triggercondition"
+TRIGGER_CONDITION = "triggercondition"
 
 # Edge attributes
 RANGE_ATTR = "range"
@@ -126,6 +31,7 @@ RANGE_ATTR = "range"
 ADD_OPERATION = "add"
 DELETE_OPERATION = "delete"
 REPLACE_OPERATION = "replace"
+
 
 # RO operations attributes
 ID_RO = "idRO"
@@ -138,10 +44,16 @@ EDGE_TO_SUCCESSORS_ATTR = "edgeToSuccessorsAttr"
 SUCCESSORS = "successors"
 
 SEQUENCE = "sequence"
-THEN = "then"
-OR = "or"
-
 OFFSET = "offset"
+OFFSET_NODE = "offsetNode"
+START_TIME_REF = "startTimeRef"
+START_TIME_WHICH = "startTimeWhich"
+START_TIME_CHANGE = "startTimeChange"
+END_TIME_REF = "endTimeRef"
+END_TIME_WHICH = "endTimeWhich"
+END_TIME_CHANGE = "endTimeChange"
+START = "start"
+END = "end"
 
 # Graph attributes
 SHAPE = "shape"
@@ -154,13 +66,7 @@ FIXEDSIZE = "fixedsize"
 # Patient values
 DEFAULT_PATIENT_VALUE = "default_value"
 
-# Extra 
-OFFSET_NODE = "offsetNode"
-START_TIME_REF = "startTimeRef"
-START_TIME_WHICH = "startTimeWhich"
-START_TIME_CHANGE = "startTimeChange"
-END_TIME_REF = "endTimeRef"
-END_TIME_WHICH = "endTimeWhich"
-END_TIME_CHANGE = "endTimeChange"
-START = "start"
-END = "end"
+# Metrics
+METRIC_COST = "cost"
+METRIC_BURDEN = "burden"
+METRIC_NON_ADHERENCE = "nonAdherence"

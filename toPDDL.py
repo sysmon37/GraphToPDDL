@@ -1,4 +1,4 @@
-from src.script import run
+from src.script import run_to_pddl
 import argparse as ap
 import traceback
 
@@ -22,23 +22,23 @@ if __name__ == "__main__":
     parser.add_argument(
         "--p-name",
         type=str,
-        default="problem",
+        default="mitplan-problem",
         help="Problem name. It is also the name of the output PDDL file (e.g. --p-name problem).",
     )
 
     parser.add_argument(
         "--d-name",
         type=str,
-        default="default_domain",
+        default="mitplan-domain",
         help="Domain name.",
     )
 
-    parser.add_argument(
-        "--no-ro",
-        action="store_true",
-        default=False,
-        help="If true, does not apply any revision operators. It will output the original graph with the corresponding PDDL.",
-    )
+    # parser.add_argument(
+    #     "--no-ro",
+    #     action="store_true",
+    #     default=False,
+    #     help="If true, does not apply any revision operators. It will output the original graph with the corresponding PDDL.",
+    # )
 
     parser.add_argument(
         "--dir",
@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
         if args.p != None and args.p[-4:].lower() != "json":
             raise Exception("The Revision operators file (--ro) must be a JSON file.")
-        run(args.ag, args.ro, args.p, args.no_ro, args.p_name, args.d_name, args.dir)
+        run_to_pddl(args.ag, args.ro, args.p, args.p_name, args.d_name, args.dir)
     except Exception as e:
         print(e)
         traceback.print_exc()
