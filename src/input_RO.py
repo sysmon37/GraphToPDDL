@@ -1,4 +1,5 @@
 import json
+import logging
 from operator import itemgetter
 
 from src.CONSTANTS import (
@@ -7,7 +8,7 @@ from src.CONSTANTS import (
     DELETE_OPERATION,
     EDGE_TO_SUCCESSORS,
     EDGE_TO_SUCCESSORS_ATTR,
-    EXISTRING_NDOE,
+    EXISTING_NDOE,
     IS_ORIGINAL_ATTR,
     NEW_NODES,
     OPERATIONS,
@@ -124,9 +125,9 @@ def check_trigger_condition(trigger, graph, operation):
                 schange = int(node[START_TIME_CHANGE])
 
                 #Compute start time
-                if node[START_TIME_REF] == EXISTRING_NDOE and node[START_TIME_WHICH] == START:
+                if node[START_TIME_REF] == EXISTING_NDOE and node[START_TIME_WHICH] == START:
                     sreftime = node0_start
-                elif node[START_TIME_REF] == EXISTRING_NDOE and node[START_TIME_WHICH] == END:
+                elif node[START_TIME_REF] == EXISTING_NDOE and node[START_TIME_WHICH] == END:
                     sreftime = node0_end
                 elif node[START_TIME_REF] == OFFSET_NODE and node[START_TIME_WHICH] == START:
                     sreftime = node1_start
@@ -140,9 +141,9 @@ def check_trigger_condition(trigger, graph, operation):
                 stime = sreftime + schange
 
                 #Compute end time
-                if node[END_TIME_REF] == EXISTRING_NDOE and node[END_TIME_WHICH] == START:
+                if node[END_TIME_REF] == EXISTING_NDOE and node[END_TIME_WHICH] == START:
                     ereftime = node0_start
-                elif node[END_TIME_REF] == EXISTRING_NDOE and node[END_TIME_WHICH] == END:
+                elif node[END_TIME_REF] == EXISTING_NDOE and node[END_TIME_WHICH] == END:
                     ereftime = node0_end
                 elif node[END_TIME_REF] == OFFSET_NODE and node[END_TIME_WHICH] == START:
                     ereftime = node1_start
@@ -174,7 +175,7 @@ def find_match(graph, operation):
     #equivalent terms as specified by an ontology but they may not be exactly
     #the same term/label. For now, we assume that an applicable RO always refers
     #to nodes such that an equivalent node exists in the AG.
-    ro_existing_node = operation[EXISTRING_NDOE]
+    ro_existing_node = operation[EXISTING_NDOE]
     print("RO node:")
     print(ro_existing_node)
 
@@ -194,102 +195,6 @@ def find_match(graph, operation):
         print("No match found")
 
 
-
-def add_all_new_nodes(graph, id_ro, trigger, operation):
-    """
-    Add a list of new nodes with some attributes. These nodes do not have any edges after the execution of this function.
-
-    Use 'add_all_new_edges' to add the respectives edges.
-
-    Args:
-        graph (networkx graph): The graph.
-        id_ro (str): The ID of the revision operator.
-        trigger (list): List of triggering nodes.
-        operation (object): The operation object.
-    """
-    edge_to_successors = []
-    for node in operation[NEW_NODES]:
-        # taking node id and the rest of its attributes
-        node_copy = {**node}
-        new_node_id = node_copy["id"]
-        node_type = node_copy[TYPE_ATTR]
-
-        # if the current node needs to connect to the successors of the 'existing node'
-        if node_copy.get(EDGE_TO_SUCCESSORS, False):
-            edge_to_successors.append(
-                {"node": new_node_id, **node_copy.get(EDGE_TO_SUCCESSORS_ATTR, {})}
-            )
-
-        if node_type == ACTION_NODE:
-            node_copy[IS_ORIGINAL_ATTR] = False
-
-        node_copy.pop("id", None)
-        node_copy.pop(TYPE_ATTR, None)
-        node_copy.pop(PREDECESSORS, None)
-        node_copy.pop(EDGE_TO_SUCCESSORS, None)
-
-        # adding it to the graph
-        # Currently assuming the added nodes are all actionNode
-        graph.add_node(
-            new_node_id, type=node_type, idRO=id_ro, trigger=trigger, **node_copy
-        )
-    return edge_to_successors
-
-
-def add_all_new_edges(graph, operation, edge_to_successors):
-    """
-    Add all the edges from the operation object.
-
-    Nodes related to these edges must be added to the graph prior to this function call.
-
-    Use 'add_all_new_nodes' to add the respectives nodes before calling this function.
-
-
-    Args:
-        graph (networkx graph): The graph.
-        id_ro (str): The ID of the revision operator.
-        trigger (list): List of triggering nodes.
-        operation (object): The operation object.
-    """
-
-    #Previously, we simply retrieved the node as specified in the RO, assuming that
-    #the label of the equivalent node in the AG is the same. Now we use a matching
-    #process to reconcile the term in the RO with the node label in the AG.
-    #existing_node = operation[EXISTRING_NDOE]
-    existing_node = find_match(graph, operation)
-    print(existing_node)
-
-
-    for node in operation[NEW_NODES]:
-        node_copy = {**node}
-        new_node_id = node_copy["id"]
-
-        predecessor_list = node_copy.get(
-            PREDECESSORS, list(graph.predecessors(existing_node))
-        )
-
-        for pred in predecessor_list:
-            if isinstance(pred, str):
-                pred = {"nodeId": pred}
-            pred_node = pred["nodeId"]
-            pred.pop("nodeId", None)
-            # copying the edge data if any but only to the first new node
-            edge_data = graph.get_edge_data(pred_node, existing_node)
-            edge_data = edge_data[0] if edge_data else {}
-            if not graph.has_edge(pred_node, new_node_id):
-                graph.add_edge(pred_node, new_node_id, **pred, **edge_data)
-
-            current_existing_nodes_successors = list(graph.successors(existing_node))
-
-    for edge in edge_to_successors:
-        node = edge["node"]
-        edge.pop("node", None)
-        for succ in current_existing_nodes_successors:
-            if not graph.has_edge(node, succ):
-                # need one last edge from the last added node to the same node 'Existing_node' is pointing too
-                graph.add_edge(node, succ, **edge)
-
-
 def replace_operation(graph, id_ro, trigger, operation):
     """
     Replace operation inserts a sequence of new nodes.
@@ -304,8 +209,54 @@ def replace_operation(graph, id_ro, trigger, operation):
         trigger (list): List of triggering nodes.
         operation (object): The operation object
     """
-    edge_to_successors = add_all_new_nodes(graph, id_ro, trigger, operation)
-    add_all_new_edges(graph, operation, edge_to_successors)
+    #Previously, we simply retrieved the node as specified in the RO, assuming that
+    #the label of the equivalent node in the AG is the same. Now we use a matching
+    #process to reconcile the term in the RO with the node label in the AG.
+    #existing_node = operation[EXISTING_NDOE]
+
+    base_node_id = find_match(graph, operation)
+    logging.debug(f"base = {base_node_id}")
+    
+    # Add a sequence of nodes defined in a revision operator
+    new_node_ids = []
+    for n in operation[NEW_NODES]:
+        # taking node id and the rest of its attributes
+        new_node = {**n}
+        new_node_id = new_node["id"]
+        new_node_type = new_node[TYPE_ATTR]
+
+        if new_node_type == ACTION_NODE:
+            new_node[IS_ORIGINAL_ATTR] = False
+
+        new_node.pop("id", None)
+        new_node.pop(TYPE_ATTR, None)
+        new_node.pop(PREDECESSORS, None)
+        new_node.pop(SUCCESSORS, None)
+        new_node.pop(EDGE_TO_SUCCESSORS, None)
+
+        graph.add_node(new_node_id, type=new_node_type, idRO=id_ro, trigger=trigger, **new_node)
+        logging.debug(f"adding node = {new_node_id} | {new_node_type} | {new_node}")
+        if new_node_ids != []:
+            graph.add_edge(new_node_ids[-1], new_node_id)
+            logging.debug(f"adding edge = {new_node_ids[-1]} -> {new_node_id}")
+
+        new_node_ids.append(new_node_id)
+
+    # Connect base predecessors to the first new node
+    for pred_node_id in graph.predecessors(base_node_id):
+        edge_data = graph.get_edge_data(pred_node_id, base_node_id)
+        edge_data = edge_data[0] if edge_data else {}
+        if not graph.has_edge(pred_node_id, new_node_ids[0]):
+            graph.add_edge(pred_node_id, new_node_ids[0], **edge_data)
+            logging.debug(f"adding edge = {pred_node_id} -> {new_node_ids[0]} | {edge_data}")
+
+    # Connect the last new node to base successors
+    for succ_node_id in list(graph.successors(base_node_id)):
+        edge_data = graph.get_edge_data(base_node_id, succ_node_id)
+        edge_data = edge_data[0] if edge_data else {}
+        if not graph.has_edge(new_node_ids[-1], succ_node_id):
+            graph.add_edge(new_node_ids[-1], succ_node_id, **edge_data)
+            logging.debug(f"adding edge = {new_node_ids[-1]} -> {succ_node_id} | {edge_data}")
 
 
 def delete_operation(graph, operation):

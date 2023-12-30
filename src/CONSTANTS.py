@@ -20,7 +20,7 @@ IS_IN_PARALLEL = "is_in_parallel"
 IS_ALTERNATIVE = "is_alternative"
 TRIGGER = "trigger"
 PARALLEL_START_ATTR = "parallelStartNode"
-PARLLEL_END_ATTR = "parallelEndNode"
+PARALLEL_END_ATTR = "parallelEndNode"
 
 TRIGGER_CONDITION = "triggercondition"
 
@@ -37,7 +37,7 @@ REPLACE_OPERATION = "replace"
 ID_RO = "idRO"
 OPERATIONS = "operations"
 NEW_NODES = "newNodes"
-EXISTRING_NDOE = "existingNode"
+EXISTING_NDOE = "existingNode"
 PREDECESSORS = "predecessors"
 EDGE_TO_SUCCESSORS = "edgeToSuccessors"
 EDGE_TO_SUCCESSORS_ATTR = "edgeToSuccessorsAttr"
@@ -68,5 +68,11 @@ DEFAULT_PATIENT_VALUE = "default_value"
 
 # Metrics
 METRIC_COST = "cost"
-METRIC_BURDEN = "burden"
-METRIC_NON_ADHERENCE = "nonAdherence"
+METRIC_BURDEN = "burdenCost"
+METRIC_NON_ADHERENCE = "nonAdherenceCost"
+METRIC_EXEC_COST = "execCost"
+
+# Temporal properties
+TIME_START = "startTimeCost"
+TIME_END = "endTimeCost"
+TIME_DURATION = "durationCost"

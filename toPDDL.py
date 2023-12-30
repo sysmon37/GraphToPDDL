@@ -1,6 +1,7 @@
 from src.script import run_to_pddl
 import argparse as ap
 import traceback
+import logging
 
 
 if __name__ == "__main__":
@@ -33,6 +34,13 @@ if __name__ == "__main__":
         help="Domain name.",
     )
 
+    parser.add_argument(
+        "--log",
+        type=str,
+        default="INFO",
+        help="Logging level"
+    )
+
     # parser.add_argument(
     #     "--no-ro",
     #     action="store_true",
@@ -62,6 +70,10 @@ if __name__ == "__main__":
 
         if args.p != None and args.p[-4:].lower() != "json":
             raise Exception("The Revision operators file (--ro) must be a JSON file.")
+        
+        log_level = getattr(logging, args.log.upper(), logging.INFO)
+        logging.basicConfig(level=log_level, format='%(levelname)s %(asctime)s: %(message)s')
+
         run_to_pddl(args.ag, args.ro, args.p, args.p_name, args.d_name, args.dir)
     except Exception as e:
         print(e)

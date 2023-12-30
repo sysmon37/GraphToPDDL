@@ -5,6 +5,7 @@ from src.CONSTANTS import (
     CONTEXT_NODE,
     ID_RO,
     IS_ORIGINAL_ATTR,
+    METRIC_EXEC_COST,
     PARALLEL_NODE,
     RANGE_ATTR,
     TRIGGER,
@@ -12,20 +13,25 @@ from src.CONSTANTS import (
     DEFAULT_PATIENT_VALUE,
     METRIC_COST,
     METRIC_BURDEN,
-    METRIC_NON_ADHERENCE
+    METRIC_NON_ADHERENCE,
+    TIME_START, 
+    TIME_END,
+    TIME_DURATION
 )
 from src.utils import (
     find_goal_node,
     find_init_node,
     find_parallel_path,
     match_nodes_to_disease,
-    find_revId_involved_nodes,
+    find_revision_involved_nodes,
     get_all_metrics,
     get_all_revIds,
     get_metric_name,
     get_type_nodes,
     get_number_parallel_paths,
+    pascal_case,
 )
+import logging
 
 
 def write_objects(graph, file):
@@ -101,7 +107,7 @@ def write_initial_state(graph, file, ros, patient_values):
     file.write("\n")
     file.write("\t(= (numGoals) {})\n".format(len(get_type_nodes(graph, GOAL_NODE))))
 
-    # nodeCost - ask with afib example for different costs
+    # write node metrics and temporal properties (ugly fix)
     file.write("\n")
     write_node_cost(graph, file)
 
@@ -205,8 +211,7 @@ def write_total_metrics(graph, file):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     """
-    metrics = get_all_metrics(graph)
-    for metric in add_default_metrics(metrics):
+    for metric in get_all_metrics(graph, exclude=[TIME_START, TIME_END]):
         metric_name = get_metric_name(metric)
         file.write("\t(= (total-{}) 0)\n".format(metric_name.lower()))
 
@@ -246,9 +251,6 @@ def write_decision_branch(graph, file):
             )
 
 
-def add_default_metrics(metrics):
-    return metrics + [m for m in [METRIC_COST, METRIC_BURDEN, METRIC_NON_ADHERENCE] if m not in metrics]
-
 def write_node_cost(graph, file):
     """
     Writes node costs predicates.
@@ -257,19 +259,13 @@ def write_node_cost(graph, file):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
     """
-    init_nodes = get_type_nodes(graph, CONTEXT_NODE)
-    metrics = get_all_metrics(graph)
+    context_nodes = get_type_nodes(graph, CONTEXT_NODE)
     # We add default metrics to make the code work with old examples where only cost is specified
-    for metric in add_default_metrics(metrics):
-        for node, attr in graph.nodes.items():
-            if node not in init_nodes:
-                metric_name = get_metric_name(metric)
-                metric_name = metric_name[0].upper() + metric_name[1:]
-                file.write(
-                    "\t(= (node{} {}) {})\n".format(
-                        metric_name, node, attr.get(metric, 0)
-                    )
-                )
+    for metric in get_all_metrics(graph):
+        pddl_metric = f'node{pascal_case(get_metric_name(metric))}'
+        for node_id, node_attr in graph.nodes.items():
+            if node_id not in context_nodes:
+                file.write(f"\t(= ({pddl_metric} {node_id}) {node_attr.get(metric, 0)})\n")
         file.write("\n")
 
 
@@ -321,7 +317,9 @@ def write_metric(graph, file):
     """
     file.write("(:metric minimize")
 
-    metrics = get_all_metrics(graph)
+    # Duration is considered as one of the total metrics
+    metrics = get_all_metrics(graph, exclude=[TIME_START, TIME_END])
+    logging.debug(f"available metrics = {metrics}")
     if len(metrics) > 1:
        file.write("\n\t(+ ")
 
@@ -363,7 +361,7 @@ def write_revision_flags(graph, file, ros):
     disease = get_type_nodes(graph, CONTEXT_NODE)
     for ro in ros:
         revId = ro["id"]
-        nodes_to_flag = find_revId_involved_nodes(graph, revId)
+        nodes_to_flag = find_revision_involved_nodes(graph, revId)
         for node, attr in graph.nodes.items():
             if attr.get(TYPE_ATTR) == CONTEXT_NODE:
                 continue
@@ -441,6 +439,7 @@ def write_any_no_revision_ops(graph, file, ros):
     diseases = get_type_nodes(graph, CONTEXT_NODE)
     any_revision_ops = []
 
+    logging.info(f"triggers = {all_triggers}")
     for trigger in all_triggers:
         disease = find_init_node(graph, trigger)
 
