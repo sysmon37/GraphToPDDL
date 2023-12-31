@@ -78,7 +78,7 @@ def update_graph_with_ROs(graph, ros):
                         return
         #print(condition)
 
-
+        logging.info(f"applying revision operator {id}")
         operations = ro[OPERATIONS]
         for op in operations:
             type = op[TYPE_ATTR]
@@ -110,7 +110,7 @@ def check_trigger_condition(trigger, graph, operation):
         ((node1_start <= node0_start) and (node1_end >= node0_start)) or
         ((node1_start <= node0_end) and (node1_end >= node0_end))):
 
-        print('overlap!')
+        logging.debug(f'overlap {node0} & {node1}')
 
         #Typically we need to modify action node durations when an overlap exists.
         for node in operation[NEW_NODES]:
@@ -136,7 +136,7 @@ def check_trigger_condition(trigger, graph, operation):
                 else:
                     #Error: there must be some ref specified.
                     sreftime = 0
-                    print('ERROR')
+                    logging.error('no ref specified')
 
                 stime = sreftime + schange
 
@@ -152,7 +152,7 @@ def check_trigger_condition(trigger, graph, operation):
                 else:
                     #Error: there must be some ref specified.
                     ereftime = 0
-                    print('ERROR')
+                    logging.error('no ref specified')
 
                 etime = ereftime + echange
 
@@ -164,7 +164,7 @@ def check_trigger_condition(trigger, graph, operation):
                 #node['durationCost'] = operation[OFFSET]
                 node['durationCost'] = str(etime - stime)
 
-                print(node['durationCost'])
+                logging.debug(f"duration = {node['durationCost']}")
 
     return 1
 
@@ -176,15 +176,14 @@ def find_match(graph, operation):
     #the same term/label. For now, we assume that an applicable RO always refers
     #to nodes such that an equivalent node exists in the AG.
     ro_existing_node = operation[EXISTING_NDOE]
-    print("RO node:")
-    print(ro_existing_node)
+    logging.debug(f"finding match for {ro_existing_node}")
 
     matched = False
     graphnodeslist = list(graph.nodes)
 
     for v in graphnodeslist:
         if v == ro_existing_node or match_terms(v, ro_existing_node):
-            print("matched!")
+            logging.info(f"found match {v} = {ro_existing_node}")
             matched = True
             break
 
@@ -192,7 +191,8 @@ def find_match(graph, operation):
         existing_node = v
         return existing_node
     else:
-        print("No match found")
+        logging.debug(f"found no match {ro_existing_node}")
+        return None
 
 
 def replace_operation(graph, id_ro, trigger, operation):
@@ -215,7 +215,7 @@ def replace_operation(graph, id_ro, trigger, operation):
     #existing_node = operation[EXISTING_NDOE]
 
     base_node_id = find_match(graph, operation)
-    logging.debug(f"base = {base_node_id}")
+    logging.info(f"applying replace operation: base = {base_node_id}")
     
     # Add a sequence of nodes defined in a revision operator
     new_node_ids = []
@@ -271,7 +271,7 @@ def delete_operation(graph, operation):
     #Find a match in the AG for the existing node to delete specified in the RO
     #node_to_delete = operation[EXISTRING_NDOE]
     node_to_delete = find_match(graph, operation)
-    print(node_to_delete)
+    logging.info(f"applying delete operation: base = {node_to_delete}")
 
 
     predecessors = graph.predecessors(node_to_delete)
@@ -297,6 +297,8 @@ def add_operation(graph, idRO, trigger, operation):
         operation (str): The operation object
     """
 
+    logging.info("applying add operation")
+    
     addedNodes = operation[NEW_NODES]
 
     # for predecessor in predecessors:

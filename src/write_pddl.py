@@ -95,7 +95,7 @@ def write_initial_state(graph, file, ros, patient_values):
     write_all_revisions_pass(graph, file)
 
     # numRevisionIDs
-    write_num_revision_Ids(graph, file)
+    write_num_revision_ids(graph, file)
     file.write("\n")
 
     # anyRevisionOps | noRevisionOps
@@ -385,7 +385,7 @@ def write_revision_flags(graph, file, ros):
         file.write("\n")
 
 
-def write_num_revision_Ids(graph, file):
+def write_num_revision_ids(graph, file):
     """
     Writes the numRevisionIDs predicate to the PDDL file.
 
@@ -439,7 +439,7 @@ def write_any_no_revision_ops(graph, file, ros):
     diseases = get_type_nodes(graph, CONTEXT_NODE)
     any_revision_ops = []
 
-    logging.info(f"triggers = {all_triggers}")
+    logging.debug(f"triggers = {all_triggers}")
     for trigger in all_triggers:
         disease = find_init_node(graph, trigger)
 
