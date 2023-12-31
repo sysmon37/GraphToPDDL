@@ -10,10 +10,17 @@ from src.CONSTANTS import (
     IS_ALTERNATIVE,
     IS_IN_PARALLEL,
     IS_ORIGINAL_ATTR,
+    METRIC_BURDEN,
+    METRIC_COST,
+    METRIC_EXEC_COST,
+    METRIC_NON_ADHERENCE,
     PARALLEL_NODE,
     PARALLEL_START_ATTR,
-    PARLLEL_END_ATTR,
+    PARALLEL_END_ATTR,
     RANGE_ATTR,
+    TIME_DURATION,
+    TIME_END,
+    TIME_START,
     TRIGGER,
     TYPE_ATTR,
 )
@@ -87,7 +94,7 @@ def get_metric_name(metric):
         str: Name of the metric.
 
     """
-    metric_name = metric if metric == "cost" else metric.replace("Cost", "")
+    metric_name = metric if metric in [METRIC_COST, METRIC_EXEC_COST] else metric.replace("Cost", "")
     return metric_name
 
 
@@ -130,7 +137,7 @@ def get_number_parallel_paths(graph):
             n_path_found[find_init_node(graph, node)] = 0
         if attributes.get(PARALLEL_START_ATTR) == True:
             p_start = node
-        if attributes.get(PARLLEL_END_ATTR) == True:
+        if attributes.get(PARALLEL_END_ATTR) == True:
             p_end = node
         if p_start != "" and p_end != "":
             parallel_sequence = list(
@@ -183,7 +190,7 @@ def find_parallel_path(graph, p_nodes_found):
                     if end_node not in end_nodes:
                         end_nodes.append(end_node)
                         parallelNode += "(parallelEndNode {})\n\t".format(end_node)
-                        graph.nodes[end_node][PARLLEL_END_ATTR] = True
+                        graph.nodes[end_node][PARALLEL_END_ATTR] = True
 
                     # for path in parallel_sequence:
                     (
@@ -294,7 +301,7 @@ def update_between_parallel_nodes(
     )
 
 
-def get_all_metrics(graph):
+def get_all_metrics(graph, add_default = True, exclude = []):
     """
     Finds all the metrics.
 
@@ -315,7 +322,10 @@ def get_all_metrics(graph):
             attr for attr in graph.nodes[node] if attr.lower().find("cost") != -1
         ]
         metrics.extend(node_metrics)
-    return list(set(metrics))
+    metrics = list(set(metrics))
+    if add_default:
+        metrics = metrics + [m for m in [METRIC_EXEC_COST, METRIC_COST, METRIC_BURDEN, METRIC_NON_ADHERENCE, TIME_START, TIME_END, TIME_DURATION] if m not in metrics]
+    return [m for m in metrics if m not in exclude]
 
 
 def get_all_revIds(graph):
@@ -336,7 +346,7 @@ def get_all_revIds(graph):
     return revIds
 
 
-def find_revId_involved_nodes(graph, revId):
+def find_revision_involved_nodes(graph, rev_id):
     """
     Finds all the nodes involved in a given revision ID. This includes the list of triggering nodes and the inserted nodes
 
@@ -347,25 +357,13 @@ def find_revId_involved_nodes(graph, revId):
     Returns:
         list: List of node's name.
     """
-    nodes = []
-    for node, attr in graph.nodes.items():
-        node_revId = attr.get(ID_RO, False)
-        if node_revId and node_revId == revId:
-            nodes.extend(attr.get(TRIGGER))
-            parent_nodes = list(graph.predecessors(node))
-            # Loop over all the parents of the existing node
-            for parent_node in parent_nodes:
-                children = list(graph.successors(parent_node))
-                while len(children) > 0:
-                    child = children.pop()
-                    child_attr = graph.nodes[child]
-                    child_id_ro = child_attr.get(ID_RO, None)
-                    # need to check the revision flags when the added nodes are not just action nodes
-                    if child_id_ro and child_id_ro != revId:
-                        print(revId, child)
-                        nodes.append(child)
-                        children.extend(list(graph.successors(child)))
-    return list(set(nodes))
+    nodes = set()
+    for node_id, node_attr in graph.nodes.items():
+        node_rev_id = node_attr.get(ID_RO, None)
+        if node_rev_id and node_rev_id == rev_id:
+            nodes.update(node_attr.get(TRIGGER))
+            break
+    return list(nodes)
 
 
 def match_nodes_to_disease(graph):
@@ -394,7 +392,7 @@ def match_nodes_to_disease(graph):
         ro_disease[disease] = set()
 
     for revId in revIds:
-        nodes = find_revId_involved_nodes(graph, revId)
+        nodes = find_revision_involved_nodes(graph, revId)
         diseases_involved = []
         for node in nodes:
             diseases_involved.append(find_init_node(graph, node))
@@ -421,3 +419,9 @@ def handle_alternative_nodes(graph):
             graph.nodes[node][IS_ALTERNATIVE] = True
             for succ in graph.successors(node):
                 graph.edges[node, succ, 0][RANGE_ATTR] = "0..1"
+
+
+def pascal_case(str):
+    if str == "":
+        return ""
+    return str[0].upper() + str[1:]
