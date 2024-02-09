@@ -135,6 +135,7 @@ dmypy.json
 
 # macOS files and folders
 **/__MACOSX/
+.DS_Store
 
 # test and temp folders
 ./test
