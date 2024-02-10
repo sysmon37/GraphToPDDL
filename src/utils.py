@@ -1,4 +1,7 @@
 import networkx as nwx
+import logging
+
+import networkx as nx
 
 from src.CONSTANTS import (
     ACTION_NODE,
@@ -211,12 +214,12 @@ def find_parallel_path(graph, p_nodes_found):
 
 
 def update_between_parallel_nodes(
-    graph,
-    start_node,
-    end_node,
-    parallelTypeNode,
-    untraversedParallelNode,
-    numParallelPaths=0,
+        graph,
+        start_node,
+        end_node,
+        parallelTypeNode,
+        untraversedParallelNode,
+        numParallelPaths=0,
 ):
     """
     Updates the PDDL representation of the parallel nodes between a parallel start node and a parallel end node.
@@ -234,10 +237,13 @@ def update_between_parallel_nodes(
     Returns:
         str: PDDL representation of the parallel nodes.
     """
-    if start_node == end_node:
+
+    logging.debug(f"update_between_parallel_nodes: [{start_node}] => [{end_node}]")
+    if (start_node == end_node
+            or isinstance(start_node, str) and not nx.has_path(graph, start_node, end_node)):
         return parallelTypeNode, untraversedParallelNode
 
-    if type(start_node) == str:
+    if isinstance(start_node, str):
         first_path, *path_list = graph.out_edges(start_node)
     else:
         first_path, *path_list = start_node
@@ -301,7 +307,7 @@ def update_between_parallel_nodes(
     )
 
 
-def get_all_metrics(graph, add_default = True, exclude = []):
+def get_all_metrics(graph, add_default=True, exclude=[]):
     """
     Finds all the metrics.
 
@@ -324,7 +330,9 @@ def get_all_metrics(graph, add_default = True, exclude = []):
         metrics.extend(node_metrics)
     metrics = list(set(metrics))
     if add_default:
-        metrics = metrics + [m for m in [METRIC_EXEC_COST, METRIC_COST, METRIC_BURDEN, METRIC_NON_ADHERENCE, TIME_START, TIME_END, TIME_DURATION] if m not in metrics]
+        metrics = metrics + [m for m in
+                             [METRIC_EXEC_COST, METRIC_COST, METRIC_BURDEN, METRIC_NON_ADHERENCE, TIME_START, TIME_END,
+                              TIME_DURATION] if m not in metrics]
     return [m for m in metrics if m not in exclude]
 
 

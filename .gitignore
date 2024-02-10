@@ -140,3 +140,9 @@ dmypy.json
 # test and temp folders
 ./test
 ./temp
+
+# Visual Studio Code
+.vscode
+
+# PyCharm
+.idea
