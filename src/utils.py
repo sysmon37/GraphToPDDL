@@ -433,3 +433,17 @@ def pascal_case(str):
     if str == "":
         return ""
     return str[0].upper() + str[1:]
+
+def get_data_items(graph, patient_values):
+    """
+    Returns data items with associated decision nodes and values
+    Args:
+        graph: a graph
+        patient_values: a dictionary with all patient values (item: value)
+    Returns:
+        a list of triples (data_item, decision_node, value)
+
+    """
+    return [(item, node, patient_values[item])
+            for node, attr in graph.nodes.items() if attr[TYPE_ATTR] == DECISION_NODE
+            for item in [attr[DATA_ITEM_ATTR]]]

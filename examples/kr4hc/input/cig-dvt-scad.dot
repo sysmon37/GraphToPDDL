@@ -1,0 +1,89 @@
+digraph dvt_scad {
+    node [shape=box]
+
+    // ========================================================================
+    // SCAD
+
+    // Context
+    SCAD [type=context];
+
+    // Decisions
+    HEMOSTABLE [type=decision, dataItem=DATA_HEMOSTABLE]
+    RENALFAILURE [type=decision, dataItem=DATA_RENALFAILURE]
+
+    // Actions
+    UFHALT [type=action]
+    DOAC [type=action]
+    UFHWARF [type=action]
+    WARFARIN [type=action]
+    FOLLOWUPVISIT [type=action]
+
+    // Goals
+    G_SCAD [type=goal]
+
+    // Edges
+    SCAD -> HEMOSTABLE
+    HEMOSTABLE -> UFHALT [range=0..0, label=NO]
+    HEMOSTABLE -> RENALFAILURE [range=1..1,label=YES]
+    UFHALT -> DOAC
+    RENALFAILURE -> DOAC [range=0..0, label=NO]
+    RENALFAILURE -> UFHWARF [range=1..1 ,label=YES]
+    UFHWARF -> WARFARIN
+    DOAC -> G_SCAD
+    WARFARIN -> FOLLOWUPVISIT
+    FOLLOWUPVISIT -> G_SCAD
+
+
+    // ========================================================================
+    // DVT
+    
+    // Context
+    DVT [type=context]
+
+    // Goals
+    G_DVT [type=goal]
+
+    // Decisions
+    EVENTRISK [type=decision, dataItem=DATA_EVENTRISK]
+    STENOSIS [type=decision, dataItem=DATA_STENOSIS]
+    PHARMAPREF [type=decision, dataItem=DATA_PHARMAPREF]
+    SYMPTOMSIMPROVE [type=decision, dataItem=DATA_SYMPTOMSIMPROVE]
+    RENALCOMPLICATION [type=decision, dataItem=DATA_RENALCOMPLICATION]
+
+    // Actions
+    CORONARYANGIO [type=action]
+    REVASC [type=action]
+    EVENTPREVENT1 [type=action]
+    NITRATES1 [type=action]
+    NITRATES2 [type=action]
+    ASPIRIN [type=action]
+    CCB [type=action, execCost=10]
+    BB [type=action, execCost=50]
+    EVENTPREVENT2 [type=action]
+    ACEINHIB [type=action]
+
+    // Edges
+    DVT -> EVENTRISK
+    EVENTRISK -> CORONARYANGIO [range=2..2, label=HIGH]
+    EVENTRISK -> STENOSIS [range=1..1, label=INTERMEDIATE]
+    EVENTRISK -> EVENTPREVENT1 [range=0..0, label=LOW]
+    CORONARYANGIO -> REVASC
+    STENOSIS -> REVASC [range=1..1, label=YES]
+    STENOSIS -> PHARMAPREF [range=0..0, label=NO]
+    PHARMAPREF -> REVASC [range=0..0, label=NO]
+    PHARMAPREF -> EVENTPREVENT1 [range=1..1, label=YES]
+    EVENTPREVENT1 -> NITRATES1
+    NITRATES1 -> ASPIRIN
+    ASPIRIN -> CCB
+    ASPIRIN -> BB
+    CCB -> SYMPTOMSIMPROVE
+    BB -> SYMPTOMSIMPROVE
+    SYMPTOMSIMPROVE -> EVENTPREVENT2 [range=1..1, label=YES]
+    SYMPTOMSIMPROVE -> REVASC [range=0..0, label=NO]
+    REVASC -> NITRATES2
+    NITRATES2 -> RENALCOMPLICATION
+    RENALCOMPLICATION -> ACEINHIB [range=1..1, label=YES]
+    RENALCOMPLICATION -> EVENTPREVENT2 [range=0..0, label=NO]
+    ACEINHIB -> EVENTPREVENT2
+    EVENTPREVENT2 -> G_DVT
+}

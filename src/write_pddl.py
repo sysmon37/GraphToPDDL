@@ -30,29 +30,32 @@ from src.utils import (
     get_type_nodes,
     get_number_parallel_paths,
     pascal_case,
+    get_data_items
 )
 import logging
 
 
-def write_objects(graph, file):
+def write_objects(graph, file, data_items: dict):
     """
     Writes the objects (disease, node and revId) to the file.
 
     Args:
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
+        data_items (dict): Dictionary of data items
     """
     disease = get_type_nodes(graph, CONTEXT_NODE)
     nodes = [
         node for node in graph.nodes if graph.nodes[node][TYPE_ATTR] != CONTEXT_NODE
     ]
     file.write("(:objects {} - disease\n".format(" ".join(disease)))
-    file.write("\t" * 3 + "{} - node\n".format(" ".join(nodes)))
-    file.write("\t" * 3 + "{} - revId\n".format(" ".join(get_all_revIds(graph))))
+    file.write("\t"*3 + f"{' '.join(nodes)} - node\n")
+    file.write("\t"*3 + f"{' '.join(get_all_revIds(graph))} - revId\n")
+    file.write("\t"*3 + f"{' '.join([d[0] for d in data_items])} - DataItem\n")
     file.write(")\n")
 
 
-def write_initial_state(graph, file, ros, patient_values):
+def write_initial_state(graph, file, ros, data_items: dict):
     """
     Writes all the predicates of the initial (:init) state to the file.
 
@@ -62,7 +65,8 @@ def write_initial_state(graph, file, ros, patient_values):
         graph (networkx graph): The graph.
         file (TextIOWrapper): The PDDL file.
         ros (list) : List of revision operators.
-        patient_values (dict) : Dictonary of the patient values.
+        data_items (dict): Dictionary of data items
+        patient_values (dict) : Dictionary of the patient values.
 
     """
     file.write("(:init ")
@@ -70,11 +74,15 @@ def write_initial_state(graph, file, ros, patient_values):
     write_decision_branch(graph, file)
     file.write("\n")
 
-    # patient value
-    if patient_values:
-        patient_values[DEFAULT_PATIENT_VALUE] = 0
-        write_patient_values(graph, file, patient_values)
-        file.write("\n")
+    # data items
+    for item, node, _ in data_items:
+        file.write(f"\t(dataItem {node} {item})\n")
+    file.write("\n")
+
+    # data values
+    for item, _, value in data_items:
+        file.write(f"\t(= (dataValue {item}) {value})\n")
+    file.write("\n")
 
     # noPrevious nodes
     write_not_previous_node(graph, file)
@@ -398,33 +406,6 @@ def write_num_revision_ids(graph, file):
         file.write("\t(= (numRevisionIDs {}) {})\n".format(disease, len(ro)))
 
 
-def write_patient_values(graph, file, patient_values):
-    """
-    Writes the patient value predicate. There is one predicate per successor
-    each decision node.
-
-    Args:
-        graph (networkx graph): The graph.
-        file (TextIOWrapper): The PDDL file.
-        patient_values (dict) : Dictonary of the patient values.
-
-    """
-    for node, attr in graph.nodes.items():
-        if attr[TYPE_ATTR] == DECISION_NODE:
-            disease = find_init_node(graph, node)
-            file.write(
-                "\n\t;; {} = {}\n".format(
-                    attr[DATA_ITEM_ATTR], patient_values[attr[DATA_ITEM_ATTR]]
-                )
-            )
-            for successor in graph.successors(node):
-                file.write(
-                    "\t(= (patientValue {} {} {}) {})\n".format(
-                        disease, node, successor, patient_values[attr[DATA_ITEM_ATTR]]
-                    )
-                )
-
-
 def write_any_no_revision_ops(graph, file, ros):
     """
     Writes anyRevisionOps or noRevsionOps predicates.
@@ -473,11 +454,14 @@ def outputPDDL(graph, ros, patient_values, problem_name, domain_name, output_dir
         pddl.write(("\t(:domain  {})\n").format(domain_name))
 
         # objects
-        write_objects(graph, pddl)
+        data_items = get_data_items(graph, patient_values)
+        logging.debug(f"data items = [{'|'.join([f'{item}@{node} = {value}' for item, node, value in data_items])}]")
+
+        write_objects(graph, pddl, data_items)
 
         # :init
         pddl.write("\n")
-        write_initial_state(graph, pddl, ros, patient_values)
+        write_initial_state(graph, pddl, ros, data_items)
 
         # :goal
         pddl.write("\n")
