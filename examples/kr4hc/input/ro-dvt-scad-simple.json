@@ -1,0 +1,47 @@
+[
+    {
+        "id": "ro1",
+        "trigger": [
+            "DOAC",
+            "CCB"
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "DOAC",
+                "newNodes": [
+                    {
+                        "id": "rev_DOAC",
+                        "type": "action"
+                    }, 
+                    {
+                        "id": "rev_FOLLOWUPVISIT",
+                        "type": "action"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "ro2_1",
+        "trigger": [
+            "rev_DOAC"
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "rev_DOAC",
+                "newNodes": [
+                    {
+                        "id": "rev_LMWHWARFARIN_1",
+                        "type": "action"
+                    }, 
+                    {
+                        "id": "rev_WARFARIN_1",
+                        "type": "action"
+                    }
+                ]
+            }
+        ]
+    }
+]
