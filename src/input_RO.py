@@ -61,25 +61,27 @@ def update_graph_with_ROs(graph, ros):
     for ro in ros:
         id, trigger, operations = itemgetter("id", TRIGGER, OPERATIONS)(ro)
         # This is to make the code work with old examples before introducing trigger condition
-        trigger_condition = ro.get(TRIGGER_CONDITION, "")
+        trigger_condition = ro.get(TRIGGER_CONDITION, [])
 
         #If no triggering conditions are specified then continue with RO as is.
         #If a triggering condition is specified then check if the condition is met.
         #If the condition is met, proceed with RO. Otherwise do not apply the RO.
 
-        for condition in trigger_condition:
-            if condition == "":
-                break
-            else:
-                for op in operations:
-                    if check_trigger_condition(trigger, graph, op):
-                        break
-                    else:
-                        return
+        # FIXME This loop is unclear and seems to be invalid. Exclude for now and show warning.
+        if trigger_condition:
+            logging.warning(f"Trigger condition [{'|'.join(trigger_condition)}] is ignored")
+        # for condition in trigger_condition:
+        #     if condition == "":
+        #         break
+        #     else:
+        #         for op in operations:
+        #             if check_trigger_condition(trigger, graph, op):
+        #                 break
+        #             else:
+        #                 return
         #print(condition)
 
         logging.info(f"applying revision operator {id}")
-        operations = ro[OPERATIONS]
         for op in operations:
             type = op[TYPE_ATTR]
             if type == REPLACE_OPERATION:
