@@ -147,3 +147,4 @@ dmypy.json
 # PyCharm
 .idea
 
+/bin

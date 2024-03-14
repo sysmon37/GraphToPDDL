@@ -4,8 +4,6 @@
 (:types disease node revID DataItem - object)
 
 (:predicates (treatmentPlanReady ?x - disease ?goal - node)
-             (noPreviousAction ?x - disease)
-             (noPreviousDecision ?x - disease)
 
              (tentativeGoal ?x - disease ?goal - node)
              (reachedGoal ?x - disease ?goal - node)
@@ -18,13 +16,16 @@
              (currentNode ?x - disease ?current - node)
 
              (originalAction ?act - node)
-             (revisionAction ?act - node)
+             (revisionAction ?act - node ?rev_op - revID)
 
              (revisionIDCounted ?x - disease ?prec - node ?succ - node)
              (anyRevisionOps ?x - disease)
              (noRevisionOps ?x - disease)
 ; Associates a data item with a specific decision node
              (dataItem ?n - node ?item - DataItem)
+
+             (transitionFromNode ?d - disease ?from - node ?to - node)
+             (transitionToNode ?d - disease ?to - node)
 
 )
 
@@ -64,219 +65,154 @@
             (dataValue ?item - DataItem)
 )
 
+;; Activate initial node
+(:action activate-initial-node
+     :parameters (?d - disease ?node - node)
 
-;;
-;;The first decision node encountered by the planner.
-;;
-(:durative-action makeFirstDecision :parameters(?x - disease ?from_node - node ?to_node - node ?item - DataItem)
+     :precondition (and
+          (initialNode ?d ?node)
+     )
 
-  :duration (= ?duration 0)
+     :effect (and
+          (not (initialNode ?d ?node))
+          (transitionToNode ?d ?node)
+     )
+)
 
-  :condition (and 
-                    (at start (noPreviousDecision ?x))                    
-                    (at start (dataItem ?from_node ?item))
-                    (at start (>= (dataValue ?item) (decisionBranchMin ?x ?from_node ?to_node)))
-                    (at start (<= (dataValue ?item) (decisionBranchMax ?x ?from_node ?to_node)))
-                    (at start (initialNode ?x ?from_node))
-                    (at start (decisionNode ?from_node))
-                    (at start (predecessorNode ?from_node ?to_node))
-             )
+;; Post-process action node
+(:action post-process-action-node
+     :parameters (?d - disease ?from_node - node ?to_node - node)
 
-  :effect (and (at end (not (noPreviousDecision ?x)))
-               (at end (currentNode ?x ?to_node))
-               (at end (increase (total-execcost) (nodeExecCost ?from_node)))
-               (at end (increase (total-cost) (nodeCost ?from_node)))
-               (at end (increase (total-burden) (nodeBurden ?from_node)))
-               (at end (increase (total-nonadherence) (nodeNonAdherence ?from_node)))
-          )
+     :precondition (and
+          (transitionFromNode ?d ?from_node ?to_node)
+          (actionNode ?from_node)
+     )
+
+     :effect (and
+          (not (transitionFromNode ?d ?from_node ?to_node))
+          (transitionToNode ?d ?to_node)
+          (increase (total-execcost) (nodeExecCost ?from_node))
+          (increase (total-cost) (nodeCost ?from_node))
+          (increase (total-burden) (nodeBurden ?from_node))
+          (increase (total-nonadherence) (nodeNonAdherence ?from_node))
+     )
+)
+
+;; Post-process other node
+(:action post-process-other-node
+     :parameters (?d - disease ?from_node - node ?to_node - node)
+
+     :precondition (and
+          (transitionFromNode ?d ?from_node ?to_node)
+          (not (actionNode ?from_node))
+     )
+
+     :effect (and
+          (not (transitionFromNode ?d ?from_node ?to_node))
+          (transitionToNode ?d ?to_node)
+     )
+)
+
+;; Pre-process goal node
+(:action pre-process-goal-node
+     :parameters (?d - disease ?to_node - node)
+
+     :precondition (and
+          (transitionToNode ?d ?to_node)
+          (goalNode ?d ?to_node)
+     )
+
+     :effect (and
+        (not (transitionToNode ?d ?to_node))
+        (currentNode ?d ?to_node)
+        (increase (tentativeGoalCount) 1)
+        (tentativeGoal ?d ?to_node)
+     )
+)
+
+;; Pre-process goal node
+(:action pre-process-other-node
+     :parameters (?d - disease ?to_node - node)
+
+     :precondition (and
+          (transitionToNode ?d ?to_node)
+          (not (goalNode ?d ?to_node))
+     )
+
+     :effect (and
+        (not (transitionToNode ?d ?to_node))
+        (currentNode ?d ?to_node)
+     )
 )
 
 ;;
 ;;Going from a decision node to an action node.
 ;;
-(:durative-action makeDecisionToNode :parameters(?x - disease ?from_node - node ?to_node - node ?item - DataItem)
+(:durative-action make-decision :parameters(?x - disease ?from_node - node ?to_node - node ?item - DataItem)
 
   :duration (= ?duration 0)
 
   :condition (and 
+                    (at start (currentNode ?x ?from_node))
+                    (at start (predecessorNode ?from_node ?to_node))
+                    (at start (decisionNode ?from_node))
                     (at start (dataItem ?from_node ?item))
                     (at start (>= (dataValue ?item) (decisionBranchMin ?x ?from_node ?to_node)))
                     (at start (<= (dataValue ?item) (decisionBranchMax ?x ?from_node ?to_node)))
-                    (at start (decisionNode ?from_node))
-                    (at start (actionNode ?to_node))
-                    (at start (predecessorNode ?from_node ?to_node))
-                    (at start (currentNode ?x ?from_node))
              )
 
-  :effect (and (at end (not (currentNode ?x ?from_node)))
-               (at end (currentNode ?x ?to_node))
-               (at end (increase (total-execcost) (nodeExecCost ?from_node)))
-               (at end (increase (total-cost) (nodeCost ?from_node)))
-               (at end (increase (total-burden) (nodeBurden ?from_node)))
-               (at end (increase (total-nonadherence) (nodeNonAdherence ?from_node)))
+  :effect (and
+                (at end (not (currentNode ?x ?from_node)))
+                (at end (transitionFromNode ?x ?from_node ?to_node))
           )
 )
 
 ;;
-;;Going from a decision node to a decision node.
+;; Take original action
 ;;
-(:durative-action makeDecisionToDecisionNode :parameters(?x - disease ?from_node - node ?to_node - node ?item - DataItem)
-
-  :duration (= ?duration 0)
-
-  :condition (and 
-                    (at start (dataItem ?from_node ?item))
-                    (at start (>= (dataValue ?item) (decisionBranchMin ?x ?from_node ?to_node)))
-                    (at start (<= (dataValue ?item) (decisionBranchMax ?x ?from_node ?to_node)))
-                    (at start (decisionNode ?from_node))
-                    (at start (decisionNode ?to_node))
-                    (at start (predecessorNode ?from_node ?to_node))
-                    (at start (currentNode ?x ?from_node))
-             )
-
-  :effect (and (at end (not (currentNode ?x ?from_node)))
-               (at end (currentNode ?x ?to_node))
-               (at end (increase (total-execcost) (nodeExecCost ?from_node)))
-               (at end (increase (total-cost) (nodeCost ?from_node)))
-               (at end (increase (total-burden) (nodeBurden ?from_node)))
-               (at end (increase (total-nonadherence) (nodeNonAdherence ?from_node)))
-          )
-)
-
-;;
-;;Going from a decision node to the goal node.
-;;
-(:durative-action makeDecisionToGoal :parameters(?x - disease ?from_node - node ?to_node - node ?item - DataItem)
-
-  :duration (= ?duration 0)
-
-  :condition (and 
-                    (at start (dataItem ?from_node ?item))
-                    (at start (>= (dataValue ?item) (decisionBranchMin ?x ?from_node ?to_node)))
-                    (at start (<= (dataValue ?item) (decisionBranchMax ?x ?from_node ?to_node)))
-                    (at start (decisionNode ?from_node))
-                    (at start (goalNode ?x ?to_node))
-                    (at start (predecessorNode ?from_node ?to_node))
-                    (at start (currentNode ?x ?from_node))
-             )
-
-  :effect (and (at end (tentativeGoal ?x ?to_node))
-               (at end (not (currentNode ?x ?from_node)))
-               (at end (currentNode ?x ?to_node))
-               (at end (increase (total-execcost) (nodeExecCost ?from_node)))
-               (at end (increase (total-cost) (nodeCost ?from_node)))
-               (at end (increase (total-burden) (nodeBurden ?from_node)))
-               (at end (increase (total-nonadherence) (nodeNonAdherence ?from_node)))
-               (at end (increase (tentativeGoalCount) 1))
-          )
-)
-
-
-;;
-;;The first action node encountered by the planner.
-;;
-(:durative-action takeFirstAction :parameters(?x - disease ?from_node - node ?to_node - node)
+(:durative-action take-original-action :parameters(?x - disease ?from_node - node ?to_node - node)
 
   :duration (= ?duration (nodeDuration ?from_node))
 
-  :condition (and (at start (noPreviousAction ?x))
-                  (at start (initialNode ?x ?from_node))
-                  (at start (actionNode ?from_node))
-                  (at start (predecessorNode ?from_node ?to_node))
-                  (at start (revisionIDCounted ?x ?from_node ?to_node))
+  :condition (and
+                (at start (currentNode ?x ?from_node))
+                (at start (predecessorNode ?from_node ?to_node))
+                (at start (actionNode ?from_node))
+                (at start (originalAction ?from_node))
+                (at start (revisionIDCounted ?x ?from_node ?to_node))
              )
 
-  :effect (and (at end (not (noPreviousAction ?x)))
-               (at end (currentNode ?x ?to_node))
-               (at end (increase (total-execcost) (nodeExecCost ?from_node)))
-               (at end (increase (total-cost) (nodeCost ?from_node)))
-               (at end (increase (total-burden) (nodeBurden ?from_node)))
-               (at end (increase (total-nonadherence) (nodeNonAdherence ?from_node)))
-               (at end (increase (total-duration) (nodeDuration ?from_node)))
+  :effect (and
+                (at end (not (currentNode ?x ?from_node)))
+                (at end (transitionFromNode ?x ?from_node ?to_node))
           )
 )
 
 ;;
-;;Previously takeActionToActionNode. Going from an action node to another action
-;;node.
+;; Take original action
 ;;
-(:durative-action takeActionNode :parameters(?x - disease ?from_node - node ?to_node - node)
+(:durative-action take-revised-action :parameters(?x - disease ?from_node - node ?to_node - node ?rev_op - revID)
 
   :duration (= ?duration (nodeDuration ?from_node))
 
-  :condition (and (at start (predecessorNode ?from_node ?to_node))
-                  (at start (actionNode ?from_node))
-                  (at start (actionNode ?to_node))
-                  (at start (currentNode ?x ?from_node))
-                  (at start (revisionIDCounted ?x ?from_node ?to_node))
+  :condition (and
+                (at start (currentNode ?x ?from_node))
+                (at start (predecessorNode ?from_node ?to_node))
+                (at start (actionNode ?from_node))
+                (at start (revisionAction ?from_node ?rev_op))
+                (at start (revisionIDCounted ?x ?from_node ?to_node))
              )
 
-  :effect (and (at end (not (currentNode ?x ?from_node)))
-               (at end (currentNode ?x ?to_node))
-               (at end (increase (total-execcost) (nodeExecCost ?from_node)))
-               (at end (increase (total-cost) (nodeCost ?from_node)))
-               (at end (increase (total-burden) (nodeBurden ?from_node)))
-               (at end (increase (total-nonadherence) (nodeNonAdherence ?from_node)))
-               (at end (increase (total-duration) (nodeDuration ?from_node)))
+  :effect (and
+                (at end (not (currentNode ?x ?from_node)))
+                (at end (transitionFromNode ?x ?from_node ?to_node))
           )
 )
-
-;;
-;;Previously takeActionToDecisionNode. Going from an action node to a decision
-;;node.
-;;
-(:durative-action takeActionNodeD :parameters(?x - disease ?from_node - node ?to_node - node)
-
-  :duration (= ?duration (nodeDuration ?from_node))
-
-  :condition (and (at start (predecessorNode ?from_node ?to_node))
-                  (at start (actionNode ?from_node))
-                  (at start (decisionNode ?to_node))
-                  (at start (currentNode ?x ?from_node))
-                  (at start (revisionIDCounted ?x ?from_node ?to_node))
-             )
-
-  :effect (and (at end (not (currentNode ?x ?from_node)))
-               (at end (currentNode ?x ?to_node))
-               (at end (increase (total-execcost) (nodeExecCost ?from_node)))
-               (at end (increase (total-cost) (nodeCost ?from_node)))
-               (at end (increase (total-burden) (nodeBurden ?from_node)))
-               (at end (increase (total-nonadherence) (nodeNonAdherence ?from_node)))
-               (at end (increase (total-duration) (nodeDuration ?from_node)))
-          )
-)
-
-;;
-;;Previously takeActionToGoal. Going from an action node to the goal node.
-;;
-(:durative-action takeActionNodeG :parameters(?x - disease ?from_node - node ?to_node - node)
-
-  :duration (= ?duration (nodeDuration ?from_node))
-
-  :condition (and (at start (actionNode ?from_node))
-                  (at start (goalNode ?x ?to_node))
-                  (at start (predecessorNode ?from_node ?to_node))
-                  (at start (currentNode ?x ?from_node))
-                  (at start (revisionIDCounted ?x ?from_node ?to_node))
-             )
-
-  :effect (and (at end (tentativeGoal ?x ?to_node))
-               (at end (not (currentNode ?x ?from_node)))
-               (at end (currentNode ?x ?to_node))
-               (at end (increase (total-execcost) (nodeExecCost ?from_node)))
-               (at end (increase (total-cost) (nodeCost ?from_node)))
-               (at end (increase (total-burden) (nodeBurden ?from_node)))
-               (at end (increase (total-nonadherence) (nodeNonAdherence ?from_node)))
-               (at end (increase (total-duration) (nodeDuration ?from_node)))
-               (at end (increase (tentativeGoalCount) 1))
-          )
-)
-
 
 ;;
 ;;Code for checking adverse interactions and confirming goals.
 ;;
-(:durative-action checkAdverseInteraction :parameters(?x - disease ?goal - node ?y - revID)
+(:durative-action check-adverse-interaction :parameters(?x - disease ?goal - node ?y - revID)
 
   :duration (= ?duration 0)
 
@@ -295,7 +231,7 @@
           )
 )
 
-(:action checkGoal :parameters(?x - disease ?goal - node ?y - revID)
+(:action check-goal :parameters(?x - disease ?goal - node ?y - revID)
 
   :precondition (and (goalNode ?x ?goal)
                      (currentNode ?x ?goal)
@@ -312,7 +248,7 @@
           )
 )
 
-(:action checkGoalNoRevisionOps :parameters(?x - disease ?goal - node)
+(:action check-goal-no-rev-ops :parameters(?x - disease ?goal - node)
 
   :precondition (and (goalNode ?x ?goal)
                      (currentNode ?x ?goal)
@@ -328,7 +264,7 @@
 ;;
 ;;Previously named countRevisions.
 ;;
-(:action checkRevisions :parameters(?x - disease ?from_node - node ?to_node - node)
+(:action check-revisions :parameters(?x - disease ?from_node - node ?to_node - node)
 
   :precondition (and (predecessorNode ?from_node ?to_node)
                      (actionNode ?from_node)
@@ -343,27 +279,9 @@
 )
 
 ;;
-;;Previously named countRevisionsFirstAction.
-;;
-(:action checkRevisionsFirstAction :parameters(?x - disease ?from_node - node ?to_node - node)
-
-  :precondition (and (predecessorNode ?from_node ?to_node)
-                     (actionNode ?from_node)
-                     (noPreviousAction ?x)
-                     (initialNode ?x ?from_node)
-                )
-
-  :effect (and (forall (?y - revID)
-                  (when (> 1 0)
-                    (increase (revisionCount ?y) (revisionFlag ?from_node ?y))))
-               (revisionIDCounted ?x ?from_node ?to_node)
-          )
-)
-
-;;
 ;;Goal reached. The treatment plan for disease x is ready.
 ;;
-(:action finalGoalReached :parameters(?x - disease ?goal - node)
+(:action final-goal-reached :parameters(?x - disease ?goal - node)
   :precondition (reachedGoal ?x ?goal)
 
   :effect (treatmentPlanReady ?x ?goal)

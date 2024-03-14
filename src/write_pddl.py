@@ -84,10 +84,6 @@ def write_initial_state(graph, file, ros, data_items: dict):
         file.write(f"\t(= (dataValue {item}) {value})\n")
     file.write("\n")
 
-    # noPrevious nodes
-    write_not_previous_node(graph, file)
-    file.write("\n")
-
     # initialNode
     # goalNode
     # predecessorNode
@@ -180,7 +176,7 @@ def write_predecessors_and_node_type(graph, file):
 
         # revisionAction
         if attributes.get(IS_ORIGINAL_ATTR) == False:
-            revisionAction.append("\t(revisionAction {})\n".format(name))
+            revisionAction.append(f"\t(revisionAction {name} {attributes[ID_RO]})\n")
 
     # Parallel nodes processing
     parallel_node = find_parallel_path(graph, parallel_node_found)
@@ -275,22 +271,6 @@ def write_node_cost(graph, file):
             if node_id not in context_nodes:
                 file.write(f"\t(= ({pddl_metric} {node_id}) {node_attr.get(metric, 0)})\n")
         file.write("\n")
-
-
-def write_not_previous_node(graph, file):
-    """
-    Writes the no previous predicates (e.g: noPreviousDecision).
-
-    Args:
-        graph (networkx graph): The graph.
-        file (TextIOWrapper): The PDDL file.
-    """
-    init_nodes = get_type_nodes(graph, CONTEXT_NODE)
-    for node in init_nodes:
-        to_node = list(graph.out_edges(node))[0][1]
-        to_node_type = graph.nodes[to_node][TYPE_ATTR]
-        file.write("\t(noPrevious{} {})\n".format(to_node_type.capitalize(), node))
-
 
 def write_goal(graph, file):
     """
