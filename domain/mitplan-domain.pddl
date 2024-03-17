@@ -13,7 +13,7 @@
              (decisionNode ?dec - node)
              (actionNode ?act - node)
              (predecessorNode ?prec - node ?succ - node)
-             (currentNode ?x - disease ?current - node)
+             (activeNode ?x - disease ?current - node)
 
              (originalAction ?act - node)
              (revisionAction ?act - node ?rev_op - revID)
@@ -24,8 +24,8 @@
 ; Associates a data item with a specific decision node
              (dataItem ?n - node ?item - DataItem)
 
-             (transitionFromNode ?d - disease ?from - node ?to - node)
-             (transitionToNode ?d - disease ?to - node)
+             (completedNode ?d - disease ?completed - node ?new - node)
+             (newNode ?d - disease ?new - node)
 
 )
 
@@ -75,7 +75,7 @@
 
      :effect (and
           (not (initialNode ?d ?node))
-          (transitionToNode ?d ?node)
+          (newNode ?d ?node)
      )
 )
 
@@ -84,13 +84,13 @@
      :parameters (?d - disease ?from_node - node ?to_node - node)
 
      :precondition (and
-          (transitionFromNode ?d ?from_node ?to_node)
+          (completedNode ?d ?from_node ?to_node)
           (actionNode ?from_node)
      )
 
      :effect (and
-          (not (transitionFromNode ?d ?from_node ?to_node))
-          (transitionToNode ?d ?to_node)
+          (not (completedNode ?d ?from_node ?to_node))
+          (newNode ?d ?to_node)
           (increase (total-execcost) (nodeExecCost ?from_node))
           (increase (total-cost) (nodeCost ?from_node))
           (increase (total-burden) (nodeBurden ?from_node))
@@ -103,13 +103,13 @@
      :parameters (?d - disease ?from_node - node ?to_node - node)
 
      :precondition (and
-          (transitionFromNode ?d ?from_node ?to_node)
+          (completedNode ?d ?from_node ?to_node)
           (not (actionNode ?from_node))
      )
 
      :effect (and
-          (not (transitionFromNode ?d ?from_node ?to_node))
-          (transitionToNode ?d ?to_node)
+          (not (completedNode ?d ?from_node ?to_node))
+          (newNode ?d ?to_node)
      )
 )
 
@@ -118,13 +118,13 @@
      :parameters (?d - disease ?to_node - node)
 
      :precondition (and
-          (transitionToNode ?d ?to_node)
+          (newNode ?d ?to_node)
           (goalNode ?d ?to_node)
      )
 
      :effect (and
-        (not (transitionToNode ?d ?to_node))
-        (currentNode ?d ?to_node)
+        (not (newNode ?d ?to_node))
+        (activeNode ?d ?to_node)
         (increase (tentativeGoalCount) 1)
         (tentativeGoal ?d ?to_node)
      )
@@ -135,13 +135,13 @@
      :parameters (?d - disease ?to_node - node)
 
      :precondition (and
-          (transitionToNode ?d ?to_node)
+          (newNode ?d ?to_node)
           (not (goalNode ?d ?to_node))
      )
 
      :effect (and
-        (not (transitionToNode ?d ?to_node))
-        (currentNode ?d ?to_node)
+        (not (newNode ?d ?to_node))
+        (activeNode ?d ?to_node)
      )
 )
 
@@ -153,7 +153,7 @@
   :duration (= ?duration 0)
 
   :condition (and 
-                    (at start (currentNode ?x ?from_node))
+                    (at start (activeNode ?x ?from_node))
                     (at start (predecessorNode ?from_node ?to_node))
                     (at start (decisionNode ?from_node))
                     (at start (dataItem ?from_node ?item))
@@ -162,8 +162,8 @@
              )
 
   :effect (and
-                (at end (not (currentNode ?x ?from_node)))
-                (at end (transitionFromNode ?x ?from_node ?to_node))
+                (at end (not (activeNode ?x ?from_node)))
+                (at end (completedNode ?x ?from_node ?to_node))
           )
 )
 
@@ -175,7 +175,7 @@
   :duration (= ?duration (nodeDuration ?from_node))
 
   :condition (and
-                (at start (currentNode ?x ?from_node))
+                (at start (activeNode ?x ?from_node))
                 (at start (predecessorNode ?from_node ?to_node))
                 (at start (actionNode ?from_node))
                 (at start (originalAction ?from_node))
@@ -183,8 +183,8 @@
              )
 
   :effect (and
-                (at end (not (currentNode ?x ?from_node)))
-                (at end (transitionFromNode ?x ?from_node ?to_node))
+                (at end (not (activeNode ?x ?from_node)))
+                (at end (completedNode ?x ?from_node ?to_node))
           )
 )
 
@@ -196,7 +196,7 @@
   :duration (= ?duration (nodeDuration ?from_node))
 
   :condition (and
-                (at start (currentNode ?x ?from_node))
+                (at start (activeNode ?x ?from_node))
                 (at start (predecessorNode ?from_node ?to_node))
                 (at start (actionNode ?from_node))
                 (at start (revisionAction ?from_node ?rev_op))
@@ -204,8 +204,8 @@
              )
 
   :effect (and
-                (at end (not (currentNode ?x ?from_node)))
-                (at end (transitionFromNode ?x ?from_node ?to_node))
+                (at end (not (activeNode ?x ?from_node)))
+                (at end (completedNode ?x ?from_node ?to_node))
           )
 )
 
@@ -217,7 +217,7 @@
   :duration (= ?duration 0)
 
   :condition (and (at start (goalNode ?x ?goal))
-                  (at start (currentNode ?x ?goal))
+                  (at start (activeNode ?x ?goal))
                   (at start (tentativeGoal ?x ?goal))
                   ;(at start (<= (revisionCount ?y) 1))
                   (at start (<= (revisionCount ?y) (- (revisionSequenceNumNodes ?y) (numNodesToReplace ?y))))
@@ -234,7 +234,7 @@
 (:action check-goal :parameters(?x - disease ?goal - node ?y - revID)
 
   :precondition (and (goalNode ?x ?goal)
-                     (currentNode ?x ?goal)
+                     (activeNode ?x ?goal)
                      (tentativeGoal ?x ?goal)
                      ;(<= (revisionCount ?y) 1)
                      (<= (revisionCount ?y) (- (revisionSequenceNumNodes ?y) (numNodesToReplace ?y)))
@@ -251,7 +251,7 @@
 (:action check-goal-no-rev-ops :parameters(?x - disease ?goal - node)
 
   :precondition (and (goalNode ?x ?goal)
-                     (currentNode ?x ?goal)
+                     (activeNode ?x ?goal)
                      (tentativeGoal ?x ?goal)
                      (noRevisionOps ?x)
                 )
@@ -268,7 +268,7 @@
 
   :precondition (and (predecessorNode ?from_node ?to_node)
                      (actionNode ?from_node)
-                     (currentNode ?x ?from_node)
+                     (activeNode ?x ?from_node)
                 )
 
   :effect (and (forall (?y - revID)
