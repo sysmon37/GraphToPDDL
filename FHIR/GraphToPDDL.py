@@ -1,3 +1,5 @@
+import json
+
 from networkx import DiGraph
 from Constants import DISEASE_NODE, GOAL_NODE, DECISION_NODE, ACTION_NODE, REVISION_NODE
 from RevisionOperators import RevisionOperators
@@ -147,7 +149,7 @@ class GraphToPDDL:
         :param pddl_file: file to write the data items to.
         '''
         for node in self.grouped_nodes[DECISION_NODE]:
-            pddl_file.write(f"\t(dataItem DATA_{node} {node})\n")
+            pddl_file.write(f"\t(dataItem {node} DATA_{node})\n")
         pddl_file.write("\n")
     
     def write_initial_goal_nodes(self, pddl_file, initial_nodes: list, goal_nodes: list):
@@ -171,6 +173,9 @@ class GraphToPDDL:
         :param pddl_file: file to write the predecessor nodes to.
         '''
         for edge in self.graph.edges:
+            # Skip starting nodes
+            if edge[0] in self.grouped_nodes[DISEASE_NODE]:
+                continue
             pddl_file.write(f"\t(predecessorNode {edge[0]} {edge[1]})\n")
         pddl_file.write("\n")
 
@@ -279,6 +284,20 @@ class GraphToPDDL:
             ")"
         )
     
+    def write_patient_data(self, pddl_file, patient_file: str):
+        '''
+        Write patient data into the PDDL file.
+
+        :param pddl_file: file to write the patient data to.
+        :param patient_file: path to the patient data file (in json).
+        '''
+        file_handle = open(patient_file, "r", encoding="utf-8")
+        patient_data = json.load(file_handle)
+        for key in patient_data:
+            pddl_file.write(f"\t(= (dataValue {key}) {patient_data[key]})\n")
+        file_handle.close()
+        pddl_file.write("\n")
+    
     def get_start_node(self, source_node: str) -> list:
         '''
         Get the disease node of the given node.
@@ -334,11 +353,12 @@ class GraphToPDDL:
                 revision_diseases[self.get_start_node(node)].append(node)
         return revision_diseases
 
-    def write_pddl(self, output_path: str):
+    def write_pddl(self, output_path: str, patient_file: str):
         '''
         Write current graph into the PDDL file.
 
         :param output_path: path to the output PDDL file.
+        :param patient_file: path to the patient data file (in json).
         '''
         pddl_file = open(output_path, "w", encoding="utf-8")
         self.write_header(pddl_file)
@@ -346,6 +366,7 @@ class GraphToPDDL:
         pddl_file.write("(:init\n")
         self.write_decision_branches(pddl_file, self.get_decision_branches())
         self.write_data_items(pddl_file)
+        self.write_patient_data(pddl_file, patient_file)
         self.write_initial_goal_nodes(
             pddl_file,
             [(node, list(self.graph.successors(node))[0]) for node in self.grouped_nodes[DISEASE_NODE]],

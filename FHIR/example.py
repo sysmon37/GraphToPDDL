@@ -20,4 +20,4 @@ if __name__ == "__main__":
     graph.render_graphviz(graph.nwx2graphviz())
     # Convert ActionGraph into PDDL
     g2pddl = GraphToPDDL("mitplan-problem", "mitplan-domain", graph.graph, ro)
-    g2pddl.write_pddl("mitplan-problem.pddl")
+    g2pddl.write_pddl("mitplan-problem.pddl", "data-dvt-scad.json")

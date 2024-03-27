@@ -115,18 +115,18 @@
                                 "expression": "RENALFAILURE 0..0"
                             }
                         }
+                    ],
+                    "relatedAction": [
+                        {
+                            "targetId": "rev_FOLLOWUPVISIT",
+                            "relationship": "after"
+                        }
                     ]
                 },
                 {
                     "id": "rev_FOLLOWUPVISIT",
                     "title": "Revise follow up visit",
-                    "cardinalityBehavior": "single",
-                    "relatedAction": [
-                        {
-                            "targetId": "rev_DOAC",
-                            "relationship": "after"
-                        }
-                    ]
+                    "cardinalityBehavior": "single"
                 }
             ]
         },
@@ -146,18 +146,18 @@
                                 "expression": "RENALFAILURE 0..0"
                             }
                         }
+                    ],
+                    "relatedAction": [
+                        {
+                            "targetId": "rev_WARFARIN_1",
+                            "relationship": "after"
+                        }
                     ]
                 },
                 {
                     "id": "rev_WARFARIN_1",
                     "title": "Revise WARFARIN",
-                    "cardinalityBehavior": "single",
-                    "relatedAction": [
-                        {
-                            "targetId": "rev_LMWHWARFARIN_1",
-                            "relationship": "after"
-                        }
-                    ]
+                    "cardinalityBehavior": "single"
                 }
             ]
         },
@@ -183,18 +183,18 @@
                                 "expression": "RENALFAILURE 0..0"
                             }
                         }
+                    ],
+                    "relatedAction": [
+                        {
+                            "targetId": "rev_WARFARIN_2",
+                            "relationship": "after"
+                        }
                     ]
                 },
                 {
                     "id": "rev_WARFARIN_2",
                     "title": "Revise WARFARIN",
                     "cardinalityBehavior": "single",
-                    "relatedAction": [
-                        {
-                            "targetId": "rev_LMWHWARFARIN_2",
-                            "relationship": "after"
-                        }
-                    ],
                     "dynamicValue": [{
                         "expression": {
                             "language": "text/dot",
