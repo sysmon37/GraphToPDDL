@@ -3,6 +3,7 @@ ACTION_NODE = "action"
 DECISION_NODE = "decision"
 GOAL_NODE = "goal"
 REVISION_NODE = "revision"
+DUMMY_NODE = "dummy"
 FORMAT_OPTIONS = {
     DISEASE_NODE: {
         "shape": "oval",

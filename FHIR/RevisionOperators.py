@@ -55,6 +55,24 @@ class RevisionOperators:
         :return: list of revision ids.
         '''
         return [revision_id for revision_id in self.revision_declarations]
+
+    def generate_dummy_node(self, ag, revision_id) -> dict:
+        '''
+        Generate a dummy node for add revision operators for the graph.
+
+        :param ag: Action Graph to connect the dummy node for.
+        :param revision_id: revision id of the dummy node.
+        :return: dummy node dictionary.
+        '''
+        dummy_idx = 0
+        while f"dummy_{dummy_idx}" in ag.graph.nodes:
+            dummy_idx += 1
+        dummy_node = {
+            "id": f"DUMMY{dummy_idx}",
+            "is_dummy": True,
+            "revision_id": revision_id,
+        }
+        return dummy_node
     
     def apply_replace(self, ag, mitigation, revision_id):
         '''
@@ -76,7 +94,7 @@ class RevisionOperators:
         for node in subgraph.graph.nodes:
             new_action = {**subgraph.graph.nodes[node]}
             new_action["revision_id"] = revision_id
-            if subgraph.graph.degree(node) > 0 and "relatedAction" not in new_action:
+            if "relatedAction" not in new_action:
                 new_action["relatedAction"] = []
             # Add connections between replaced node's successors and predecessors
             # to the first node and final node of the sub-ActionGraph
@@ -122,6 +140,13 @@ class RevisionOperators:
             new_action = {**action}
             new_action["revision_id"] = revision_id
             ag.add_action(new_action)
+
+            dummy_node = self.generate_dummy_node(ag, revision_id)
+            if "relatedAction" in new_action:
+                dummy_node["relatedAction"] = new_action["relatedAction"]
+            if "condition" in new_action:
+                dummy_node["condition"] = new_action["condition"]
+            ag.add_action(dummy_node)
 
     def apply_to_graph(self, ag):
         '''

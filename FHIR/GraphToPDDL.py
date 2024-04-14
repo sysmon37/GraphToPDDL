@@ -1,7 +1,7 @@
 import json
 
 from networkx import DiGraph
-from Constants import DISEASE_NODE, GOAL_NODE, DECISION_NODE, ACTION_NODE, REVISION_NODE
+from Constants import DISEASE_NODE, GOAL_NODE, DECISION_NODE, ACTION_NODE, REVISION_NODE, DUMMY_NODE
 from RevisionOperators import RevisionOperators
 
 class GraphToPDDL:
@@ -31,12 +31,14 @@ class GraphToPDDL:
         action_nodes = [node for node in self.graph.nodes if self.graph.nodes[node]["type"] == ACTION_NODE]
         goal_nodes = [node for node in self.graph.nodes if self.graph.nodes[node]["type"] == GOAL_NODE]
         revision_nodes = [node for node in self.graph.nodes if self.graph.nodes[node]["type"] == REVISION_NODE]
+        dummy_nodes = [node for node in self.graph.nodes if self.graph.nodes[node]["type"] == DUMMY_NODE]
         return {
             DISEASE_NODE: start_nodes,
             DECISION_NODE: decision_nodes,
             ACTION_NODE: action_nodes,
             GOAL_NODE: goal_nodes,
-            REVISION_NODE: revision_nodes
+            REVISION_NODE: revision_nodes,
+            DUMMY_NODE: dummy_nodes
         }
     
     def write_header(self, pddl_file):
@@ -58,6 +60,7 @@ class GraphToPDDL:
             f"\t{' '.join(self.grouped_nodes[DECISION_NODE])} "
             f"{' '.join(self.grouped_nodes[ACTION_NODE])} "
             f"{' '.join(self.grouped_nodes[GOAL_NODE])} "
+            f"{' '.join(self.grouped_nodes[DUMMY_NODE])} "
             f"{' '.join(self.grouped_nodes[REVISION_NODE])} - node\n"
         )
         pddl_file.write(f"\t{' '.join(self.revision_operators.get_revision_ids())} - revId\n")
@@ -99,14 +102,19 @@ class GraphToPDDL:
         :param triggers: dictionary with keys set to revision ids and values to trigger nodes' ids.
         '''
         for revision_id in triggers:
+            total_triggers = 0
             for node in self.graph.nodes:
-                if node not in self.grouped_nodes[DISEASE_NODE]:
+                if node not in self.grouped_nodes[DISEASE_NODE] and node not in self.grouped_nodes[DUMMY_NODE]:
                     num_triggers = len([trigger for trigger in triggers[revision_id] if trigger == node])
+                    total_triggers += num_triggers
                     # The amount of revision triggers for this node
                     pddl_file.write(f"\t(= (revisionFlag {node} {revision_id}) {num_triggers})\n")
+                if node in self.grouped_nodes[DUMMY_NODE] and self.graph.nodes[node]["revision_id"] == revision_id:
+                    total_triggers += 1
+                    pddl_file.write(f"\t(= (revisionFlag {node} {revision_id}) 1)\n")
             pddl_file.write("\n")
             # Total amount of triggers for this revision id
-            pddl_file.write(f"\t(= (revisionSequenceNumNodes {revision_id}) {len(triggers[revision_id])})\n")
+            pddl_file.write(f"\t(= (revisionSequenceNumNodes {revision_id}) {total_triggers})\n")
             # The amount of nodes that this revision targets
             # Due to FHIR standard limitations, revision operator can target at most 1 node
             pddl_file.write(f"\t(= (numNodesToReplace {revision_id}) 1)\n")
@@ -191,6 +199,8 @@ class GraphToPDDL:
             pddl_file.write(f"\t(decisionNode {node})\n")
         for node in self.grouped_nodes[REVISION_NODE]:
             pddl_file.write(f"\t(actionNode {node})\n")
+        for node in self.grouped_nodes[DUMMY_NODE]:
+            pddl_file.write(f"\t(dummyNode {node})\n")
         pddl_file.write("\n")
 
     def write_actions(self, pddl_file):
@@ -214,7 +224,7 @@ class GraphToPDDL:
         '''
         for node in self.graph.nodes:
             # Skip disease nodes
-            if node in self.grouped_nodes[DISEASE_NODE]:
+            if node in self.grouped_nodes[DISEASE_NODE] or node in self.grouped_nodes[DUMMY_NODE]:
                 continue
 
             node_exec_cost = 0
@@ -292,9 +302,10 @@ class GraphToPDDL:
         :param patient_file: path to the patient data file (in json).
         '''
         file_handle = open(patient_file, "r", encoding="utf-8")
-        patient_data = json.load(file_handle)
-        for key in patient_data:
-            pddl_file.write(f"\t(= (dataValue {key}) {patient_data[key]})\n")
+        patient_observations = json.load(file_handle)
+        for observation in patient_observations:
+            key = observation["component"][0]["code"]["coding"][0]["code"]
+            pddl_file.write(f"\t(= (dataValue DATA_{key}) {observation['valueQuantity']['value']})\n")
         file_handle.close()
         pddl_file.write("\n")
     
@@ -350,7 +361,9 @@ class GraphToPDDL:
             revision_diseases[node] = []
         for trigger in revision_triggers:
             for node in revision_triggers[trigger]:
-                revision_diseases[self.get_start_node(node)].append(node)
+                start_node = self.get_start_node(node)
+                if node not in revision_diseases[start_node]:
+                    revision_diseases[start_node].append(node)
         return revision_diseases
 
     def write_pddl(self, output_path: str, patient_file: str):

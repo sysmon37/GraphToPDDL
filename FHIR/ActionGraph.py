@@ -1,7 +1,7 @@
 import json
 from graphviz import Digraph
 from networkx import DiGraph
-from Constants import DISEASE_NODE, GOAL_NODE, DECISION_NODE, ACTION_NODE, REVISION_NODE, FORMAT_OPTIONS
+from Constants import DISEASE_NODE, GOAL_NODE, DECISION_NODE, ACTION_NODE, REVISION_NODE, FORMAT_OPTIONS, DUMMY_NODE
 
 class ActionGraph:
     '''
@@ -21,12 +21,65 @@ class ActionGraph:
         self.actions = {**self.actions, **{action["id"]: action for action in json.load(fhir_file)["action"]}}
         fhir_file.close()
     
+    def get_action(self, action_id: str) -> dict:
+        '''
+        Get the action by its id.
+
+        :param action_id: id of the action.
+        :return: action dictionary.
+        '''
+        return self.graph.nodes[action_id]
+    
+    def is_action_node(self, action_id: str) -> bool:
+        '''
+        Check if the node is an action node.
+
+        :param action_id: id of the action.
+        :return: True if the node is an action node, else False.
+        '''
+        return self.graph.nodes[action_id]["type"] == ACTION_NODE
+
+    def get_revision_id(self, action_id: str):
+        '''
+        Get revision id of the action.
+
+        :param action_id: id of the action.
+        :return: revision id of the action if exists, else None.
+        '''
+        if "revision_id" in self.graph.nodes[action_id]:
+            return self.graph.nodes[action_id]["revision_id"]
+        return None
+    
     def add_action(self, action: dict):
         '''
         Add PlanDefinition action to the graph.
 
         :param action: PlanDefinition action, compliant to FHIR standard.
         '''
+        # Remove old edges when adding dummy node (otherwise revisions will be skipped)
+        if "is_dummy" in action and action["is_dummy"]:
+            related_actions = action["relatedAction"]
+            before_relations = []
+            after_relations = []
+            for relation in related_actions:
+                if relation["relationship"] == "before":
+                    before_relations.append(relation)
+                elif relation["relationship"] == "after":
+                    after_relations.append(relation)
+            
+            # Perform removal using cartesian product of before and after relations
+            for before_relation in before_relations:
+                for after_relation in after_relations:
+                    for idx, relation in enumerate(self.actions[before_relation["targetId"]]["relatedAction"]):
+                        if relation["targetId"] == after_relation["targetId"] and relation["relationship"] == "after":
+                            del self.actions[before_relation["targetId"]]["relatedAction"][idx]
+                            break
+                    self.graph.remove_edge(before_relation["targetId"], after_relation["targetId"])
+                    for idx, relation in enumerate(self.actions[after_relation["targetId"]]["relatedAction"]):
+                        if relation["targetId"] == before_relation["targetId"] and relation["relationship"] == "before":
+                            del self.actions[after_relation["targetId"]]["relatedAction"][idx]
+                            break
+
         self.actions[action["id"]] = action
 
     def add_relation(self, action_id: str, relation_data: dict):
@@ -49,6 +102,8 @@ class ActionGraph:
         :param node: id of the action.
         :return: type of the node (start, decision, etc).
         '''
+        if "is_dummy" in self.graph.nodes[node_id]:
+            return DUMMY_NODE
         if self.graph.in_degree(node_id) == 0:
             return DISEASE_NODE
         if self.graph.out_degree(node_id) == 0:
@@ -64,14 +119,17 @@ class ActionGraph:
             return REVISION_NODE
         return ACTION_NODE
 
-    def nwx2graphviz(self) -> Digraph:
+    def nwx2graphviz(self, show_dummy_nodes: bool = False) -> Digraph:
         '''
         Convert networkx graph into graphviz graph.
 
+        :param show_dummy_nodes: whether to show dummy nodes in the graph.
         :return: graphviz Digraph.
         '''
         dot_graph = Digraph()
         for node in self.graph.nodes:
+            if not show_dummy_nodes and self.graph.nodes[node]["type"] == DUMMY_NODE:
+                continue
             dot_graph.node(
                 name=node,
                 label=self.graph.nodes[node]["title"] if "title" in self.graph.nodes[node] else node,
@@ -80,6 +138,8 @@ class ActionGraph:
             )
         
         for edge in self.graph.edges:
+            if not show_dummy_nodes and (self.graph.nodes[edge[0]]["type"] == DUMMY_NODE or self.graph.nodes[edge[1]]["type"] == DUMMY_NODE):
+                continue
             if 'targetId' in self.graph.edges[edge] and self.graph.nodes[edge[0]]["type"] == DECISION_NODE:
                 dot_graph.edge(
                     edge[0], edge[1],

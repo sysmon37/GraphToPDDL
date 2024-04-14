@@ -1,23 +1,28 @@
-from ActionGraph import ActionGraph
-from RevisionOperators import RevisionOperators
-from GraphToPDDL import GraphToPDDL
+from MitPlan import MitPlan
 
 # An example script showing how to use MitPlan
 
 if __name__ == "__main__":
-    graph = ActionGraph()
-    ro = RevisionOperators()
-    # Add PlanDefinitions to the graph
-    graph.add_fhir_actions("plan-definition-dvt.json")
-    graph.add_fhir_actions("plan-definition-scad.json")
-    graph.update_graph()
-    # Create revision operators
-    ro.add_fhir_revision_operators("ro-dvt-scad-short.json")
-    ro.update_revision_operators()
-    # Apply revision operators to the graph
-    ro.apply_to_graph(graph)
-    # Render the graph into the .png file
-    graph.render_graphviz(graph.nwx2graphviz())
-    # Convert ActionGraph into PDDL
-    g2pddl = GraphToPDDL("mitplan-problem", "mitplan-domain", graph.graph, ro)
-    g2pddl.write_pddl("mitplan-problem.pddl", "data-dvt-scad.json")
+    mp = MitPlan(
+        # PlanDefinitions
+        ["plan-definition-mdd.json", "plan-definition-alzheimer.json"],
+        # Revision operators
+        ["ro-ad-mdd.json"],
+        # Patient data
+        "data-ad-mdd.json",
+        # PDDL problem name
+        "mitplan-problem",
+        # PDDL domain name
+        "mitplan-domain"
+    )
+    # You can add more PlanDefinitions using the add_plan_file method or a new revision using add_revision_file
+    # then just call create_graph method to recreate the graph
+    mp.create_graph()
+    # Render the graph into png file (mitplan-graph.png)
+    mp.render_graph(filename="mitplan-graph", output_dir=".")
+    # Generate pddl problem file (mitplan-problem.pddl)
+    mp.generate_pddl()
+    # Generate LLM queries
+    queries = mp.generate_queries(skip_decisions=False, include_other_plans=True)
+    print(queries)
+    print(mp.generate_patient_data_query())
