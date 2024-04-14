@@ -1,14 +1,13 @@
 # FHIR integration
 
 This folder contains a modified version of GraphToPDDL which is integrated with FHIR standard. The structure is as follows:
-* `ActionGraph.py` - the main graph object with all clinical actions
-* `Constants.py` - constant values used by other scripts
-* `GraphToPDDL.py` - conversion of action graphs into PDDL problems
-* `RevisionOperators.py` - support for revision operators and applying them to the graph
-* `example.py` - a simple script showing how you can use all the scripts together
-* `plan-definition-dvt.json` - simple PlanDefinition resource containing mock treatment for [Deep Vein Thrombosis](https://www.cdc.gov/ncbddd/dvt/facts.html)
-* `plan-definition-scad.json` - simple PlanDefinition resource containing mock treatment for [Spontaneous Coronary Artery Dissection](https://www.mayoclinic.org/diseases-conditions/spontaneous-coronary-artery-dissection/symptoms-causes/syc-20353711)
-* `ro-dvt-scad.json` - simple example of resource operators defined using DetectedIssue and RequestOrchestration resources
+* `ActionGraph.py` - the main graph object with all clinical actions.
+* `Constants.py` - constant values used by other scripts.
+* `GraphToPDDL.py` - conversion of action graphs into PDDL problems.
+* `RevisionOperators.py` - support for revision operators and applying them to the graph.
+* `MitPlan.py` - the main class that ties every other part of MitPlan together.
+* `example.py` - a simple script showing how you can MitPlan.
+* `examples` - examples of FHIR resources used by MitPlan.
 
 ### Adding edges between nodes
 
@@ -82,3 +81,21 @@ If you would like to **add** a node, specify a RequestOrchestration to add withi
 If you wouuld like to **delete** a node. specify a node to delete using `note` field, but do not use `action` field.
 
 When triggering a revision with RequestOrchestration, all the actions inside of the RequestOrchestration (in the `action` field) will be added to the original graph. All the rules for adding decision nodes and edges are the same as for the regular `ActionGraph`.
+
+### Generating LLM queries
+
+As a part of the system, it is possible to generate queries for Large Language Models. These can be used to generate explanations for revision operations chosen by the optimizer.
+
+In order to generate them you can use `generate_queries` and `generate_patient_data_query` methods in `MitPlan.py`. The first method will generate queries containing only the actions chosen by the optimizer. It takes in two parameters:
+- `skip_decisions`, which will omit decision nodes when traversing a graph during query generation (it will only contain action and revision nodes) [`True` by default]
+- `include_other_plans`, which will add actions chosen by the optimizer for other diseases solved by the MitPlan to the beginning of the query [`False` by default]
+
+The `generate_patient_data_query` will generate a part of the LLM query containing patient data listed in enumerated list.
+
+Remember that `generate_queries` will run rewrite-no-lp optmizer **first**. The optimizer assumes you are running MitPlan on a **UNIX** machine. The command it runs is as follows:
+
+```bash
+./rewrite-no-lp --optimise {DOMAIN_NAME}.pddl {PROBLEM_NAME}.pddl
+```
+
+So remember to put rewrite-no-lp script into the directory where `MitPlan.py` is present! If you need to change this command edit the `command` variable inside of the `generate_queries` method in `MitPlan.py` file. If the function doesn't return anything, then it means that either the optimizer couldn't find a solution or there was an error during the execution of the command. You can use the `error` variable inside of the `run_optimizer` function in `MitPlan.py` to see where the error is, or just list all lines in the for loop.

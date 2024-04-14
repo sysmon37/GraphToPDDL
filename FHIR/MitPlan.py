@@ -146,7 +146,7 @@ class MitPlan:
         :param disease: name of the disease.
         :return: LLM query for that disease.
         '''
-        query = f"Clinical practice guidelines for treating the pateint with {disease}:\n"
+        query = f"Clinical practice guidelines for treating the patient with {disease}:\n"
         for action in self.optimizer_result[disease]:
             query += f"{self.graph.get_action(action)['title']}\n"
         return query

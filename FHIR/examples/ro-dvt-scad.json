@@ -1,0 +1,208 @@
+{
+    "revision_declarations": [
+        {
+            "resourceType" : "DetectedIssue",
+            "id" : "ro1",
+            "status" : "final",
+            "text" : {
+                "status" : "generated",
+                "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"></div>"
+            },
+            "category" : [{
+                "coding" : [{
+                "system" : "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                "code" : "DRG",
+                "display" : "Drug Interaction Alert"
+                }]
+            }],
+            "implicated" : [
+                { "reference" : "DOAC" },
+                { "reference" : "CCB" }
+            ],
+            "mitigation": [
+                {
+                    "action" : {
+                        "coding" : [{
+                        "system" : "local",
+                        "code" : "rev_DOAC_FOLLOWUPVISIT",
+                        "display" : "Drug conflict"
+                        }],
+                        "text" : "Replace DOAC with Rev_DOAC and schedule follow-up visit"
+                    },
+                    "note": "DOAC"
+                }
+            ]
+        },
+        {
+            "resourceType" : "DetectedIssue",
+            "status" : "final",
+            "id" : "ro2_1",
+            "text" : {
+                "status" : "generated",
+                "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"></div>"
+            },
+            "category" : [{
+                "coding" : [{
+                "system" : "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                "code" : "DRG",
+                "display" : "Drug Interaction Alert"
+                }]
+            }],
+            "implicated" : [
+                { "reference" : "rev_DOAC" }
+            ],
+            "mitigation": [
+                {
+                    "action" : {
+                        "coding" : [{
+                        "system" : "local",
+                        "code" : "rev_WARFARIN_LMWHWARFARIN",
+                        "display" : "Drug conflict"
+                        }],
+                        "text" : "Replace DOAC with warfarin and lmhwarfarin"
+                    },
+                    "note": "rev_DOAC"
+                }
+            ]
+        },
+        {
+            "resourceType" : "DetectedIssue",
+            "id" : "ro2_2",
+            "status" : "final",
+            "text" : {
+                "status" : "generated",
+                "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"></div>"
+            },
+            "category" : [{
+                "coding" : [{
+                "system" : "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                "code" : "DRG",
+                "display" : "Drug Interaction Alert"
+                }]
+            }],
+            "implicated" : [
+                { "reference" : "DOAC" }
+            ],
+            "mitigation": [
+                {
+                    "action" : {
+                        "coding" : [{
+                        "system" : "local",
+                        "code" : "rev_WARFARIN_LMWHWARFARIN_2",
+                        "display" : "Drug conflict"
+                        }],
+                        "text" : "Replace DOAC with warfarin and lmhwarfarin"
+                    },
+                    "note": "DOAC"
+                }
+            ]
+        }
+    ],
+    "revision_definitions": [
+        {
+            "resourceType": "RequestOrchestration",
+            "id": "rev_DOAC_FOLLOWUPVISIT",
+            "action": [
+                {
+                    "id": "rev_DOAC",
+                    "title": "Revise DOAC",
+                    "cardinalityBehavior": "single",
+                    "condition": [
+                        {
+                            "kind": "applicability",
+                            "expression": {
+                                "language": "text/mitplan",
+                                "expression": "RENALFAILURE 0..0"
+                            }
+                        }
+                    ],
+                    "relatedAction": [
+                        {
+                            "targetId": "rev_FOLLOWUPVISIT",
+                            "relationship": "after"
+                        }
+                    ]
+                },
+                {
+                    "id": "rev_FOLLOWUPVISIT",
+                    "title": "Revise follow up visit",
+                    "cardinalityBehavior": "single"
+                }
+            ]
+        },
+        {
+            "resourceType": "RequestOrchestration",
+            "id": "rev_WARFARIN_LMWHWARFARIN",
+            "action": [
+                {
+                    "id": "rev_LMWHWARFARIN_1",
+                    "title": "Revise LMWH/WARFARIN",
+                    "cardinalityBehavior": "single",
+                    "condition": [
+                        {
+                            "kind": "applicability",
+                            "expression": {
+                                "language": "text/mitplan",
+                                "expression": "RENALFAILURE 0..0"
+                            }
+                        }
+                    ],
+                    "relatedAction": [
+                        {
+                            "targetId": "rev_WARFARIN_1",
+                            "relationship": "after"
+                        }
+                    ]
+                },
+                {
+                    "id": "rev_WARFARIN_1",
+                    "title": "Revise WARFARIN",
+                    "cardinalityBehavior": "single"
+                }
+            ]
+        },
+        {
+            "resourceType": "RequestOrchestration",
+            "id": "rev_WARFARIN_LMWHWARFARIN_2",
+            "action": [
+                {
+                    "id": "rev_LMWHWARFARIN_2",
+                    "title": "Revise LMWH/WARFARIN",
+                    "cardinalityBehavior": "single",
+                    "dynamicValue": [{
+                        "expression": {
+                            "language": "text/dot",
+                            "expression": "execCost=100"
+                        }
+                    }],
+                    "condition": [
+                        {
+                            "kind": "applicability",
+                            "expression": {
+                                "language": "text/mitplan",
+                                "expression": "RENALFAILURE 0..0"
+                            }
+                        }
+                    ],
+                    "relatedAction": [
+                        {
+                            "targetId": "rev_WARFARIN_2",
+                            "relationship": "after"
+                        }
+                    ]
+                },
+                {
+                    "id": "rev_WARFARIN_2",
+                    "title": "Revise WARFARIN",
+                    "cardinalityBehavior": "single",
+                    "dynamicValue": [{
+                        "expression": {
+                            "language": "text/dot",
+                            "expression": "execCost=100"
+                        }
+                    }]
+                }
+            ]
+        }
+    ]    
+}
