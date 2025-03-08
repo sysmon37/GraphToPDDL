@@ -1,0 +1,219 @@
+digraph afib_ckd_htn {
+
+//================================================
+// AFIB
+//================================================
+
+// Context
+afib_c [type=context];
+
+// Goal
+afib_g [type=goal];
+
+// Actions
+afib_a_cardioversion [type=action];
+afib_a_anticoagulation [type=action];
+afib_a_rate_control_1 [type=action];
+afib_a_rate_control_maintenance_1 [type=action];
+afib_a_rate_control_maintenance_2 [type=action];
+afib_a_rhytm_control_maintenance_1 [type=action];
+afib_a_rhytm_control_maintenance_2 [type=action];
+afib_a_pill_in_a_pocket [type=action];
+
+
+// Decisions
+afib_d_special_circumstances [type=decision, dataItem=afib_special_circumstances];
+afib_d_afib_type [type=decision, dataItem=afib_afib_type];
+afib_d_symptom_recurrence [type=decision, dataItem=afib_symptom_recurrence];
+afib_d_symptoms_improve [type=decision, dataItem=afib_symptoms_improve];
+afib_d_symptoms_resolve [type=decision, dataItem=afib_symptoms_resolve];
+afib_d_afib_recurs [type=decision, dataItem=afib_afib_recurs];
+afib_d_tachychardia [type=decision, dataItem=afib_tachychardia];
+
+// Parallel gateways
+afib_p1 [type=parallel];
+afib_p2 [type=parallel];
+afib_p3 [type=parallel];
+afib_p4 [type=parallel];
+
+// Dummy nodes
+afib_d1 [type=dummy];
+afib_d2 [type=dummy];
+afib_d3 [type=dummy];
+afib_d4 [type=dummy];
+
+
+// Arcs
+afib_c -> afib_p1 -> afib_d_special_circumstances;
+afib_d_special_circumstances -> afib_a_rate_control_1 [range="0..0", label="0:no"];
+afib_d_special_circumstances -> afib_d_afib_type [range="1..1", label="1:yes"];
+
+afib_d_afib_type -> afib_d_symptom_recurrence [range="1..1", label="1:paroxysmal"];
+afib_d_afib_type -> afib_a_cardioversion [range="2..2", label="2:persistent"];
+afib_a_rate_control_1  -> afib_d_symptoms_resolve;
+afib_p1 -> afib_a_anticoagulation -> afib_p4;
+afib_d_symptoms_resolve -> afib_d_afib_type [range="0..0", label="0:no"];
+afib_d_symptoms_resolve -> afib_a_rate_control_maintenance_1 [range="1..1", label="1:yes"];
+afib_a_cardioversion -> afib_d_symptoms_improve;
+
+afib_d_symptoms_improve -> afib_a_rate_control_maintenance_1 [range="0..0", label="0:no"];
+afib_d_symptoms_improve -> afib_p2 [range="1..1", label="1:yes"];
+
+afib_p2 -> {afib_d_tachychardia, afib_d_afib_recurs};
+
+afib_d_tachychardia -> afib_a_rate_control_maintenance_2 [range="1..1", label="1:yes"];
+afib_a_rate_control_maintenance_2 -> afib_d1 -> afib_p3;
+afib_d_tachychardia -> afib_d1 [range="0..0", label="0:no"];
+afib_p3 -> afib_d4;
+
+afib_d_afib_recurs -> afib_a_rhytm_control_maintenance_2 [range="1..1", label="1:yes"];
+afib_a_rhytm_control_maintenance_2 -> afib_d2 -> afib_p3;
+afib_d_afib_recurs -> afib_d2 [range="0..0", label="0:no"];
+
+afib_d_symptom_recurrence -> afib_a_pill_in_a_pocket [range="0..0", label="0:no"];
+afib_d_symptom_recurrence -> afib_a_rhytm_control_maintenance_1 [range="1..1", label="1:yes"];
+afib_a_pill_in_a_pocket -> afib_d3 -> afib_d4;
+afib_a_rhytm_control_maintenance_1 -> afib_d3;
+afib_a_rate_control_maintenance_1 -> afib_d4 -> afib_p4 -> afib_g;
+
+//================================================
+// CKD
+//================================================
+
+    // Context
+    ckd_c [type=context];
+
+    // Goal
+    ckd_g [type=goal];
+
+    // Actions
+    ckd_a_phosphate_binders [type=action];
+    ckd_a_esa [type=action];
+    ckd_a_iron_therapy [type=action];
+    ckd_a_ace_inhibitor [type=action];
+    ckd_a_aspirin [type=action];
+    ckd_a_lifestyle_management [type=action];
+
+    // Decisions
+    ckd_d_egfr [type=decision, dataItem=ckd_egfr];
+    ckd_d_hemoglobin_level [type=decision, dataItem=ckd_hemoglobin_level];
+    ckd_d_metabolic_abnormality [type=decision, dataItem=ckd_metabolic_abnormality];
+    ckd_d_ferritin_level [type=decision, dataItem=ckd_ferritin_level];
+
+    // Parallel gateways
+    ckd_p1 [type=parallel];
+    ckd_p2 [type=parallel];
+    ckd_p3 [type=parallel];
+    ckd_p4 [type=parallel];
+    ckd_p5 [type=parallel];
+    ckd_p6 [type=parallel];
+
+    // Dummy nodes
+    ckd_d1 [type=dummy];
+    ckd_d2 [type=dummy];
+    ckd_d3 [type=dummy];
+    ckd_d4 [type=dummy];
+
+    // Arcs
+    ckd_c -> ckd_p1 -> ckd_d_egfr;
+    ckd_p1 -> ckd_p2;
+    ckd_d_egfr -> ckd_d4 [range="2..2", label="2:>= 60"];
+    ckd_d_egfr -> ckd_p3 [range="1..1", label="1:<60"];
+    
+    ckd_p3 -> ckd_d_hemoglobin_level;
+    ckd_d_hemoglobin_level -> ckd_a_esa [range="1..1", label="1:<100"];
+    ckd_d_hemoglobin_level -> ckd_d1 [range="2..2", label="2:>=100"];
+    ckd_a_esa -> ckd_d1 -> ckd_p4;
+        
+    ckd_p3 -> ckd_d_ferritin_level;
+    ckd_d_ferritin_level -> ckd_a_iron_therapy [range="1..1", label="1:<100"];
+    ckd_d_ferritin_level -> ckd_d2 [range="2..2", label="2:>=100"];
+    ckd_a_iron_therapy -> ckd_d2 -> ckd_p4;
+
+    ckd_p3 -> ckd_d_metabolic_abnormality;
+    ckd_d_metabolic_abnormality -> ckd_a_phosphate_binders [range="1..1", label="1:yes"];
+    ckd_d_metabolic_abnormality -> ckd_d3 [range="0..0", label="0:no"];
+    ckd_a_phosphate_binders -> ckd_d3 -> ckd_p4;
+    ckd_p4 -> ckd_d4 -> ckd_p6;
+
+    ckd_p2 -> ckd_a_aspirin;
+    ckd_p2 -> ckd_a_lifestyle_management;
+    ckd_p2 -> ckd_a_ace_inhibitor;
+
+    ckd_a_ace_inhibitor -> ckd_p5;
+    ckd_a_lifestyle_management -> ckd_p5;
+    ckd_a_aspirin -> ckd_p5 -> ckd_p6 -> ckd_g;
+
+//================================================
+// HTN
+//================================================
+
+// Context
+htn_c [type=context];
+
+// Goal
+htn_g [type=goal];
+
+// Actions
+htn_a_lifestyle_management [type=action];
+htn_a_step1_acei [type=action];
+htn_a_step1_ccb [type=action];
+htn_a_step2_acei [type=action];
+htn_a_step2_diuretics [type=action];
+htn_a_step3_acei [type=action];
+htn_a_step3_ccb [type=action];
+htn_a_step3_diuretric [type=action];
+htn_a_specialist_consult [type=action];
+
+// Decisions
+htn_d_age_under_55 [type=decision, dataItem=htn_age_under_55];
+htn_d_bp_controlled_1 [type=decision, dataItem=htn_bp_controlled_1];
+htn_d_bp_controlled_2 [type=decision, dataItem=htn_bp_controlled_2];
+htn_d_bp_controlled_3 [type=decision, dataItem=htn_bp_controlled_3];
+
+// Parallel gateways
+htn_p1 [type=parallel];
+htn_p2 [type=parallel];
+htn_p3 [type=parallel];
+htn_p4 [type=parallel];
+htn_p5 [type=parallel];
+htn_p6 [type=parallel];
+
+// Dummy (do-nothing) nodes
+htn_d1 [type=dummy];
+htn_d2 [type=dummy];
+htn_d3 [type=dummy];
+
+// Arcs
+htn_c -> htn_p1 -> htn_d_age_under_55;
+htn_p1 -> htn_a_lifestyle_management -> htn_p6 -> htn_g;
+
+htn_d_age_under_55 -> htn_a_step1_acei [range="1..1", label="1:yes"];
+htn_d_age_under_55 -> htn_a_step1_ccb [range="0..0", label="0:no"];
+
+htn_a_step1_acei -> htn_d_bp_controlled_1;
+htn_a_step1_ccb -> htn_d_bp_controlled_1;
+
+htn_d_bp_controlled_1 -> htn_d3 [range="1..1", label="1:yes"];
+htn_d_bp_controlled_1 -> htn_p2 [range="0..0", label="0:no"];
+
+htn_p5 -> htn_d2 -> htn_d3 -> htn_p6;
+
+htn_p2 -> htn_a_step2_acei;
+htn_p2 -> htn_a_step2_diuretics
+htn_a_step2_acei -> htn_p3;
+htn_a_step2_diuretics -> htn_p3;
+
+htn_p3 -> htn_d_bp_controlled_2;
+htn_d_bp_controlled_2 -> htn_d2 [range="1..1", label="1:yes"];
+htn_d_bp_controlled_2 -> htn_p4 [range="0..0", label="0:no"];
+htn_p4 -> htn_d_bp_controlled_3;
+htn_p4 -> htn_a_step3_acei -> htn_p5;
+htn_p4 -> htn_a_step3_ccb -> htn_p5;
+htn_p4 -> htn_a_step3_diuretric -> htn_p5;
+htn_d_bp_controlled_3 -> htn_d1 [range="1..1", label="1:yes"];
+htn_d_bp_controlled_3 -> htn_a_specialist_consult [range="0..0", label="0:no"];
+htn_a_specialist_consult -> htn_d1;
+htn_d1 -> htn_p5;
+
+}

@@ -1,0 +1,76 @@
+digraph afib {
+
+// Context
+afib_c [type=context];
+
+// Goal
+afib_g [type=goal];
+
+// Actions
+afib_a_cardioversion [type=action];
+afib_a_anticoagulation [type=action];
+afib_a_rate_control_1 [type=action];
+afib_a_rate_control_maintenance_1 [type=action];
+afib_a_rate_control_maintenance_2 [type=action];
+afib_a_rhytm_control_maintenance_1 [type=action];
+afib_a_rhytm_control_maintenance_2 [type=action];
+afib_a_pill_in_a_pocket [type=action];
+
+
+// Decisions
+afib_d_special_circumstances [type=decision, dataItem=afib_special_circumstances];
+afib_d_afib_type [type=decision, dataItem=afib_afib_type];
+afib_d_symptom_recurrence [type=decision, dataItem=afib_symptom_recurrence];
+afib_d_symptoms_improve [type=decision, dataItem=afib_symptoms_improve];
+afib_d_symptoms_resolve [type=decision, dataItem=afib_symptoms_resolve];
+afib_d_afib_recurs [type=decision, dataItem=afib_afib_recurs];
+afib_d_tachychardia [type=decision, dataItem=afib_tachychardia];
+
+// Parallel gateways
+afib_p1 [type=parallel];
+afib_p2 [type=parallel];
+afib_p3 [type=parallel];
+afib_p4 [type=parallel];
+
+// Dummy nodes
+afib_d1 [type=dummy];
+afib_d2 [type=dummy];
+afib_d3 [type=dummy];
+afib_d4 [type=dummy];
+
+
+// Arcs
+afib_c -> afib_p1 -> afib_d_special_circumstances;
+afib_d_special_circumstances -> afib_a_rate_control_1 [range="0..0", label="0:no"];
+afib_d_special_circumstances -> afib_d_afib_type [range="1..1", label="1:yes"];
+
+afib_d_afib_type -> afib_d_symptom_recurrence [range="1..1", label="1:paroxysmal"];
+afib_d_afib_type -> afib_a_cardioversion [range="2..2", label="2:persistent"];
+afib_a_rate_control_1  -> afib_d_symptoms_resolve;
+afib_p1 -> afib_a_anticoagulation -> afib_p4;
+afib_d_symptoms_resolve -> afib_d_afib_type [range="0..0", label="0:no"];
+afib_d_symptoms_resolve -> afib_a_rate_control_maintenance_1 [range="1..1", label="1:yes"];
+afib_a_cardioversion -> afib_d_symptoms_improve;
+
+afib_d_symptoms_improve -> afib_a_rate_control_maintenance_1 [range="0..0", label="0:no"];
+afib_d_symptoms_improve -> afib_p2 [range="1..1", label="1:yes"];
+
+afib_p2 -> {afib_d_tachychardia, afib_d_afib_recurs};
+
+afib_d_tachychardia -> afib_a_rate_control_maintenance_2 [range="1..1", label="1:yes"];
+afib_a_rate_control_maintenance_2 -> afib_d1 -> afib_p3;
+afib_d_tachychardia -> afib_d1 [range="0..0", label="0:no"];
+afib_p3 -> afib_d4;
+
+afib_d_afib_recurs -> afib_a_rhytm_control_maintenance_2 [range="1..1", label="1:yes"];
+afib_a_rhytm_control_maintenance_2 -> afib_d2 -> afib_p3;
+afib_d_afib_recurs -> afib_d2 [range="0..0", label="0:no"];
+
+afib_d_symptom_recurrence -> afib_a_pill_in_a_pocket [range="0..0", label="0:no"];
+afib_d_symptom_recurrence -> afib_a_rhytm_control_maintenance_1 [range="1..1", label="1:yes"];
+afib_a_pill_in_a_pocket -> afib_d3 -> afib_d4;
+afib_a_rhytm_control_maintenance_1 -> afib_d3;
+afib_a_rate_control_maintenance_1 -> afib_d4 -> afib_p4 -> afib_g;
+
+// afib_g;
+}

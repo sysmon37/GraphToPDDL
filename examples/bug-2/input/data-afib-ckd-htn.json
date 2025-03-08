@@ -1,0 +1,17 @@
+{
+    "afib_special_circumstances": 1,
+    "afib_afib_type": 2,
+    "afib_symptom_recurrence": 0,
+    "afib_symptoms_improve": 1,
+    "afib_symptoms_resolve": 1,
+    "afib_afib_recurs": 1,
+    "afib_tachychardia": 1,
+    "ckd_egfr": 1,
+    "ckd_hemoglobin_level": 1,
+    "ckd_metabolic_abnormality": 1,
+    "ckd_ferritin_level": 1,
+    "htn_age_under_55": 0,
+    "htn_bp_controlled_1": 0,
+    "htn_bp_controlled_2": 0,
+    "htn_bp_controlled_3": 0
+}

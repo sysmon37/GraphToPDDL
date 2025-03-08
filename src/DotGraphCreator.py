@@ -8,6 +8,7 @@ from src.CONSTANTS import (
     DATA_ITEM_ATTR,
     DECISION_NODE,
     GOAL_NODE,
+    DUMMY_NODE,
     IS_ALTERNATIVE,
     PARALLEL_NODE,
     RANGE_ATTR,
@@ -61,6 +62,14 @@ class DotGraphCreator:
             FILLCOLOR: "orange",
             FONTCOLOR: "black",
         },
+        DUMMY_NODE: {
+            SHAPE: "rectangle",
+            HEIGHT: 0.3,
+            WIDTH: 0.9,
+            FIXEDSIZE: True,
+            FILLCOLOR: "darkgrey",
+            FONTCOLOR: "white",
+        }
     }
 
     @classmethod

@@ -1,0 +1,122 @@
+[
+    {
+        "id": "remove-bb-1",
+        "trigger": [
+            "afib_a_rate_control_maintenance_1"
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "afib_a_rate_control_maintenance_1",
+                "newNodes": [
+                    {
+                        "id": "rev-dummy-1",
+                        "cost": 100,
+                        "type": "dummy",
+                        "edgeToSuccessors": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "remove-bb-2",
+        "trigger": [
+            "afib_a_rate_control_maintenance_2"
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "afib_a_rate_control_maintenance_2",
+                "newNodes": [
+                    {
+                        "id": "rev-dummy-2",
+                        "cost": 100,
+                        "type": "dummy",
+                        "edgeToSuccessors": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "replace-cpb-with-scb-1",
+        "trigger": [
+            "afib_a_rhytm_control_maintenance_1"
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "afib_a_rhytm_control_maintenance_1",
+                "newNodes": [
+                    {
+                        "id": "rev-afib-scb-1",
+                        "cost": 100,
+                        "type": "action",
+                        "edgeToSuccessors": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "replace-cpb-with-scb-2",
+        "trigger": [
+            "afib_a_rhytm_control_maintenance_2"
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "afib_a_rhytm_control_maintenance_2",
+                "newNodes": [
+                    {
+                        "id": "rev-afib-scb-2",
+                        "cost": 100,
+                        "type": "action",
+                        "edgeToSuccessors": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "replace-low-dose-aspirin-with-warfarin",
+        "trigger": [
+            "ckd_a_aspirin"
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "ckd_a_aspirin",
+                "newNodes": [
+                    {
+                        "id": "rev-ckd-warfarin",
+                        "cost": 100,
+                        "type": "action",
+                        "edgeToSuccessors": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "replace-low-dose-aspirin-with-doac",
+        "trigger": [
+            "ckd_a_aspirin"
+        ],
+        "operations": [
+            {
+                "type": "replace",
+                "existingNode": "ckd_a_aspirin",
+                "newNodes": [
+                    {
+                        "id": "rev-ckd-doac",
+                        "cost": 100,
+                        "type": "action",
+                        "edgeToSuccessors": true
+                    }
+                ]
+            }
+        ]
+    }
+]

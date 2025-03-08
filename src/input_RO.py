@@ -5,6 +5,7 @@ from operator import itemgetter
 from src.CONSTANTS import (
     ACTION_NODE,
     DECISION_NODE,
+    DUMMY_NODE,
     DELETE_OPERATION,
     EDGE_TO_SUCCESSORS,
     EDGE_TO_SUCCESSORS_ATTR,
@@ -28,7 +29,8 @@ from src.CONSTANTS import (
     END_TIME_WHICH,
     END_TIME_CHANGE,
     START,
-    END
+    END,
+    ID_RO
 )
 
 from src.matching import match_terms
@@ -217,6 +219,9 @@ def replace_operation(graph, id_ro, trigger, operation):
     #existing_node = operation[EXISTING_NDOE]
 
     base_node_id = find_match(graph, operation)
+    if base_node_id is None:
+        return
+
     logging.info(f"applying replace operation: base = {base_node_id}")
     
     # Add a sequence of nodes defined in a revision operator
@@ -252,14 +257,27 @@ def replace_operation(graph, id_ro, trigger, operation):
             graph.add_edge(pred_node_id, new_node_ids[0], **edge_data)
             logging.debug(f"adding edge = {pred_node_id} -> {new_node_ids[0]} | {edge_data}")
 
+    # Add a new dummy (alternative) node
+    import uuid
+    alt_node_id = 'alt-' + str(uuid.uuid4())[:8]
+    graph.add_node(alt_node_id, **{IS_ORIGINAL_ATTR: False, TYPE_ATTR: DUMMY_NODE, ID_RO: id_ro})
+    logging.debug(f"adding node = {alt_node_id} | DUMMY (ALT)")
+
+    graph.add_edge(new_node_ids[-1], alt_node_id)
+    logging.debug(f"adding edge = {new_node_ids[-1]} -> {alt_node_id}")
+
     # Connect the last new node to base successors
     for succ_node_id in list(graph.successors(base_node_id)):
         edge_data = graph.get_edge_data(base_node_id, succ_node_id)
         edge_data = edge_data[0] if edge_data else {}
-        if not graph.has_edge(new_node_ids[-1], succ_node_id):
-            graph.add_edge(new_node_ids[-1], succ_node_id, **edge_data)
-            logging.debug(f"adding edge = {new_node_ids[-1]} -> {succ_node_id} | {edge_data}")
+        if not graph.has_edge(alt_node_id, succ_node_id):
+            graph.add_edge(alt_node_id, succ_node_id, **edge_data)
+            logging.debug(f"adding edge = {alt_node_id} -> {succ_node_id} | {edge_data}")
 
+    # Remove all outgoing edges from base node and connect it to alt node
+    graph.remove_edges_from(list(graph.out_edges(base_node_id)))
+    graph.add_edge(base_node_id, alt_node_id)
+    logging.debug(f"adding edge = {base_node_id} -> {alt_node_id}")
 
 def delete_operation(graph, operation):
     """
@@ -273,6 +291,8 @@ def delete_operation(graph, operation):
     #Find a match in the AG for the existing node to delete specified in the RO
     #node_to_delete = operation[EXISTRING_NDOE]
     node_to_delete = find_match(graph, operation)
+    if node_to_delete is None:
+        return
     logging.info(f"applying delete operation: base = {node_to_delete}")
 
 

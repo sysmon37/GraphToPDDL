@@ -1,0 +1,206 @@
+{
+  "resourceType": "PlanDefinition",
+  "id": "PlanHTN",
+  "name": "HTN_Plan",
+  "title": "Plan to treat Hypertension",
+  "status": "active",
+  "action": [
+    {
+      "id": "start-htn",
+      "title": "Start treatment",
+      "relatedAction": [
+        {
+          "targetId": "htn-age",
+          "relationship": "after"
+        }
+      ]
+    },
+    {
+      "id": "htn-age",
+      "title": "Age < 55?",
+      "relatedAction": [
+        {
+          "targetId": "htn-ccb-1",
+          "relationship": "after"
+        },
+        {
+          "targetId": "htn-ace-inhibitor-1",
+          "relationship": "after"
+        }
+      ]
+    },
+    {
+      "id": "htn-ccb-1",
+      "title": "CCB",
+      "relatedAction": [
+        {
+          "targetId": "htn-bp-controlled-1",
+          "relationship": "after"
+        }
+      ],
+      "condition": [
+        {
+          "kind": "applicability",
+          "expression": {
+            "language": "mitplan",
+            "expression": "htn-age 0..0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "htn-ace-inhibitor-1",
+      "title": "ACE inhibitor",
+      "condition": [
+        {
+          "kind": "applicability",
+          "expression": {
+            "language": "mitplan",
+            "expression": "htn-age 1..1"
+          }
+        }
+      ],
+      "relatedAction": [
+        {
+          "targetId": "htn-bp-controlled-1",
+          "relationship": "after"
+        }
+      ]
+    },
+    {
+      "id": "htn-bp-controlled-1",
+      "title": "BP controlled?",
+      "relatedAction": [
+        {
+          "targetId": "goal-htn",
+          "relationship": "after"
+        },
+        {
+          "targetId": "htn-ace-inhibitor-2",
+          "relationship": "after"
+        }
+      ]
+    },
+    {
+      "id": "htn-ace-inhibitor-2",
+      "title": "ACE inhibitor",
+      "relatedAction": [
+        {
+          "targetId": "htn-bp-controlled-2",
+          "relationship": "after"
+        }
+      ],
+      "condition": [
+        {
+          "kind": "applicability",
+          "expression": {
+            "language": "mitplan",
+            "expression": "htn-bp-controlled-1 0..0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "htn-bp-controlled-2",
+      "title": "BP controlled?",
+      "relatedAction": [
+        {
+          "targetId": "goal-htn",
+          "relationship": "after"
+        },
+        {
+          "targetId": "htn-ace-inhibitor-3",
+          "relationship": "after"
+        }
+      ]
+    },
+    {
+      "id": "htn-ace-inhibitor-3",
+      "title": "ACE inhibitor",
+      "relatedAction": [
+        {
+          "targetId": "htn-bp-controlled-3",
+          "relationship": "after"
+        }
+      ],
+      "condition": [
+        {
+          "kind": "applicability",
+          "expression": {
+            "language": "mitplan",
+            "expression": "htn-bp-controlled-2 0..0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "htn-bp-controlled-3",
+      "title": "BP controlled?",
+      "relatedAction": [
+        {
+          "targetId": "goal-htn",
+          "relationship": "after"
+        },
+        {
+          "targetId": "htn-specialist-consult",
+          "relationship": "after"
+        }
+      ],
+      "condition": [
+        {
+          "kind": "applicability",
+          "expression": {
+            "language": "mitplan",
+            "expression": "htn-bp-controlled-2 0..0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "htn-specialist-consult",
+      "title": "Consult a specialist",
+      "relatedAction": [
+        {
+          "targetId": "goal-htn",
+          "relationship": "after"
+        }
+      ],
+      "condition": [
+        {
+          "kind": "applicability",
+          "expression": {
+            "language": "mitplan",
+            "expression": "htn-bp-controlled-3 0..0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "goal-htn",
+      "title": "End treatment",
+      "condition": [
+        {
+          "kind": "applicability",
+          "expression": {
+            "language": "mitplan",
+            "expression": "htn-bp-controlled-1 1..1"
+          }
+        },
+        {
+          "kind": "applicability",
+          "expression": {
+            "language": "mitplan",
+            "expression": "htn-bp-controlled-2 1..1"
+          }
+        },
+        {
+          "kind": "applicability",
+          "expression": {
+            "language": "mitplan",
+            "expression": "htn-bp-controlled-3 1..1"
+          }
+        }
+      ]
+    }
+  ]
+}

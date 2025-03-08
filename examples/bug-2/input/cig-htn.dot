@@ -1,0 +1,70 @@
+digraph htn {
+
+// Context
+htn_c [type=context];
+
+// Goal
+htn_g [type=goal];
+
+// Actions
+htn_a_lifestyle_management [type=action];
+htn_a_step1_acei [type=action];
+htn_a_step1_ccb [type=action];
+htn_a_step2_acei [type=action];
+htn_a_step2_diuretics [type=action];
+htn_a_step3_acei [type=action];
+htn_a_step3_ccb [type=action];
+htn_a_step3_diuretric [type=action];
+htn_a_specialist_consult [type=action];
+
+// Decisions
+htn_d_age_under_55 [type=decision, dataItem=htn_age_under_55];
+htn_d_bp_controlled_1 [type=decision, dataItem=htn_bp_controlled_1];
+htn_d_bp_controlled_2 [type=decision, dataItem=htn_bp_controlled_2];
+htn_d_bp_controlled_3 [type=decision, dataItem=htn_bp_controlled_3];
+
+// Parallel gateways
+htn_p1 [type=parallel];
+htn_p2 [type=parallel];
+htn_p3 [type=parallel];
+htn_p4 [type=parallel];
+htn_p5 [type=parallel];
+htn_p6 [type=parallel];
+
+// Dummy (do-nothing) nodes
+htn_d1 [type=dummy];
+htn_d2 [type=dummy];
+htn_d3 [type=dummy];
+
+// Arcs
+htn_c -> htn_p1 -> htn_d_age_under_55;
+htn_p1 -> htn_a_lifestyle_management -> htn_p6 -> htn_g;
+
+htn_d_age_under_55 -> htn_a_step1_acei [range="1..1", label="1:yes"];
+htn_d_age_under_55 -> htn_a_step1_ccb [range="0..0", label="0:no"];
+
+htn_a_step1_acei -> htn_d_bp_controlled_1;
+htn_a_step1_ccb -> htn_d_bp_controlled_1;
+
+htn_d_bp_controlled_1 -> htn_d3 [range="1..1", label="1:yes"];
+htn_d_bp_controlled_1 -> htn_p2 [range="0..0", label="0:no"];
+
+htn_p5 -> htn_d2 -> htn_d3 -> htn_p6;
+
+htn_p2 -> htn_a_step2_acei;
+htn_p2 -> htn_a_step2_diuretics
+htn_a_step2_acei -> htn_p3;
+htn_a_step2_diuretics -> htn_p3;
+
+htn_p3 -> htn_d_bp_controlled_2;
+htn_d_bp_controlled_2 -> htn_d2 [range="1..1", label="1:yes"];
+htn_d_bp_controlled_2 -> htn_p4 [range="0..0", label="0:no"];
+htn_p4 -> htn_d_bp_controlled_3;
+htn_p4 -> htn_a_step3_acei -> htn_p5;
+htn_p4 -> htn_a_step3_ccb -> htn_p5;
+htn_p4 -> htn_a_step3_diuretric -> htn_p5;
+htn_d_bp_controlled_3 -> htn_d1 [range="1..1", label="1:yes"];
+htn_d_bp_controlled_3 -> htn_a_specialist_consult [range="0..0", label="0:no"];
+htn_a_specialist_consult -> htn_d1;
+htn_d1 -> htn_p5;
+}

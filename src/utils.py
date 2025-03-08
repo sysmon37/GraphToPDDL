@@ -153,64 +153,80 @@ def get_number_parallel_paths(graph):
     return n_path_found
 
 
-def find_parallel_path(graph, p_nodes_found):
-    """
-    Finds all parallel paths from a list of parallel nodes.
+def find_parallel_path(graph, parallel_nodes):
+    str = ""
+    for p in parallel_nodes:
+        n_in = graph.in_degree(p)
+        n_out = graph.out_degree(p)
+        if n_in == 1 and n_out > 1:
+            str += "(parallelStartNode {})\n\t".format(p)
+            graph.nodes[p][PARALLEL_START_ATTR] = True
+        elif n_in > 1 and n_out == 1:
+            str += "(parallelEndNode {})\n\t".format(p)
+            graph.nodes[p][PARALLEL_END_ATTR] = True
+        else:
+            raise Exception(f"Ill-specified parallel node [{p} | in = {n_in} | out = {n_out}]")
+    return str
 
-    Args:
-        graph (networkx graph): The graph.
-        p_nodes_found (list): List of parallel start and end nodes.
-
-
-    Returns:
-        str: PDDL representation of the parallel path.
-
-    """
-    parallelNode = ""
-    # TODO: numParallelPaths for each diseases
-    end_nodes = []
-
-    for start_node in p_nodes_found:
-
-        # TODO: Check whether this will make it more robust with a bigger graph
-        # Check if the current start node is an en d node
-        if start_node not in end_nodes:
-            for end_node in p_nodes_found:
-
-                parallel_sequence = list(
-                    nwx.all_simple_paths(graph, source=start_node, target=end_node)
-                )
-                if not parallel_sequence:
-                    continue
-                elif len(parallel_sequence) == 1:
-                    continue
-                else:
-                    parallelTypeNode = ""
-                    untraversedParallelNode = ""
-
-                    parallelNode += "(parallelStartNode {})\n\t".format(start_node)
-                    graph.nodes[start_node][PARALLEL_START_ATTR] = True
-                    if end_node not in end_nodes:
-                        end_nodes.append(end_node)
-                        parallelNode += "(parallelEndNode {})\n\t".format(end_node)
-                        graph.nodes[end_node][PARALLEL_END_ATTR] = True
-
-                    # for path in parallel_sequence:
-                    (
-                        parallelTypeNode,
-                        untraversedParallelNode,
-                    ) = update_between_parallel_nodes(
-                        graph,
-                        start_node,
-                        end_node,
-                        parallelTypeNode,
-                        untraversedParallelNode,
-                    )
-
-                    parallelNode += parallelTypeNode
-                    parallelNode += untraversedParallelNode
-
-    return parallelNode
+# FIXME: The code below is no longer used as handling of parallel paths has been simplified
+# def find_parallel_path(graph, p_nodes_found):
+#     """
+#     Finds all parallel paths from a list of parallel nodes.
+#
+#     Args:
+#         graph (networkx graph): The graph.
+#         p_nodes_found (list): List of parallel start and end nodes.
+#
+#
+#     Returns:
+#         str: PDDL representation of the parallel path.
+#
+#     """
+#     parallelNode = ""
+#     # TODO: numParallelPaths for each diseases
+#     end_nodes = []
+#
+#     for start_node in p_nodes_found:
+#
+#         # TODO: Check whether this will make it more robust with a bigger graph
+#         # Check if the current start node is an en d node
+#         if start_node not in end_nodes:
+#             for end_node in p_nodes_found:
+#
+#                 parallel_sequence = list(
+#                     nwx.all_simple_paths(graph, source=start_node, target=end_node)
+#                 )
+#                 if not parallel_sequence:
+#                     continue
+#                 elif len(parallel_sequence) == 1:
+#                     continue
+#                 else:
+#                     parallelTypeNode = ""
+#                     untraversedParallelNode = ""
+#
+#                     parallelNode += "(parallelStartNode {})\n\t".format(start_node)
+#                     graph.nodes[start_node][PARALLEL_START_ATTR] = True
+#                     if end_node not in end_nodes:
+#                         end_nodes.append(end_node)
+#                         parallelNode += "(parallelEndNode {})\n\t".format(end_node)
+#                         graph.nodes[end_node][PARALLEL_END_ATTR] = True
+#
+#                     # for path in parallel_sequence:
+#                     (
+#                         parallelTypeNode,
+#                         untraversedParallelNode,
+#                     ) = update_between_parallel_nodes(
+#                         graph,
+#                         start_node,
+#                         end_node,
+#                         parallelTypeNode,
+#                         untraversedParallelNode,
+#                     )
+#
+#                     parallelNode += parallelTypeNode
+#                     parallelNode += untraversedParallelNode
+#
+#     return parallelNode
 
 
 def update_between_parallel_nodes(

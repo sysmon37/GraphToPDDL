@@ -10,6 +10,7 @@ ACTION_NODE = "action"
 DECISION_NODE = "decision"
 PARALLEL_NODE = "parallel"
 ALTERNATIVE_NODE = "alternative"
+DUMMY_NODE = "dummy"
 
 # Node attributes
 ID_ATTR = "id"

@@ -1,0 +1,482 @@
+[
+  {
+    "resourceType": "Observation",
+    "id": "afib-recurrence",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Is there a high risk of recurrence of AFib?"
+    },
+    "valueQuantity": {
+      "value": 1,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "afib-high-burden-recurrence"
+            }
+          ]
+        },
+        "valueString": "High risk of AFib recurrence."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "afib-recurs",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Does AFib recur?"
+    },
+    "valueQuantity": {
+      "value": 0,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "afib-afib-recurs"
+            }
+          ]
+        },
+        "valueString": "AFib did not recur."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "age",
+    "status": "final",
+    "valueQuantity": {
+      "value": 0,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Age"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "htn-age"
+            }
+          ]
+        },
+        "valueString": "Patient is 70 years old."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "bp-controlled-1",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Is BP controlled?"
+    },
+    "valueQuantity": {
+      "value": 0,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "htn-bp-controlled-1"
+            }
+          ]
+        },
+        "valueString": "BP is not controlled in the first round of treatment."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "bp-controlled-2",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Is BP controlled?"
+    },
+    "valueQuantity": {
+      "value": 1,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "htn-bp-controlled-2"
+            }
+          ]
+        },
+        "valueString": "BP has been controlled in the second round of treatment."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "bp-controlled-3",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Is BP controlled?"
+    },
+    "valueQuantity": {
+      "value": 1,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "htn-bp-controlled-3"
+            }
+          ]
+        },
+        "valueString": "BP has been controlled in the second round of treatment."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "egfr",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "eGFR levels"
+    },
+    "valueQuantity": {
+      "value": 1,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "ckd-egfr"
+            }
+          ]
+        },
+        "valueString": "eGFR less than 30."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "ferritin",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Ferritin levels"
+    },
+    "valueQuantity": {
+      "value": 0,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "ckd-ferritin"
+            }
+          ]
+        },
+        "valueString": "Ferritin levels at 110."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "hemoglobin",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Hemoglobin levels"
+    },
+    "valueQuantity": {
+      "value": 1,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "ckd-hemoglobin"
+            }
+          ]
+        },
+        "valueString": "Hemoglobin less than 95. Detected anemia."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "metabolic-abnormalities",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Metabolic abnormalities"
+    },
+    "valueQuantity": {
+      "value": 0,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "ckd-metabolic-abnormality"
+            }
+          ]
+        },
+        "valueString": "Patient does not have any metabolic disturbances."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "persistent-afib",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Is AFib persistent?"
+    },
+    "valueQuantity": {
+      "value": 0,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "afib-type"
+            }
+          ]
+        },
+        "valueString": "AFib isn't persistent."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "special-circumstances",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Are there any special circumstances for AFib?"
+    },
+    "valueQuantity": {
+      "value": 1,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "afib-special-circumstances"
+            }
+          ]
+        },
+        "valueString": "Special circumstances for AFib present."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "sympotms-improved",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Are AFib symptoms improved?"
+    },
+    "valueQuantity": {
+      "value": 1,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "afib-symptoms-improve"
+            }
+          ]
+        },
+        "valueString": "AFib symptoms have been temporarily improved."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "sympotms-resolved",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Are AFib symptoms resolved?"
+    },
+    "valueQuantity": {
+      "value": 1,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "afib-symptoms-resolve"
+            }
+          ]
+        },
+        "valueString": "AFib symptoms have been temporarily resolved."
+      }
+    ]
+  },
+  {
+    "resourceType": "Observation",
+    "id": "tachycardia",
+    "status": "final",
+    "code": {
+      "coding": [
+        {
+          "code": "mitplan"
+        }
+      ],
+      "text": "Is tachycardia present?"
+    },
+    "valueQuantity": {
+      "value": 0,
+      "unit": "",
+      "system": "",
+      "code": "mitplan"
+    },
+    "component": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "local",
+              "code": "afib-tachycardia"
+            }
+          ]
+        },
+        "valueString": "Tachycardia is not preset."
+      }
+    ]
+  }
+]

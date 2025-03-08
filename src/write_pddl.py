@@ -194,17 +194,18 @@ def write_predecessors_and_node_type(graph, file):
     file.write("\n")
     file.write("".join(revisionAction))
 
+    # FIXME: the code below is no longer necessary as handling of parallel nodes has been simplified
     # number of parallel paths
-    n_path_found = get_number_parallel_paths(graph)
-    if parallel_node_found:
-        [
-            file.write("".join(f"\n\t(= (parallelPathCount {init_node}) 0)"))
-            for init_node, n_paths in n_path_found.items()
-        ]
-        [
-            file.write("".join(f"\n\t(= (numParallelPaths {init_node}) {n_paths})"))
-            for init_node, n_paths in n_path_found.items()
-        ]
+    # n_path_found = get_number_parallel_paths(graph)
+    # if parallel_node_found:
+    #     [
+    #         file.write("".join(f"\n\t(= (parallelPathCount {init_node}) 0)"))
+    #         for init_node, n_paths in n_path_found.items()
+    #     ]
+    #     [
+    #         file.write("".join(f"\n\t(= (numParallelPaths {init_node}) {n_paths})"))
+    #         for init_node, n_paths in n_path_found.items()
+    #     ]
 
 
 def write_total_metrics(graph, file):
@@ -284,14 +285,17 @@ def write_goal(graph, file):
         node for node in graph.nodes if graph.nodes[node][TYPE_ATTR] == GOAL_NODE
     ]
     file.write("(:goal ")
-    if len(goal_nodes) > 1:
-        file.write("(and")
+    add_and = len(goal_nodes) > 1
+    if add_and:
+        file.write("(and\n")
     for node in goal_nodes:
         find_init_node(graph, node)
         file.write(
             "\t(treatmentPlanReady {} {})\n".format(find_init_node(graph, node), node)
         )
-    file.write("\t)\n)\n")
+    if add_and:
+        file.write(")\n")
+    file.write(")\n")
 
 
 # TODO - revise this, no weights input for now
@@ -350,6 +354,10 @@ def write_revision_flags(graph, file, ros):
     for ro in ros:
         revId = ro["id"]
         nodes_to_flag = find_revision_involved_nodes(graph, revId)
+        if not nodes_to_flag:
+            logging.warning(f"Skipping RO {revId} -- not applied to the current problem")
+            continue
+
         for node, attr in graph.nodes.items():
             if attr.get(TYPE_ATTR) == CONTEXT_NODE:
                 continue
@@ -402,8 +410,10 @@ def write_any_no_revision_ops(graph, file, ros):
 
     logging.debug(f"triggers = {all_triggers}")
     for trigger in all_triggers:
-        disease = find_init_node(graph, trigger)
+        if trigger not in graph.nodes:
+            continue
 
+        disease = find_init_node(graph, trigger)
         if not disease in any_revision_ops:
             diseases.remove(disease)
             any_revision_ops.append(disease)
