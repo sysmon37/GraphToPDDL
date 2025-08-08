@@ -95,7 +95,7 @@
 
 	(= (dataValue afib_special_circumstances) 1)
 	(= (dataValue afib_afib_type) 2)
-	(= (dataValue afib_symptom_recurrence) 0)
+	(= (dataValue afib_symptom_recurrence) 1)
 	(= (dataValue afib_symptoms_improve) 1)
 	(= (dataValue afib_symptoms_resolve) 1)
 	(= (dataValue afib_afib_recurs) 1)

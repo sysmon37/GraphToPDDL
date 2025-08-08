@@ -35,7 +35,7 @@
           ; Node states
           ; * newNode - a node that should be entered 
           ; * preActiveNode - a node that has been entered and now should be pre-processed
-          ; * activeNode - a node that has been pre-processed and how should be processed (i.e., a decision should be made or an action should be taken)
+          ; * activeNode - a node that has been pre-processed and how should be processed (i.e., a clinical decision should be made or a clinical action should be taken)
           ; * postActiveNode - a node that has been processed and now should be post-processed
           ; * completedNode - a node that has been post-processed and now should be marked as completed
           ; 
@@ -112,6 +112,7 @@
                (parallelEndNode ?node)
                (forall (?prev - node)
                     (or 
+                    ; prev is not a predecessor of node or prev is completed (we iterate over all existing nodes)
                          (not (predecessorNode ?prev ?node))
                          (completedNode ?d ?prev ?node)
                     )
